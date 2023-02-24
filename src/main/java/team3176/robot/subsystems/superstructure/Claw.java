@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import team3176.robot.constants.Hardwaremap;
 import team3176.robot.constants.SuperStructureConstants;
 import team3176.robot.subsystems.superstructure.Superstructure.GamePiece;
@@ -81,6 +82,9 @@ public class Claw extends SubsystemBase {
     {
         return linebreakTwo.get();
     }
+    public boolean isEmpty() {
+        return getLinebreakOne() || getLinebreakTwo();
+    }
 
     public static Claw getInstance()
     {
@@ -98,10 +102,13 @@ public class Claw extends SubsystemBase {
     }
     /**
      *  scores game piece then returns to idle state
-     * @return to be called with a whileTrue trigger binding
+     * @return to be called with a whileTrue or onTrue trigger binding
      */
     public Command scoreGamePiece() {
-        return this.startEnd(() ->  {score(); this.currentGamePiece = GamePiece.NONE;},() -> idle());
+        return this.run(() ->  {score(); this.currentGamePiece = GamePiece.NONE;})
+                    .until(() -> this.isEmpty()).
+                    andThen(new WaitCommand(0.5))
+                    .andThen(this.runOnce(()->idle()));
     }
 
     //more examples of command composition and why its awesome!!

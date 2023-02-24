@@ -32,8 +32,8 @@ public class TurtleSpeed extends CommandBase {
 
   @Override
   public void execute() {
-    drivetrain.drive(forwardCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_FEET_PER_SECOND *0.3, 
-    strafeCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_FEET_PER_SECOND *0.3, 
+    drivetrain.drive(forwardCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND *0.3, 
+    strafeCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND *0.3, 
     spinCommand.getAsDouble()*100);
   }
 

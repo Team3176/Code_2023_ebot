@@ -4,8 +4,9 @@
 
 package team3176.robot.subsystems.superstructure;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -40,6 +41,14 @@ public class Intake extends SubsystemBase {
     rollermotor.set(ControlMode.PercentOutput, -pct);
     
   }
+
+  public void setCoastMode() {
+    rollermotor.setNeutralMode(NeutralMode.Coast);
+  }
+
+  public void setBrakeMode() {
+    rollermotor.setNeutralMode(NeutralMode.Brake);
+  } 
 
   public void Extend() {
     pistonOne.set(Value.kForward);
@@ -81,6 +90,17 @@ public class Intake extends SubsystemBase {
     }, () -> {
       this.Retract();
       this.spinVelocityPercent(0.0);
+    });
+  }
+
+
+  public Command extendAndFreeSpin() {
+    return this.startEnd(() ->{
+      this.Extend();
+      this.setCoastMode();
+    }, () -> {
+      this.Retract();
+      this.setBrakeMode();
     });
   }
 }
