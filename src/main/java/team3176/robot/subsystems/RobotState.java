@@ -130,84 +130,76 @@ public class RobotState extends SubsystemBase {
     m_led.start();
   }
 
-  public void setSegment(int start, int end, int red, int green, int blue)
-    {
+  public void setSegment(int start, int end, int red, int green, int blue) {
       for (var i=start; i < end; i++)
       {
         m_ledBuffer.setRGB(i, red , green, blue);
       }
-    }
+  }
 
-    public void setSegment(int start, int end, Color color)
-    {
+  public void setSegment(int start, int end, Color color) {
       for (var i=start; i < end; i++)
       {
         m_ledBuffer.setLED(i, color);
       }
       // m_led.setData(m_ledBuffer);
-    }
+  }
 
-    public void setleftfrontlow(Status s)
-    {
+  public void setleftfrontlow(Status s) {
       leftfrontlowcolor = LookUpColor(s);
       leftfrontlowflash = LookUpFlash(s);
       setSegment(SignalingConstants.LEFTFRONTLOWSTART, SignalingConstants.LEFTFRONTLOWSTOP, leftfrontlowcolor);
       m_led.setData(m_ledBuffer);
-    }
-    public void setleftfronthigh(Status s)
-    {
+  }
+  
+  public void setleftfronthigh(Status s) {
       leftfronthighcolor = LookUpColor(s);
       leftfronthighflash = LookUpFlash(s);
       setSegment(SignalingConstants.LEFTFRONTHIGHSTART, SignalingConstants.LEFTFRONTHIGHSTOP, leftfronthighcolor);
       m_led.setData(m_ledBuffer);
-    }
-    public void setcrossbarhigh(Status s)
-    {
+  }
+  
+  public void setcrossbarhigh(Status s) {
       crosshighcolor = LookUpColor(s);
       crosshighflash = LookUpFlash(s);
       setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP, crosshighcolor);
       m_led.setData(m_ledBuffer);
-    }
+  }
 
-    public void setrightfronthigh(Status s)
-    {
+  public void setrightfronthigh(Status s) {
       rightfronthighcolor = LookUpColor(s);
       rightfronthighflash = LookUpFlash(s);
       setSegment(SignalingConstants.RIGHTFRONTHIGHSTART, SignalingConstants.RIGHTFRONTHIGHSTOP, rightfronthighcolor);
       m_led.setData(m_ledBuffer);
-    }
+  }
 
-    public void setrightfrontlow(Status s)
-    {
+  public void setrightfrontlow(Status s) {
       rightfrontlowcolor = LookUpColor(s);
       rightfrontlowflash = LookUpFlash(s);
       setSegment(SignalingConstants.RIGHTFRONTLOWSTART, SignalingConstants.RIGHTFRONTLOWSTOP, rightfrontlowcolor);
       m_led.setData(m_ledBuffer);
-    }
+  }
 
-    public void setleftback(Status s)
-    {
+  public void setleftback(Status s) {
       leftbackcolor = LookUpColor(s);
       leftbackflash = LookUpFlash(s);
       setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTOP, leftbackcolor);
       m_led.setData(m_ledBuffer);
-    }
+  }
 
-    public void setcrossbarlow(Status s)
-    {
+  public void setcrossbarlow(Status s) {
       crosslowcolor = LookUpColor(s);
       crosslowflash = LookUpFlash(s);
       setSegment(SignalingConstants.CROSSLOWSTART, SignalingConstants.CROSSLOWSTOP, crosslowcolor);
       m_led.setData(m_ledBuffer);
-    }
+  }
 
-    public void setrightback(Status s)
-    {
+  public void setrightback(Status s) {
       rightbackcolor = LookUpColor(s);
       rightbackflash = LookUpFlash(s);
       setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTOP, rightbackcolor);
       m_led.setData(m_ledBuffer);
-    }
+  }
 
   private Color LookUpColor(Status s){
     Color c = Color.kBlack;
@@ -237,12 +229,12 @@ public class RobotState extends SubsystemBase {
     }
     return c;
   }
+  
   private Boolean LookUpFlash(Status s){
       return ((s == Status.CUBEFLASH) || (s == Status.CONEFLASH));
   }
 
-  public void FlashColor()
-  {
+  public void FlashColor() {
     m_flashcounter++;
     if (m_flashcounter == 25){
      if (leftfrontlowflash){
@@ -274,31 +266,31 @@ public class RobotState extends SubsystemBase {
     if (m_flashcounter == 50){
       if (leftfrontlowflash){
         setSegment(SignalingConstants.LEFTFRONTLOWSTART, SignalingConstants.LEFTFRONTLOWSTOP,Color.kBlack);
-       }
-       if (leftfronthighflash){
+      }
+      if (leftfronthighflash){
         setSegment(SignalingConstants.LEFTFRONTHIGHSTART, SignalingConstants.LEFTFRONTHIGHSTOP,Color.kBlack);
-       }
-       if (crosshighflash){
+      }
+      if (crosshighflash){
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTART,Color.kBlack);
-       }
-       if (rightfronthighflash){
+      }
+      if (rightfronthighflash){
         setSegment(SignalingConstants.RIGHTFRONTHIGHSTART, SignalingConstants.RIGHTFRONTHIGHSTOP, Color.kBlack);
-       }
-       if (rightfrontlowflash){
+      }
+      if (rightfrontlowflash){
         setSegment(SignalingConstants.RIGHTFRONTLOWSTART, SignalingConstants.RIGHTFRONTLOWSTOP,Color.kBlack);
-       }
-       if (leftbackflash){
+      }
+      if (leftbackflash){
         setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTOP,Color.kBlack);
-       }
-       if (crosslowflash){
+      }
+      if (crosslowflash){
         setSegment(SignalingConstants.CROSSLOWSTART, SignalingConstants.CROSSLOWSTOP, Color.kBlack);
-       }
-       if (rightbackflash){
+      }
+      if (rightbackflash){
         setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTOP,Color.kBlack);
-       }
-       m_led.setData(m_ledBuffer);
+      }
+      m_led.setData(m_ledBuffer);
       m_flashcounter = 0;
-     }
+    }
   }
 
 
@@ -308,12 +300,10 @@ public class RobotState extends SubsystemBase {
     }
   }
 
-  public void setColorWantState(int LEDState)
-  {
+  public void setColorWantState(int LEDState) {
     System.out.println("WAS CALLED");
     wantedLEDState = LEDState;
-    if (wantedLEDState == 0)
-    {
+    if (wantedLEDState == 0) {
       setleftfrontlow(Status.NONE);
       setleftfronthigh(Status.NONE);
       setcrossbarhigh(Status.NONE);
@@ -323,8 +313,7 @@ public class RobotState extends SubsystemBase {
       setcrossbarlow(Status.NONE);
       setrightback(Status.NONE);
     }
-    else if (wantedLEDState == 1)
-    {
+    else if (wantedLEDState == 1) {
       setleftfrontlow(Status.CONEFLASH);
       setleftfronthigh(Status.CONEFLASH);
       setcrossbarhigh(Status.CONEFLASH);
@@ -334,8 +323,7 @@ public class RobotState extends SubsystemBase {
       setcrossbarlow(Status.CONEFLASH);
       setrightback(Status.CONEFLASH);
     }
-    else if (wantedLEDState == 2)
-    {
+    else if (wantedLEDState == 2) {
       setleftfrontlow(Status.CUBEFLASH);
       setleftfronthigh(Status.CUBEFLASH);
       setcrossbarhigh(Status.CUBEFLASH);
@@ -364,11 +352,9 @@ public class RobotState extends SubsystemBase {
     Logger.getInstance().processInputs("Intake", inputs);
 
     
-    if ((m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false) && i == 25)
-    {
+    if ((m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false) && i == 25) {
       System.out.println("AHHHHH");
-      if (wantedLEDState == 1)
-      {
+      if (wantedLEDState == 1) {
         setleftfrontlow(Status.CONE);
         setleftfronthigh(Status.CONE);
         setrightfronthigh(Status.CONE);
@@ -377,8 +363,7 @@ public class RobotState extends SubsystemBase {
         setcrossbarlow(Status.CONE);
         setrightback(Status.CONE);
       }
-      else if (wantedLEDState == 2)
-      {
+      else if (wantedLEDState == 2) {
         setleftfrontlow(Status.CUBE);
         setleftfronthigh(Status.CUBE);
         setrightfronthigh(Status.CUBE);
@@ -387,8 +372,7 @@ public class RobotState extends SubsystemBase {
         setcrossbarlow(Status.CUBE);
         setrightback(Status.CUBE);
       }
-      if (m_Claw.getLinebreakOne() == true && m_Claw.getLinebreakTwo() == true)
-      {
+      if (m_Claw.getLinebreakOne() == true && m_Claw.getLinebreakTwo() == true) {
         setleftfrontlow(Status.NONE);
         setleftfronthigh(Status.NONE);
         setrightfronthigh(Status.NONE);
@@ -403,7 +387,7 @@ public class RobotState extends SubsystemBase {
       i++;
     }
     
-      FlashColor();
+    FlashColor();
   }
 
   @Override
