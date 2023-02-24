@@ -5,6 +5,7 @@
 package team3176.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import team3176.robot.constants.RobotConstants.Status;
 import team3176.robot.subsystems.RobotState;
 
 public class SetColorWantState extends CommandBase {
@@ -27,7 +28,7 @@ public class SetColorWantState extends CommandBase {
   @Override
   public void execute() 
   {
-    System.out.println("SetColorWantStateCommand(" + LEDState + ")");
+    //System.out.println("SetColorWantStateCommand()");
     m_RobotState.setColorWantState(LEDState);
   }
 
@@ -38,6 +39,6 @@ public class SetColorWantState extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

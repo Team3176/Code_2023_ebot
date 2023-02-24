@@ -42,14 +42,14 @@ public class Superstructure extends SubsystemBase {
                     .andThen(new IntakeRetractSpinot());
     }
 
-    public Command poopCube() {
-        return new ParallelCommandGroup(new IntakeExtendFreeSpin())
-                    .andThen(this.preparePoop())
-                    .andThen(m_Claw.scoreGamePiece())
-                    .andThen(this.prepareCarry())
-                    .andThen(new IntakeRetractSpinot());
-            //May need to add Wait Cmds in the above logic
-    }
+    // public Command poopCube() {
+    //     return new ParallelCommandGroup(new IntakeExtendFreeSpin())
+    //                 .andThen(this.preparePoop())
+    //                 .andThen(m_Claw.scoreGamePiece())
+    //                 .andThen(this.prepareCarry())
+    //                 .andThen(new IntakeRetractSpinot());
+    //         //May need to add Wait Cmds in the above logic
+    // }
 
     public Command intakeCubeHumanPlayer() {
         return new ParallelCommandGroup(new ClawInhaleCube(), m_Arm.armSetPositionOnce(SuperStructureConstants.ARM_HIGH_POS))

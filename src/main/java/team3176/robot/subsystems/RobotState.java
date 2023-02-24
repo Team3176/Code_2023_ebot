@@ -363,11 +363,10 @@ public class RobotState extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Intake", inputs);
 
-    FlashColor();
-
-    i++;
-    if ((!m_Claw.getLinebreakOne() || !m_Claw.getLinebreakTwo()) && i == 50)
+    
+    if ((m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false) && i == 25)
     {
+      System.out.println("AHHHHH");
       if (wantedLEDState == 1)
       {
         setleftfrontlow(Status.CONE);
@@ -388,20 +387,23 @@ public class RobotState extends SubsystemBase {
         setcrossbarlow(Status.CUBE);
         setrightback(Status.CUBE);
       }
-      i = 0;
+      if (m_Claw.getLinebreakOne() == true && m_Claw.getLinebreakTwo() == true)
+      {
+        setleftfrontlow(Status.NONE);
+        setleftfronthigh(Status.NONE);
+        setrightfronthigh(Status.NONE);
+        setrightfrontlow(Status.NONE);
+        setleftback(Status.NONE);
+        setcrossbarlow(Status.NONE);
+        setrightback(Status.NONE);
+        wantedLEDState = 0;
+      }
+      i=0;
+    } else {
+      i++;
     }
-    else if ((m_Claw.getLinebreakOne() || m_Claw.getLinebreakTwo()) && i == 50)
-    {
-      setleftfrontlow(Status.NONE);
-      setleftfronthigh(Status.NONE);
-      setrightfronthigh(Status.NONE);
-      setrightfrontlow(Status.NONE);
-      setleftback(Status.NONE);
-      setcrossbarlow(Status.NONE);
-      setrightback(Status.NONE);
-      wantedLEDState = 0;
-      i = 0;
-    }
+    
+      FlashColor();
   }
 
   @Override
