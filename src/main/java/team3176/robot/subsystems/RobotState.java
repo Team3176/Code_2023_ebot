@@ -347,11 +347,11 @@ public class RobotState extends SubsystemBase {
     }
   }
 
-  public Command setColorWantStateCommand(int LEDState)
-  {
-    System.out.println("setColorWantStateCommand()");
-    return this.runOnce(() -> setColorWantState(LEDState));
-  }
+  // public Command setColorWantStateCommand(int LEDState)
+  // {
+  //   System.out.println("setColorWantStateCommand()");
+  //   return this.runOnce(() -> setColorWantState(LEDState));
+  // }
 
   public static RobotState getInstance() {
     if(instance == null) {instance = new RobotState(new RobotStateIO() {});}
