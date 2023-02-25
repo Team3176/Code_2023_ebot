@@ -55,6 +55,12 @@ public class RobotState extends SubsystemBase {
   private Color leftbackcolor = Color.kBlack;
   private Color crosslowcolor = Color.kBlack;
   private Color rightbackcolor = Color.kBlack;
+  private Color allcolor = Color.kBlack;
+  private boolean allflash = false;
+
+  private boolean isSolid;
+  private boolean isFlashing;
+  public boolean isLinebreak;
 
   private Alliance alliance; 
 
@@ -121,6 +127,9 @@ public class RobotState extends SubsystemBase {
     this.io = io;
     m_Claw = Claw.getInstance();
     wantedLEDState = 0;
+    isSolid = false;
+    isFlashing = false;
+    isLinebreak = true;
 
     m_led = new AddressableLED(0);
     m_ledBuffer = new AddressableLEDBuffer(SignalingConstants.LEDLENGTH);
@@ -201,21 +210,35 @@ public class RobotState extends SubsystemBase {
       m_led.setData(m_ledBuffer);
   }
 
+  public void setallyellow()
+  {
+    setSegment(0, 73, Color.kOrange);
+    m_led.setData(m_ledBuffer);
+  }
+
+  public void setallpurple()
+  {
+    setSegment(0, 73, Color.kPurple);
+    m_led.setData(m_ledBuffer);
+  }
+
+  public void setallblack()
+  {
+    setSegment(0, 73, Color.kBlack);
+    m_led.setData(m_ledBuffer);
+  }
+
+  public void setall(Status s)
+  {
+    allcolor = LookUpColor(s);
+    allflash = LookUpFlash(s);
+    setSegment(0, 73, allcolor);
+    m_led.setData(m_ledBuffer);
+  }
+
   private Color LookUpColor(Status s){
     Color c = Color.kBlack;
     switch(s){
-      case STABLE: c = Color.kGreen;
-      break;
-      case OK: c = Color.kDarkRed;
-      break;
-      case OPTIONALCHECK: c = Color.kLightYellow;
-      break;
-      case WARNING: c = Color.kFuchsia;
-      break;
-      case GOOD: c = Color.kLightCoral;
-      break;
-      case ERROR: c = Color.kLime;
-      break;
       case CONE: c = Color.kOrange;
       break;
       case CUBE: c = Color.kPurple;
@@ -244,7 +267,7 @@ public class RobotState extends SubsystemBase {
       setSegment(SignalingConstants.LEFTFRONTHIGHSTART, SignalingConstants.LEFTFRONTHIGHSTOP,leftfrontlowcolor);
      }
      if (crosshighflash){
-      setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTART,crosshighcolor);
+      setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP,crosshighcolor);
      }
      if (rightfronthighflash){
       setSegment(SignalingConstants.RIGHTFRONTHIGHSTART, SignalingConstants.RIGHTFRONTHIGHSTOP, rightfronthighcolor);
@@ -271,7 +294,7 @@ public class RobotState extends SubsystemBase {
         setSegment(SignalingConstants.LEFTFRONTHIGHSTART, SignalingConstants.LEFTFRONTHIGHSTOP,Color.kBlack);
       }
       if (crosshighflash){
-        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTART,Color.kBlack);
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP,Color.kBlack);
       }
       if (rightfronthighflash){
         setSegment(SignalingConstants.RIGHTFRONTHIGHSTART, SignalingConstants.RIGHTFRONTHIGHSTOP, Color.kBlack);
@@ -293,6 +316,29 @@ public class RobotState extends SubsystemBase {
     }
   }
 
+  public void flashAll()
+  {
+    m_flashcounter++;
+    if (m_flashcounter == 25)
+    {
+      if (allflash)
+      {
+        setSegment(0, 73, allcolor);
+      }
+      m_led.setData(m_ledBuffer);
+    }
+    if (m_flashcounter == 50)
+    {
+      if (allflash)
+      {
+        setallblack();
+      }
+    }
+    m_led.setData(m_ledBuffer);
+    m_flashcounter = 0;
+    
+  }
+
 
   public void update() {
     if (DriverStation.isFMSAttached() && (alliance == null)) {
@@ -304,34 +350,18 @@ public class RobotState extends SubsystemBase {
     System.out.println("WAS CALLED");
     wantedLEDState = LEDState;
     if (wantedLEDState == 0) {
-      setleftfrontlow(Status.NONE);
-      setleftfronthigh(Status.NONE);
-      setcrossbarhigh(Status.NONE);
-      setrightfronthigh(Status.NONE);
-      setrightfrontlow(Status.NONE);
-      setleftback(Status.NONE);
-      setcrossbarlow(Status.NONE);
-      setrightback(Status.NONE);
+      isFlashing = false;
+      setallblack();
     }
     else if (wantedLEDState == 1) {
-      setleftfrontlow(Status.CONEFLASH);
-      setleftfronthigh(Status.CONEFLASH);
-      setcrossbarhigh(Status.CONEFLASH);
-      setrightfronthigh(Status.CONEFLASH);
-      setrightfrontlow(Status.CONEFLASH);
-      setleftback(Status.CONEFLASH);
-      setcrossbarlow(Status.CONEFLASH);
-      setrightback(Status.CONEFLASH);
+      isFlashing = true;
+      System.out.println("WantedLEDState 1 FLASH");
+      setallyellow();
     }
     else if (wantedLEDState == 2) {
-      setleftfrontlow(Status.CUBEFLASH);
-      setleftfronthigh(Status.CUBEFLASH);
-      setcrossbarhigh(Status.CUBEFLASH);
-      setrightfronthigh(Status.CUBEFLASH);
-      setrightfrontlow(Status.CUBEFLASH);
-      setleftback(Status.CUBEFLASH);
-      setcrossbarlow(Status.CUBEFLASH);
-      setrightback(Status.CUBEFLASH);
+      isFlashing = true;
+      System.out.println("WantedLEDState 2 FLASH");
+      setallpurple();
     }
   }
 
@@ -351,17 +381,12 @@ public class RobotState extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Intake", inputs);
 
-    
-    if ((m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false) && i == 25) {
+    //(m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false)
+    if (isLinebreak == false) {
       System.out.println("AHHHHH");
+      isSolid = true;
       if (wantedLEDState == 1) {
-        setleftfrontlow(Status.CONE);
-        setleftfronthigh(Status.CONE);
-        setrightfronthigh(Status.CONE);
-        setrightfrontlow(Status.CONE);
-        setleftback(Status.CONE);
-        setcrossbarlow(Status.CONE);
-        setrightback(Status.CONE);
+        setallyellow();
       }
       else if (wantedLEDState == 2) {
         setleftfrontlow(Status.CUBE);
@@ -372,22 +397,25 @@ public class RobotState extends SubsystemBase {
         setcrossbarlow(Status.CUBE);
         setrightback(Status.CUBE);
       }
-      if (m_Claw.getLinebreakOne() == true && m_Claw.getLinebreakTwo() == true) {
-        setleftfrontlow(Status.NONE);
-        setleftfronthigh(Status.NONE);
-        setrightfronthigh(Status.NONE);
-        setrightfrontlow(Status.NONE);
-        setleftback(Status.NONE);
-        setcrossbarlow(Status.NONE);
-        setrightback(Status.NONE);
-        wantedLEDState = 0;
-      }
-      i=0;
-    } else {
-      i++;
     }
-    
-    FlashColor();
+    else if (isLinebreak == true && isSolid == true)
+    {
+      setallblack();
+      isSolid = false;
+    }
+
+    else if (isSolid == false && isFlashing == true){
+      System.out.println("isSolid == false and isFlashing = true");
+      if (wantedLEDState == 1)
+      {
+        setallyellow();
+      }
+      else if (wantedLEDState == 2)
+      {
+        setallpurple();
+      }
+      flashAll();
+    }
   }
 
   @Override

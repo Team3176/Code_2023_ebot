@@ -36,6 +36,8 @@ import team3176.robot.subsystems.superstructure.Intake;
 import team3176.robot.subsystems.superstructure.Superstructure;
 
 import team3176.robot.commands.SetColorWantState;
+import team3176.robot.commands.SimulateLinebreakOff;
+import team3176.robot.commands.SimulateLinebreakOn;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -129,6 +131,8 @@ public class RobotContainer {
     m_Controller.operator.b().onTrue(new SetColorWantState(1));
     m_Controller.operator.a().onTrue(new SetColorWantState(2));
     m_Controller.operator.x().onTrue(new SetColorWantState(0));
+    m_Controller.operator.leftBumper().onTrue(new SimulateLinebreakOff());
+    m_Controller.operator.rightBumper().onTrue(new SimulateLinebreakOn());
 
     // m_Controller.operator.povUp().onTrue(new ArmToHighPosition());
     // m_Controller.operator.povRight().onTrue(new ArmToCarryPosition());
