@@ -38,7 +38,7 @@ public class RobotState extends SubsystemBase {
   private AddressableLEDBuffer m_ledBuffer;
   private int i = 0;
 
-  private int m_flashcounter = 0;
+  private double m_flashcounter = 0;
   private boolean leftfrontlowflash = false;
   private boolean leftfronthighflash = false;
   private boolean crosshighflash = false;
@@ -60,7 +60,6 @@ public class RobotState extends SubsystemBase {
 
   private boolean isSolid;
   private boolean isFlashing;
-  public boolean isLinebreak;
 
   private Alliance alliance; 
 
@@ -129,7 +128,6 @@ public class RobotState extends SubsystemBase {
     wantedLEDState = 0;
     isSolid = false;
     isFlashing = false;
-    isLinebreak = true;
 
     m_led = new AddressableLED(0);
     m_ledBuffer = new AddressableLEDBuffer(SignalingConstants.LEDLENGTH);
@@ -230,6 +228,16 @@ public class RobotState extends SubsystemBase {
     m_led.setData(m_ledBuffer);
   }
 
+  public void setallred()
+  {
+    if (isFlashing = true)
+    {
+      allflash = true;
+    }
+    setSegment(0, 73, Color.kRed);
+    m_led.setData(m_ledBuffer);
+  }
+
   public void setallblack()
   {
     setSegment(0, 73, Color.kBlack);
@@ -326,7 +334,7 @@ public class RobotState extends SubsystemBase {
 
   public void flashAll()
   {
-    if (m_flashcounter == 25)
+    if (m_flashcounter == 10)
     {
       if (allflash = true)
       {
@@ -338,10 +346,14 @@ public class RobotState extends SubsystemBase {
         {
           setallpurple();
         }
+        else if (wantedLEDState == 3)
+        {
+          setallred();
+        }
       }
       m_led.setData(m_ledBuffer);
     }
-    if (m_flashcounter == 50)
+    if (m_flashcounter == 20)
     {
       if (allflash = true)
       {
@@ -375,6 +387,10 @@ public class RobotState extends SubsystemBase {
       isFlashing = true;
       setallpurple();
     }
+    else if (wantedLEDState == 3) {
+      isFlashing = true;
+      setallred();
+    }
   }
 
   // public Command setColorWantStateCommand(int LEDState)
@@ -394,17 +410,17 @@ public class RobotState extends SubsystemBase {
     Logger.getInstance().processInputs("Intake", inputs);
 
     //(m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false)
-    if (isLinebreak == false) {
+    if (m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false) {
       isSolid = true;
       isFlashing = false;
       if (wantedLEDState == 1) {
         setallyellow();
       }
-      else if (wantedLEDState == 2) {
+      else if (wantedLEDState == 2 || wantedLEDState == 3) {
         setallpurple();
       }
     }
-    else if (isLinebreak == true && isSolid == true)
+    else if ((m_Claw.getLinebreakOne() == true && m_Claw.getLinebreakTwo() == true) && isSolid == true)
     {
       setallblack();
       wantedLEDState = 0;
