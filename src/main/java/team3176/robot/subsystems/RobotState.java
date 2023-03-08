@@ -23,6 +23,7 @@ import team3176.robot.constants.RobotConstants.Status;
 import team3176.robot.constants.SignalingConstants;
 
 import team3176.robot.subsystems.superstructure.Claw;
+import team3176.robot.subsystems.drivetrain.Drivetrain;
 import team3176.robot.subsystems.vision.Vision.LEDState;
 
 
@@ -34,6 +35,7 @@ public class RobotState extends SubsystemBase {
   private static RobotState instance;
   private int wantedLEDState;
   private Claw m_Claw;
+  private Drivetrain m_Drivetrain;
   private AddressableLED m_led;
   private AddressableLEDBuffer m_ledBuffer;
   private int i = 0;
@@ -125,6 +127,7 @@ public class RobotState extends SubsystemBase {
   private RobotState(RobotStateIO io) {
     this.io = io;
     m_Claw = Claw.getInstance();
+    m_Drivetrain = Drivetrain.getInstance();
     wantedLEDState = 0;
     isSolid = false;
     isFlashing = false;
@@ -390,6 +393,125 @@ public class RobotState extends SubsystemBase {
     else if (wantedLEDState == 3) {
       isFlashing = true;
       setallred();
+    }
+  }
+
+  public void ChargeStationSignal()
+  {
+    double balance = m_Drivetrain.getChassisPitch();
+    if (balance == 180)
+    {
+      setSegment(0, 73, Color.kBlack);
+    }
+    else if (balance >= 160)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 1, Color.kGreen);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 1, Color.kGreen);
+    }
+    else if (balance >= 144)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 2, Color.kGreen);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 2, Color.kGreen);
+    }
+    else if (balance >= 128)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 3, Color.kGreen);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 3, Color.kGreen);
+    }
+    else if (balance >= 112)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 4, Color.kGreen);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 4, Color.kGreen);
+    }
+    else if (balance >= 96)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 5, Color.kGreen);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 5, Color.kGreen);
+    }
+    else if (balance >= 80)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 6, Color.kGreen);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 6, Color.kGreen);
+    }
+    else if (balance >= 64)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 7, Color.kGreen);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 7, Color.kGreen);
+    }
+    else if (balance >= 48)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 8, Color.kGreen);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 8, Color.kGreen);
+    }
+    else if (balance >= 32)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 9, Color.kGreen);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 9, Color.kGreen);
+    }
+    else if (balance >= 16)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 10, Color.kGreen);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 10, Color.kGreen);
+    }
+    else if (balance == 0)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTOP, Color.kGreen);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTOP, Color.kGreen);
+    }
+    else if (balance <= -16)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 1, Color.kRed);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 1, Color.kRed);
+    }
+    else if (balance <= -32)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 2, Color.kRed);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 2, Color.kRed);
+    }
+    else if (balance <= -64)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 3, Color.kRed);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 3, Color.kRed);
+    }
+    else if (balance <= -80)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 4, Color.kRed);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 4, Color.kRed);
+    }
+    else if (balance <= -96)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 5, Color.kRed);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 5, Color.kRed);
+    }
+    else if (balance <= -112)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 6, Color.kRed);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 6, Color.kRed);
+    }
+    else if (balance <= -128)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 7, Color.kRed);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 7, Color.kRed);
+    }
+    else if (balance <= -144)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 8, Color.kRed);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 8, Color.kRed);
+    }
+    else if (balance <= -160)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 9, Color.kRed);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 9, Color.kRed);
+    }
+    else if (balance <= -176)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTART + 10, Color.kRed);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTART + 10, Color.kRed);
+    }
+    else if (balance == -180)
+    {
+      setSegment(SignalingConstants.LEFTBACKSTART, SignalingConstants.LEFTBACKSTOP, Color.kRed);
+      setSegment(SignalingConstants.RIGHTBACKSTART, SignalingConstants.RIGHTBACKSTOP, Color.kRed);
     }
   }
 
