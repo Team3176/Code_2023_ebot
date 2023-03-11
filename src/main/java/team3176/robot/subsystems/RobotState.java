@@ -5,6 +5,8 @@
 package team3176.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -393,6 +395,107 @@ public class RobotState extends SubsystemBase {
     else if (wantedLEDState == 3) {
       isFlashing = true;
       setallred();
+    }
+  }
+
+  public void BatteryGuage()
+  {
+    // double voltage = RobotController.getBatteryVoltage();
+    // TEMP for loop for testing
+    double voltage = 13.1;
+    while (voltage >= -0.5)
+    {
+      voltage = voltage -0.1;
+      Timer.delay(0.1);
+      if (voltage >= 13)
+      {
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP, Color.kLimeGreen);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 12)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 1, Color.kLimeGreen);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 11)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 2, Color.kLimeGreen);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 10)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 3, Color.kLimeGreen);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 9)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 4, Color.kLimeGreen);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 8)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 5, Color.kDarkOrange);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 7)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 6, Color.kDarkOrange);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 6)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 7, Color.kDarkOrange);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 5)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 8, Color.kDarkOrange);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 4)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 9, Color.kDarkOrange);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 3)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 10, Color.kRed);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 2)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 11, Color.kRed);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage >= 1)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 12, Color.kRed);
+        m_led.setData(m_ledBuffer);
+      }
+      else if (voltage > 0)
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 13, Color.kRed);
+        m_led.setData(m_ledBuffer);
+      }
+      else
+      {
+        setallblack();
+        setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP, Color.kRed);
+        m_led.setData(m_ledBuffer);
+      }
     }
   }
 

@@ -7,16 +7,13 @@ package team3176.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import team3176.robot.subsystems.RobotState;
 
-public class SetColorWantState extends CommandBase {
-  /** Creates a new SetColorWantState. */
+public class TempVoltageSignalCommand extends CommandBase {
+  /** Creates a new TempVoltageSignalCommand. */
   RobotState m_RobotState;
-  int LEDState;
-  public SetColorWantState(int LEDState) {
-    // Use addRequirements() here to declare subsystem dependencies.
+  public TempVoltageSignalCommand() {
     m_RobotState = RobotState.getInstance();
+    // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_RobotState);
-    this.LEDState = LEDState;
-
   }
 
   // Called when the command is initially scheduled.
@@ -27,8 +24,7 @@ public class SetColorWantState extends CommandBase {
   @Override
   public void execute() 
   {
-    //System.out.println("SetColorWantStateCommand()");
-    m_RobotState.setColorWantState(LEDState);
+    m_RobotState.BatteryGuage();
   }
 
   // Called once the command ends or is interrupted.
@@ -38,6 +34,6 @@ public class SetColorWantState extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 }

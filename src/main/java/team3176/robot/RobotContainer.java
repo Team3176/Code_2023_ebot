@@ -36,6 +36,7 @@ import team3176.robot.subsystems.superstructure.Intake;
 import team3176.robot.subsystems.superstructure.Superstructure;
 
 import team3176.robot.commands.SetColorWantState;
+import team3176.robot.commands.TempVoltageSignalCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -126,10 +127,12 @@ public class RobotContainer {
     m_Controller.getTransStick_Button8()
         .whileTrue(new InstantCommand(() -> m_Drivetrain.resetFieldOrientation(), m_Drivetrain));
 
-    m_Controller.operator.b().onTrue(new SetColorWantState(1));
-    m_Controller.operator.a().onTrue(new SetColorWantState(2));
-    m_Controller.operator.y().onTrue(new SetColorWantState(3));
-    m_Controller.operator.x().onTrue(new SetColorWantState(0));
+    // m_Controller.operator.b().onTrue(new SetColorWantState(1));
+    // m_Controller.operator.a().onTrue(new SetColorWantState(2));
+    // m_Controller.operator.y().onTrue(new SetColorWantState(3));
+    // m_Controller.operator.x().onTrue(new SetColorWantState(0));
+
+    m_Controller.operator.a().onTrue(new TempVoltageSignalCommand());
 
     // m_Controller.operator.povUp().onTrue(new ArmToHighPosition());
     // m_Controller.operator.povRight().onTrue(new ArmToCarryPosition());

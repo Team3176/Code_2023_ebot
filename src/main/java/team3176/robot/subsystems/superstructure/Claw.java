@@ -131,18 +131,10 @@ public class Claw extends SubsystemBase {
     @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    io.updateInputs(inputs);
-    Logger.getInstance().processInputs("Claw", inputs);
-    Logger.getInstance().recordOutput("Claw/Velocity", getClawVelocity());
     // Code stating if something is in the Intake
     SmartDashboard.putBoolean("linebreakOne",linebreakOne.get());
     SmartDashboard.putBoolean("linebreakTwo",linebreakTwo.get());
     // SmartDashboard.putBoolean("isExtended", isExtended);
 
-   }
-
-   public double getClawVelocity()
-   {
-        return inputs.velocity;
    }
 }
