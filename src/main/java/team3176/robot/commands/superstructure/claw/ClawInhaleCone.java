@@ -31,7 +31,7 @@ public class ClawInhaleCone extends CommandBase {
   public void execute() 
   {
     m_Claw.intake();
-    if(m_Claw.getLinebreakTwo()) {
+    if(m_Claw.hardware.getLinebreakTwo()) {
       continueRunningTimer.restart();
     }
   }

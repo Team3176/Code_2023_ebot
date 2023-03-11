@@ -14,6 +14,7 @@ import team3176.robot.constants.SuperStructureConstants;
 import team3176.robot.subsystems.superstructure.Superstructure.GamePiece;
 
 import team3176.robot.subsystems.superstructure.ClawIO;
+import team3176.robot.subsystems.superstructure.ClawIO.ClawHardware;
 import team3176.robot.subsystems.superstructure.ClawIO.ClawIOInputs;
 import org.littletonrobotics.junction.Logger;
 
@@ -24,6 +25,7 @@ public class Claw extends SubsystemBase {
     private static Claw instance;
     private final ClawIO io;
     private final ClawIOInputs inputs = new ClawIOInputs();
+    public final ClawHardware hardware = new ClawHardware();
     public GamePiece currentGamePiece = GamePiece.CONE;
     private Claw(ClawIO io) {
         this.io = io;
@@ -32,11 +34,15 @@ public class Claw extends SubsystemBase {
         linebreakTwo = new DigitalInput(7);
     }
     public void setClawMotor(double percent, double amps) {
-        claw.set(percent);
-        claw.setSmartCurrentLimit(SuperStructureConstants.CLAW_AMPS);
+        // claw.set(percent);
+        //claw.setSmartCurrentLimit(SuperStructureConstants.CLAW_AMPS);
+        setVelocity(percent);
+        setAmps(SuperStructureConstants.CLAW_AMPS);
+        hardware.setVelocity(inputs.velocity);
+        hardware.setAmps((int) inputs.currentAmps);
         SmartDashboard.putNumber("intake power (%)", percent);
-        SmartDashboard.putNumber("intake motor current (amps)", claw.getOutputCurrent());
-        SmartDashboard.putNumber("intake motor temperature (C)", claw.getMotorTemperature());
+        SmartDashboard.putNumber("intake motor current (amps)", hardware.getCurrent());
+        SmartDashboard.putNumber("intake motor temperature (C)", hardware.getTemperature());
     }
 
     //states now implemented as functions
@@ -80,17 +86,13 @@ public class Claw extends SubsystemBase {
         this.currentGamePiece = piece;
     }
 
-    public boolean getLinebreakOne()
+    public boolean isClawHolding()
     {
-        return linebreakOne.get();
+        return hardware.getLinebreakOne() || hardware.getLinebreakTwo();
     }
-    
-    public boolean getLinebreakTwo()
-    {
-        return linebreakTwo.get();
-    }
+
     public boolean isEmpty() {
-        return getLinebreakOne() || getLinebreakTwo();
+        return hardware.getLinebreakOne() || hardware.getLinebreakTwo();
     }
 
     public static Claw getInstance()
@@ -119,18 +121,19 @@ public class Claw extends SubsystemBase {
     }
 
     //more examples of command composition and why its awesome!!
-    public Command intakeCone() {
-        return this.intakeGamePiece(GamePiece.CONE).until(this::getLinebreakTwo);
-    }
-    public Command intakeCube() {
-        return this.intakeGamePiece(GamePiece.CUBE).until(this::getLinebreakOne);
-    }
+    // public Command intakeCone() {
+    //     return this.intakeGamePiece(GamePiece.CONE).until(this::getLinebreakTwo);
+    // }
+    // public Command intakeCube() {
+    //     return this.intakeGamePiece(GamePiece.CUBE).until(this::getLinebreakOne);
+    // }
+
     public Command determineGamePiece() {
         return this.runOnce( () -> {
-            if(this.linebreakOne.get()) {
+            if(this.hardware.getLinebreakOne()) {
                 this.currentGamePiece = GamePiece.CONE;
                 hold();
-            } else if(this.linebreakTwo.get()) {
+            } else if(this.hardware.getLinebreakTwo()) {
                 this.currentGamePiece = GamePiece.CUBE;
                 hold();
             }
@@ -172,6 +175,11 @@ public class Claw extends SubsystemBase {
    public void runVoltage(double volts)
    {
     io.setVoltage(volts);
+   }
+
+   public void setAmps(double amps)
+   {
+    io.setAmps(amps);
    }
 
    public void setVelocity(double velocity)

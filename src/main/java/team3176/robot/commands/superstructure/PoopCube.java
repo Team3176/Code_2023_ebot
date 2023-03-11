@@ -37,7 +37,7 @@ public class PoopCube extends CommandBase {
   public void initialize() {
     //System.out.println("PoopCube Init");
     //m_Intake.extendAndFreeSpin();
-    currentArmPosition = m_Arm.getArmPosition();
+    currentArmPosition = m_Arm.hardware.getAbsolutePosition();
     kArmPoopLowerLimit = SuperStructureConstants.ARM_ZERO_POS - this.CarryDeadband;
     kArmPoopUpperLimit = SuperStructureConstants.ARM_ZERO_POS + this.CarryDeadband;
     kArmCarryLowerLimit = SuperStructureConstants.ARM_CARRY_POS - this.CarryDeadband;
@@ -56,12 +56,12 @@ public class PoopCube extends CommandBase {
     //if (m_Arm.getArmPosition() >= kArmPoopLowerLimit && m_Arm.getArmPosition() <= kArmPoopUpperLimit) {
       m_Claw.scoreGamePiece();
     //}
-    if (m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false) {
+    if (m_Claw.hardware.getLinebreakOne() == false || m_Claw.hardware.getLinebreakTwo() == false) {
       m_Claw.idle();
       new WaitCommand(2);
       m_Superstructure.prepareCarry();
     }
-    this.currentArmPosition = m_Arm.getArmPosition();
+    this.currentArmPosition = m_Arm.hardware.getAbsolutePosition();
   
   }
 

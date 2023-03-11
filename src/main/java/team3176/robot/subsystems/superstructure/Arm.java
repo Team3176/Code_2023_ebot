@@ -25,6 +25,7 @@ import team3176.robot.constants.SuperStructureConstants;
 
 import team3176.robot.subsystems.superstructure.ArmIO;
 import team3176.robot.subsystems.superstructure.ArmIO.ArmIOInputs;
+import team3176.robot.subsystems.superstructure.ArmIO.ArmHardware;
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
@@ -32,9 +33,10 @@ public class Arm extends SubsystemBase {
     private static final double MIN_ENCODER_ANGLE_VALUE = SuperStructureConstants.ARM_ZERO_POS;
     private static Arm instance;
     private final ArmIO io;
+    public final ArmHardware hardware = new ArmHardware();
     private final ArmIOInputs inputs = new ArmIOInputs();
-    private CANSparkMax armController;
-    private CANCoder armEncoder;
+    // private CANSparkMax armController;
+    // private CANCoder armEncoder;
     private double armEncoderAbsPosition;    
     private double lastEncoderPos;
     private final PIDController m_turningPIDController;
@@ -45,9 +47,9 @@ public class Arm extends SubsystemBase {
 
     private Arm(ArmIO io) {
         this.io = io;
-        armController = new CANSparkMax(Hardwaremap.arm_CID, MotorType.kBrushless);
-        armController.setSmartCurrentLimit(SuperStructureConstants.ARM_CURRENT_LIMIT_A);
-        armEncoder = new CANCoder(Hardwaremap.armEncoder_CID);
+        // armController = new CANSparkMax(Hardwaremap.arm_CID, MotorType.kBrushless);
+        // armController.setSmartCurrentLimit(SuperStructureConstants.ARM_CURRENT_LIMIT_A);
+        // armEncoder = new CANCoder(Hardwaremap.armEncoder_CID);
         this.m_turningPIDController = new PIDController(SuperStructureConstants.ARM_kP, SuperStructureConstants.ARM_kI, SuperStructureConstants.ARM_kD);
         SmartDashboard.putNumber("Arm_kp", SuperStructureConstants.ARM_kP);
         SmartDashboard.putNumber("Arm_Kg", SuperStructureConstants.ARM_kg);
@@ -55,17 +57,20 @@ public class Arm extends SubsystemBase {
     }
 
     public void setCoastMode() {
-        armController.setIdleMode(IdleMode.kCoast);
+        // armController.setIdleMode(IdleMode.kCoast);
+        hardware.setNeutralMode(1);
     }
 
     public void setBrakeMode() {
-        armController.setIdleMode(IdleMode.kBrake);
+        // armController.setIdleMode(IdleMode.kBrake);
+        hardware.setNeutralMode(2);
     } 
 
     private void setArmPidPosMode() {
-        this.armEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-        this.armEncoder.configMagnetOffset(SuperStructureConstants.ARM_ENCODER_OFFSET);
-        this.armEncoder.configSensorDirection(false,100);
+        // this.armEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        // this.armEncoder.configMagnetOffset(SuperStructureConstants.ARM_ENCODER_OFFSET);
+        // this.armEncoder.configSensorDirection(false,100);
+        hardware.encoderConfig();
 
         this.m_turningPIDController.setTolerance(SuperStructureConstants.ARM_TOLERANCE);
         //this.m_turningPIDController.enableContinuousInput() 
@@ -74,9 +79,9 @@ public class Arm extends SubsystemBase {
         this.m_turningPIDController.setI(SuperStructureConstants.ARM_kI);
         this.m_turningPIDController.setD(SuperStructureConstants.ARM_kD);
         //this.m_turningPIDController.enableContinuousInput(0, 360);
-        this.armController.setOpenLoopRampRate(0.5);
+        hardware.setOpenLoopRampRate(0.5);
         
-        this.armController.burnFlash();
+        hardware.flashMotor();
     }
 
     public static Arm getInstance() {
@@ -91,7 +96,7 @@ public class Arm extends SubsystemBase {
     private void setPIDPosition(double desiredAngle) {
         //need to double check these values
         
-        this.armEncoderAbsPosition = armEncoder.getAbsolutePosition();
+        this.armEncoderAbsPosition = hardware.getAbsolutePosition();
         double physicsAngle = (desiredAngle - SuperStructureConstants.ARM_CARRY_POS);
         
         //kg is the scalar representing the percent power needed to hold the arm at 90 degrees away from the robot
@@ -106,23 +111,31 @@ public class Arm extends SubsystemBase {
         }
         double turnOutput = m_turningPIDController.calculate(this.armEncoderAbsPosition, desiredAngle);
         turnOutput = MathUtil.clamp(turnOutput,-0.2,0.2);
-        armController.set(turnOutput + feedForward);
+        //armController.set(turnOutput + feedForward);
+        hardware.setVelocityPID(turnOutput, feedForward);
+        setVelocity(turnOutput + feedForward);
         SmartDashboard.putNumber("Arm_Output", turnOutput + feedForward);
         SmartDashboard.putNumber("Arm Feed Forward", feedForward);
     }
     public void armAnalogUp() {
         this.currentState = States.OPEN_LOOP;
-        armController.set(SuperStructureConstants.ARM_OUTPUT_POWER);
+        //armController.set(SuperStructureConstants.ARM_OUTPUT_POWER);
+        hardware.setVelocity(SuperStructureConstants.ARM_OUTPUT_POWER);
+        setVelocity(SuperStructureConstants.ARM_OUTPUT_POWER);
     }
     public void armAnalogDown() {
         this.currentState = States.OPEN_LOOP;
-        armController.set(-SuperStructureConstants.ARM_OUTPUT_POWER);
+        // armController.set(-SuperStructureConstants.ARM_OUTPUT_POWER);
+        hardware.setVelocity(SuperStructureConstants.ARM_OUTPUT_POWER);
+        setVelocity(SuperStructureConstants.ARM_OUTPUT_POWER);
         //System.out.println("Arm Analog Down"); 
         //System.out.println("Arm_Abs_Position: " + armEncoder.getAbsolutePosition()); 
         //System.out.println("Arm_Rel_Position: " + armEncoder.getPosition());
     }
     public void idle() {
-        armController.set(0.0);
+        // armController.set(0.0);
+        hardware.setVelocity(0);
+        setVelocity(0);
     }
     public void fineTune(double delta) {
         this.currentState = States.CLOSED_LOOP;
@@ -132,11 +145,9 @@ public class Arm extends SubsystemBase {
     private void nothing() {
 
     }
-    public double getArmPosition() {
-        return armEncoder.getAbsolutePosition();
-    }
+
     public boolean isArmAtPosition() {
-        return Math.abs(this.armEncoder.getAbsolutePosition() - this.armSetpointAngleRaw) < 7;
+        return Math.abs(this.hardware.getAbsolutePosition() - this.armSetpointAngleRaw) < 7;
     }
     /**
      * to be used for trajectory following without disrupting other commands
@@ -184,8 +195,8 @@ public class Arm extends SubsystemBase {
         Logger.getInstance().recordOutput("Arm/Velocity", getVelocity());
         Logger.getInstance().recordOutput("Arm/Position", getPosition());
 
-        SmartDashboard.putNumber("Arm_Position", armEncoder.getAbsolutePosition());
-        SmartDashboard.putNumber("Arm_Position_Relative", armEncoder.getAbsolutePosition() - SuperStructureConstants.ARM_ZERO_POS);
+        SmartDashboard.putNumber("Arm_Position", hardware.getAbsolutePosition());
+        SmartDashboard.putNumber("Arm_Position_Relative", hardware.getAbsolutePosition() - SuperStructureConstants.ARM_ZERO_POS);
 
         // if (counter == 50) {
         //     System.out.println("Arm_Position: " + armEncoder.getAbsolutePosition()); 
@@ -195,7 +206,7 @@ public class Arm extends SubsystemBase {
         // }
         if(this.currentState == States.CLOSED_LOOP) {
             this.armSetpointAngleRaw = MathUtil.clamp(this.armSetpointAngleRaw, SuperStructureConstants.ARM_ZERO_POS, SuperStructureConstants.ARM_HIGH_POS);
-            SmartDashboard.putNumber("Arm_Error", armEncoder.getAbsolutePosition()-this.armSetpointAngleRaw);
+            SmartDashboard.putNumber("Arm_Error", hardware.getAbsolutePosition()-this.armSetpointAngleRaw);
             setPIDPosition(armSetpointAngleRaw);
         }
     }

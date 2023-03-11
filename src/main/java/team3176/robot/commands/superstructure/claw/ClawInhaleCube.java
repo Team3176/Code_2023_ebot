@@ -29,7 +29,7 @@ public class ClawInhaleCube extends CommandBase {
   public void execute() 
   {
     m_Claw.intake();
-    if(m_Claw.getLinebreakOne()) {
+    if(m_Claw.hardware.getLinebreakOne()) {
     continueRunningTimer.restart();
     }
   }

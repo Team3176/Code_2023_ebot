@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import team3176.robot.subsystems.superstructure.IntakeIO;
 import team3176.robot.subsystems.superstructure.IntakeIO.IntakeIOInputs;
+import team3176.robot.subsystems.superstructure.IntakeIO.IntakeHardware;
 import org.littletonrobotics.junction.Logger;
 
 import team3176.robot.constants.Hardwaremap;
@@ -26,52 +27,48 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private TalonFX rollermotor = new TalonFX(Hardwaremap.intake_CID);
   private DoubleSolenoid pistonOne;
-  private DoubleSolenoid pistonTwo;
-  private DigitalInput linebreak;
 
   private boolean isExtended;
   private boolean isInIntake;
   private static Intake instance;
   private final IntakeIO io;
   private final IntakeIOInputs inputs = new IntakeIOInputs();
+  private final IntakeHardware hardware = new IntakeHardware();
   public Intake(IntakeIO io) 
   {
     this.io = io;
     pistonOne = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 6);
     //pistonTwo = new DoubleSolenoid(PneumaticsModuleType.REVPH, 3, 2);
-    linebreak = new DigitalInput(8);
-
   }
 
   public void spinVelocityPercent(double pct) {
-    rollermotor.configPeakOutputReverse(-pct);
-    rollermotor.set(ControlMode.PercentOutput, -pct);
-    
+    setVelocity(pct);
+    hardware.setVelocity(inputs.velocity);
   }
 
   public void setCoastMode() {
-    rollermotor.setNeutralMode(NeutralMode.Coast);
+    //rollermotor.setNeutralMode(NeutralMode.Coast);
+    hardware.setNeutralMode(1);
   }
 
   public void setBrakeMode() {
-    rollermotor.setNeutralMode(NeutralMode.Brake);
+    //rollermotor.setNeutralMode(NeutralMode.Brake);
+    hardware.setNeutralMode(2);
   } 
 
   public void Extend() {
-    pistonOne.set(Value.kForward);
+    setIsExtended(true);
     //pistonTwo.set(Value.kForward);
+    hardware.PistonState(inputs.isExtended);
     this.isExtended = true;
   }
 
   public void Retract() {
-    pistonOne.set(Value.kReverse);
+    //pistonOne.set(Value.kReverse);
+    setIsExtended(false);
     //pistonTwo.set(Value.kReverse);
+    hardware.PistonState(inputs.isExtended);
     this.isExtended = false;
-  }
-
-  public boolean getLinebreak()
-  {
-    return linebreak.get();
   }
 
   public static Intake getInstance(){
@@ -107,7 +104,7 @@ public class Intake extends SubsystemBase {
 
    public boolean getIsExtended()
    {
-    return inputs.isextended;
+    return inputs.isExtended;
    }
 
    public void runVoltage(double volts)
@@ -118,6 +115,11 @@ public class Intake extends SubsystemBase {
    public void setVelocity(double velocity)
    {
     io.setVelocity(velocity);
+   }
+
+   public void setIsExtended(boolean isExtended)
+   {
+    io.setIsExtended(isExtended);
    }
 
   public Command extendAndSpin() {

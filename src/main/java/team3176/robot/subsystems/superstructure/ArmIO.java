@@ -10,6 +10,15 @@ package team3176.robot.subsystems.superstructure;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
+import com.ctre.phoenix.sensors.CANCoder;
+import team3176.robot.constants.Hardwaremap;
+import team3176.robot.constants.SuperStructureConstants;
+
 /** Template hardware interface for a closed loop subsystem. */
 public interface ArmIO{
   /** Contains all of the input data received from hardware. */
@@ -36,6 +45,56 @@ public interface ArmIO{
       appliedVolts = table.getDouble("AppliedVolts", appliedVolts);
       currentAmps = table.getDoubleArray("CurrentAmps", currentAmps);
       tempCelcius = table.getDoubleArray("TempCelcius", tempCelcius);
+    }
+  }
+
+  public static class ArmHardware
+  {
+    private CANSparkMax armController = new CANSparkMax(Hardwaremap.arm_CID, MotorType.kBrushless);
+    private CANCoder armEncoder = new CANCoder(Hardwaremap.armEncoder_CID);
+
+    public void setVelocity(double percent)
+    {
+        armController.set(percent);
+    }
+
+    public void setVelocityPID(double turnOutput, double feedForward)
+    {
+        armController.set(turnOutput + feedForward);
+    }
+
+    public void setNeutralMode(int mode)
+    {
+        if (mode == 1)
+        {
+            armController.setIdleMode(IdleMode.kCoast);
+        }
+        else if (mode == 2)
+        {
+            armController.setIdleMode(IdleMode.kBrake);
+        }
+    }
+
+    public void encoderConfig()
+    {
+        this.armEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        this.armEncoder.configMagnetOffset(SuperStructureConstants.ARM_ENCODER_OFFSET);
+        this.armEncoder.configSensorDirection(false,100);
+    }
+
+    public void setOpenLoopRampRate(double rate)
+    {
+        armController.setOpenLoopRampRate(rate);
+    }
+
+    public void flashMotor()
+    {
+        armController.burnFlash();
+    }
+
+    public double getAbsolutePosition()
+    {
+        return armEncoder.getAbsolutePosition();
     }
   }
 

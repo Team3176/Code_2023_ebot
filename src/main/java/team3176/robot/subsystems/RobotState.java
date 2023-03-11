@@ -410,7 +410,7 @@ public class RobotState extends SubsystemBase {
     Logger.getInstance().processInputs("Intake", inputs);
 
     //(m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false)
-    if (m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false) {
+    if (m_Claw.hardware.getLinebreakOne() == false || m_Claw.getIsLinebreakTwo() == false) {
       isSolid = true;
       isFlashing = false;
       if (wantedLEDState == 1) {
@@ -420,7 +420,7 @@ public class RobotState extends SubsystemBase {
         setallpurple();
       }
     }
-    else if ((m_Claw.getLinebreakOne() == true && m_Claw.getLinebreakTwo() == true) && isSolid == true)
+    else if ((m_Claw.hardware.getLinebreakOne() == true && m_Claw.hardware.getLinebreakTwo() == true) && isSolid == true)
     {
       setallblack();
       wantedLEDState = 0;
