@@ -3,6 +3,10 @@ package team3176.robot.subsystems.superstructure;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import org.littletonrobotics.junction.Logger;
+import team3176.robot.subsystems.superstructure.ClawIO;
+import team3176.robot.subsystems.superstructure.ClawIO.ClawIOInputs;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,11 +19,14 @@ import team3176.robot.subsystems.superstructure.Superstructure.GamePiece;
 
 public class Claw extends SubsystemBase {
     private CANSparkMax claw;
+    private ClawIO io;
+    private ClawIOInputs inputs;
     private DigitalInput linebreakOne;
     private DigitalInput linebreakTwo;
     private static Claw instance;
     public GamePiece currentGamePiece = GamePiece.NONE;
-    private Claw() {
+    private Claw(ClawIO io) {
+        this.io = io;
         claw = new CANSparkMax(Hardwaremap.claw_CID, MotorType.kBrushless);
         linebreakOne = new DigitalInput(9);
         linebreakTwo = new DigitalInput(7);
@@ -89,7 +96,7 @@ public class Claw extends SubsystemBase {
     public static Claw getInstance()
     {
         if (instance == null ) {
-            instance = new Claw();
+            instance = new Claw(new ClawIO() {});
           }
         return instance;
     }
@@ -124,10 +131,18 @@ public class Claw extends SubsystemBase {
     @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    io.updateInputs(inputs);
+    Logger.getInstance().processInputs("Claw", inputs);
+    Logger.getInstance().recordOutput("Claw/Velocity", getClawVelocity());
     // Code stating if something is in the Intake
     SmartDashboard.putBoolean("linebreakOne",linebreakOne.get());
     SmartDashboard.putBoolean("linebreakTwo",linebreakTwo.get());
     // SmartDashboard.putBoolean("isExtended", isExtended);
 
+   }
+
+   public double getClawVelocity()
+   {
+        return inputs.velocity;
    }
 }
