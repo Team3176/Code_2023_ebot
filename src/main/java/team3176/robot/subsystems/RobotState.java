@@ -61,6 +61,8 @@ public class RobotState extends SubsystemBase {
   private Color rightbackcolor = Color.kBlack;
   private Color allcolor = Color.kBlack;
   private boolean allflash = false;
+  private int voltage;
+  private int tempVoltage = 14;
 
   private boolean isSolid;
   private boolean isFlashing;
@@ -400,23 +402,26 @@ public class RobotState extends SubsystemBase {
 
   public void BatteryGuage()
   {
-    // double voltage = RobotController.getBatteryVoltage();
     // TEMP for loop for testing
-    double voltage = 13.1;
-    while (voltage >= -0.5)
-    {
-      voltage = voltage -0.1;
-      Timer.delay(0.1);
+    //double voltage = 13.1;
+    // while (voltage >= -0.5)
+    // {
+      //voltage = voltage -0.1;
+      //Timer.delay(0.1);
+      System.out.println("BatteryGuage()");
       if (voltage >= 13)
       {
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP, Color.kLimeGreen);
         m_led.setData(m_ledBuffer);
+        System.out.println("Voltage >= 13");
       }
       else if (voltage >= 12)
       {
         setallblack();
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 1, Color.kLimeGreen);
         m_led.setData(m_ledBuffer);
+        System.out.println("Voltage >= 12");
+
       }
       else if (voltage >= 11)
       {
@@ -496,7 +501,7 @@ public class RobotState extends SubsystemBase {
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP, Color.kRed);
         m_led.setData(m_ledBuffer);
       }
-    }
+    // }
   }
 
   public void ChargeStationSignal()
@@ -633,6 +638,14 @@ public class RobotState extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Intake", inputs);
+    voltage = (int) RobotController.getBatteryVoltage();
+
+    if (voltage < tempVoltage)
+    {
+      BatteryGuage();
+      tempVoltage = voltage;
+      System.out.println("Voltage: " + voltage);
+    }
 
     //(m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false)
     if (m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false) {
@@ -647,20 +660,10 @@ public class RobotState extends SubsystemBase {
     }
     else if ((m_Claw.getLinebreakOne() == true && m_Claw.getLinebreakTwo() == true) && isSolid == true)
     {
-      setallblack();
       wantedLEDState = 0;
       isSolid = false;
     }
     else if (isSolid == false && isFlashing == true){
-      // System.out.println("isSolid == false and isFlashing = true");
-      // if (wantedLEDState == 1)
-      // {
-      //   setallyellow();
-      // }
-      // else if (wantedLEDState == 2)
-      // {
-      //   setallpurple();
-      // }
       if (wantedLEDState == 0)
       {
         allflash = false;
