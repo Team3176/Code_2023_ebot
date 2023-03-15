@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -142,6 +143,7 @@ public class RobotState extends SubsystemBase {
 
     m_led.setData(m_ledBuffer);
     m_led.start();
+    SmartDashboard.putNumber("BatteryVoltage", voltage);
   }
 
   // public void setSegment(int start, int end, int red, int green, int blue) {
@@ -408,99 +410,114 @@ public class RobotState extends SubsystemBase {
     // {
       //voltage = voltage -0.1;
       //Timer.delay(0.1);
+      setallblack();
       System.out.println("BatteryGuage()");
       if (voltage >= 13)
       {
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP, Color.kLimeGreen);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
         System.out.println("Voltage >= 13");
       }
       else if (voltage >= 12)
       {
-        setallblack();
+        //setallblack();
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 1, Color.kLimeGreen);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
         System.out.println("Voltage >= 12");
 
       }
       else if (voltage >= 11)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage >= 11");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 2, Color.kLimeGreen);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else if (voltage >= 10)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage >= 10");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 3, Color.kLimeGreen);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else if (voltage >= 9)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage >= 9");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 4, Color.kLimeGreen);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else if (voltage >= 8)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage >= 8");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 5, Color.kDarkOrange);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else if (voltage >= 7)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage >= 7");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 6, Color.kDarkOrange);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else if (voltage >= 6)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage >= 6");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 7, Color.kDarkOrange);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else if (voltage >= 5)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage >= 5");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 8, Color.kDarkOrange);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else if (voltage >= 4)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage >= 4");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 9, Color.kDarkOrange);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else if (voltage >= 3)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage >= 3");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 10, Color.kRed);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else if (voltage >= 2)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage >= 2");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 11, Color.kRed);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else if (voltage >= 1)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage >= 1");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 12, Color.kRed);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else if (voltage > 0)
       {
-        setallblack();
+        //setallblack();
+        System.out.println("Voltage > 0");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP - 13, Color.kRed);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
       else
       {
-        setallblack();
+        //setallblack();
+        System.out.println("NO MORE VOLTAGE");
         setSegment(SignalingConstants.CROSSHIGHSTART, SignalingConstants.CROSSHIGHSTOP, Color.kRed);
-        m_led.setData(m_ledBuffer);
+        //m_led.setData(m_ledBuffer);
       }
+      //m_led.setData(m_ledBuffer);
     // }
   }
 
@@ -638,13 +655,13 @@ public class RobotState extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Intake", inputs);
-    voltage = (int) RobotController.getBatteryVoltage();
-
+    //voltage = (int) RobotController.getBatteryVoltage();
+    voltage = (int) SmartDashboard.getNumber("BatteryVoltage", voltage);
     if (voltage < tempVoltage)
     {
       BatteryGuage();
       tempVoltage = voltage;
-      System.out.println("Voltage: " + voltage);
+      System.out.println("TempVoltage: " + tempVoltage);
     }
 
     //(m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false)
