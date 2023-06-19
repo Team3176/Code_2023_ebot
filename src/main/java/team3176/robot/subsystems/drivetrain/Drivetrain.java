@@ -86,7 +86,7 @@ public class Drivetrain extends SubsystemBase {
   double angleAvgRollingWindow;
 
   public enum driveMode {
-    DEFENSE, DRIVE, VISION
+    DEFENSE, DRIVE, VISION, CUBECHASE
   }
 
   private SwervePod podFR;

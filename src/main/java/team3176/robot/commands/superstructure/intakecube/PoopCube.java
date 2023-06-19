@@ -26,7 +26,7 @@ public class PoopCube extends CommandBase {
   {
     m_Arm.armSetPositionOnce(SuperStructureConstants.ARM_ZERO_POS);
     m_IntakeCube.spinConveyor(0.4);
-    m_IntakeCube.spinIntake(.85);
+    m_IntakeCube.spinIntake(1.0);
     m_Claw.setClawMotor(-0.6, 5);
   }
 
@@ -34,8 +34,8 @@ public class PoopCube extends CommandBase {
   @Override
   public void execute() 
   {
-    m_IntakeCube.spinConveyor(0.6);
-    m_IntakeCube.spinIntake(.85);
+    m_IntakeCube.spinConveyor(0.6    );
+    m_IntakeCube.spinIntake(1.0);
     m_Claw.setClawMotor(-0.6, 5);
   }
 
