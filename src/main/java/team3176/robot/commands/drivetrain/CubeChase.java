@@ -7,13 +7,13 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
 import team3176.robot.subsystems.drivetrain.Drivetrain.driveMode;
-import team3176.robot.subsystems.vision.VisionDual;
+import team3176.robot.subsystems.vision.VisionCubeChase;
 import edu.wpi.first.math.controller.PIDController;
 
 
 public class CubeChase extends CommandBase {
   private Drivetrain drivetrain = Drivetrain.getInstance();
-  private VisionDual visiondual = VisionDual.getInstance();
+  private VisionCubeChase visionCubeChase = VisionCubeChase.getInstance();
 
 
   private DoubleSupplier forwardCommand;
@@ -29,7 +29,7 @@ public class CubeChase extends CommandBase {
     this.strafeCommand = strafeCommand;
     this.spinCommand = spinCommand;
     addRequirements(drivetrain);
-    addRequirements(visiondual);
+    addRequirements(visionCubeChase);
   }
 
   @Override
@@ -37,12 +37,12 @@ public class CubeChase extends CommandBase {
     drivetrain.setDriveMode(driveMode.DRIVE);
     drivetrain.setSpinLock(false);
     //drivetrain.setCoastMode();
-    this.tx = visiondual.getTx();
+    this.tx = visionCubeChase.getTx();
   }
 
   @Override
   public void execute() {
-    this.tx = visiondual.getTx();
+    this.tx = visionCubeChase.getTx();
     splicingSpinCommand = -1 * txController.calculate(tx, 0.0);
     //drivetrain.drive(forwardCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND * 1.0, 
     //#strafeCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND * 1.0, 

@@ -11,7 +11,7 @@ import team3176.robot.subsystems.vision.VisionDualIO.VisionDualInputs;
 
 public class VisionDual extends SubsystemBase{
     private VisionDualIO io;
-    private VisionDualInputsAutoLogged inputs;
+    private VisionDualInputs inputs;
     private Pose3d bestVisionPose3d;
     private Pose2d bestVisionPose2d;
     private enum blendModes {RIGHT,LEFT,BOTH};
@@ -36,46 +36,52 @@ public class VisionDual extends SubsystemBase{
     public boolean isValid() {
         return inputs.lValid || inputs.rValid;
     }
+/* 
+    public double getTx() {
+        return inputs.rTx;
+    }
+*/
 
     public void periodic() {
-        Logger.getInstance().processInputs("Vision", inputs);
-        boolean isRed = DriverStation.getAlliance() == Alliance.Red;
-        Pose3d rPose = isRed ? inputs.rfovRed : inputs.rfovBlue;
-        Pose3d lPose = isRed ? inputs.lfovRed : inputs.lfovBlue;
-        if(inputs.lValid && inputs.rValid) {
-            //possible both good
-            if(inputs.lNumTags > inputs.rNumTags) {
-                mode = blendModes.LEFT;
-            } 
-            else if (inputs.rNumTags > inputs.lNumTags) {
-                mode = blendModes.RIGHT;
-            }
-            else {
-                mode = blendModes.BOTH;
-            }
-        }
-        else if (inputs.lValid) {
-            mode = blendModes.LEFT;
-        }
-        else {
-            mode = blendModes.RIGHT;
-        }
-        
-        switch(mode){
-            case BOTH:
-                bestVisionPose3d  = lPose.interpolate(rPose, 0.5);       
-                break;
-            case LEFT:
-                bestVisionPose3d = lPose;
-                break;
-            case RIGHT:
-                bestVisionPose3d = rPose;
-                break;
-        }
-        bestVisionPose2d = bestVisionPose3d.toPose2d();
-        Logger.getInstance().recordOutput("Vision/bestPose",bestVisionPose3d);
-        
-        
+        io.updateInputs(inputs); 
+       // Logger.getInstance().processInputs("Vision", inputs);
+        //boolean isRed = DriverStation.getAlliance() == Alliance.Red;
+        //Pose3d rPose = isRed ? inputs.rfovRed : inputs.rfovBlue;
+        //Pose3d lPose = isRed ? inputs.lfovRed : inputs.lfovBlue;
+        //if(inputs.lValid && inputs.rValid) {
+        //    //possible both good
+        //    if(inputs.lNumTags > inputs.rNumTags) {
+        //        mode = blendModes.LEFT;
+        //    } 
+        //    else if (inputs.rNumTags > inputs.lNumTags) {
+        //        mode = blendModes.RIGHT;
+        //    }
+        //    else {
+        //        mode = blendModes.BOTH;
+        //    }
+        //}
+        //else if (inputs.lValid) {
+        //    mode = blendModes.LEFT;
+       // }
+        //else {
+        //    mode = blendModes.RIGHT;
+       // }
+       // 
+        //switch(mode){
+        //    case BOTH:
+        //        bestVisionPose3d  = lPose.interpolate(rPose, 0.5);       
+        //        break;
+        //    case LEFT:
+        //        bestVisionPose3d = lPose;
+        //        break;
+        //    case RIGHT:
+        //        bestVisionPose3d = rPose;
+        //        break;
+       // }
+       // bestVisionPose2d = bestVisionPose3d.toPose2d();
+       // Logger.getInstance().recordOutput("Vision/bestPose",bestVisionPose3d);
+       // 
+       // 
         // wildstang 111 code for refence
         // if (rtv > 0.0 && ltv > 0.0){
         //     if (lnumtargets > rnumtargets){
