@@ -373,7 +373,7 @@ public class RobotState extends SubsystemBase {
   }
 
   public void setColorWantState(int LEDState) {
-    System.out.println("WAS CALLED");
+    //System.out.println("WAS CALLED");
     wantedLEDState = LEDState;
     if (wantedLEDState == 0) {
       isFlashing = false;

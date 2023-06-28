@@ -1,4 +1,4 @@
-//LimelightHelpers v1.2.0 (Feb 13, 2023)
+//LimelightHelpers v1.2.1 (March 1, 2023)
 
 package team3176.robot.subsystems.drivetrain;
 
@@ -385,7 +385,7 @@ public class LimelightHelpers {
     private static Pose3d toPose3D(double[] inData){
         if(inData.length < 6)
         {
-            System.err.println("Bad LL 3D Pose Data!");
+            System.err.println("388:Bad LL 3D Pose Data!");
             return new Pose3d();
         }
         return new Pose3d(
@@ -397,7 +397,7 @@ public class LimelightHelpers {
     private static Pose2d toPose2D(double[] inData){
         if(inData.length < 6)
         {
-            System.err.println("Bad LL 2D Pose Data!");
+            System.err.println("400:Bad LL 2D Pose Data!");
             return new Pose2d();
         }
         Translation2d tran2d = new Translation2d(inData[0], inData[1]);
@@ -521,7 +521,7 @@ public class LimelightHelpers {
     }
 
     public static double[] getBotPose_TargetSpace(String limelightName) {
-        return getLimelightNTDoubleArray(limelightName, "botpose_targetSpace");
+        return getLimelightNTDoubleArray(limelightName, "botpose_targetspace");
     }
 
     public static double[] getCameraPose_TargetSpace(String limelightName) {
@@ -743,7 +743,7 @@ public class LimelightHelpers {
             if (responseCode == 200) {
                 return true;
             } else {
-                System.err.println("Bad LL Request");
+                System.err.println("746:Bad LL Request");
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());
