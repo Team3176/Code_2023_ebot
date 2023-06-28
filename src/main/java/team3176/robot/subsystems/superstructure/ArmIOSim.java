@@ -7,23 +7,13 @@
 
 package team3176.robot.subsystems.superstructure;
 
-import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.ctre.phoenix.sensors.CANCoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import team3176.robot.constants.SuperStructureConstants;
 import team3176.robot.Constants;
@@ -37,8 +27,9 @@ public class ArmIOSim implements ArmIO{
     armSim = new SingleJointedArmSim(DCMotor.getNEO(1), 75, 0.5, 0.7, -1.0*Math.PI, 3.14, true);
   }
   /** Updates the set of loggable inputs. */
+  @Override
   public void updateInputs(ArmIOInputs inputs) {
-    armSim.update(Constants.loopPeriodSecs);
+    armSim.update(Constants.LOOP_PERIODIC_SECS);
     inputs.Position = Units.radiansToDegrees(armSim.getAngleRads()) + 90 + SuperStructureConstants.ARM_SIM_OFFSET;
     inputs.VelocityRadPerSec = armSim.getVelocityRadPerSec();
     inputs.AppliedVolts = appliedVolts;
@@ -46,6 +37,7 @@ public class ArmIOSim implements ArmIO{
     inputs.TempCelcius = new double[] {0.0};
     Logger.getInstance().recordOutput("Arm/SimPos",armSim.getAngleRads());
   }
+  @Override
   public void set(double percentOuput) {
     if(DriverStation.isEnabled()) {
       appliedVolts = percentOuput * 12;
@@ -55,9 +47,5 @@ public class ArmIOSim implements ArmIO{
     appliedVolts = MathUtil.clamp(appliedVolts,-12,12);
     armSim.setInputVoltage(appliedVolts);
   }
-  public void setCoastMode(boolean isCoastMode) {
-    
-  }
-  public void reset() {}
 }
 

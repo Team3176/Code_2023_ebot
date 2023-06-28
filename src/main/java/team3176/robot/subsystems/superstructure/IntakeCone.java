@@ -4,12 +4,9 @@
 
 package team3176.robot.subsystems.superstructure;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -20,13 +17,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 
-import team3176.robot.subsystems.superstructure.IntakeConeIO;
 import team3176.robot.subsystems.superstructure.IntakeConeIO.IntakeConeIOInputs;
 import org.littletonrobotics.junction.Logger;
-
-import team3176.robot.subsystems.superstructure.Claw;
-
-import team3176.robot.constants.Hardwaremap;
 
 public class IntakeCone extends SubsystemBase {
   /** Creates a new IntakeCone. */
@@ -34,10 +26,8 @@ public class IntakeCone extends SubsystemBase {
   private DoubleSolenoid pistonOne;
   private DigitalInput linebreak;
 
-  private boolean isExtended;
-  private boolean isInIntake;
   private static IntakeCone instance;
-  private Claw m_Claw;
+  private Claw claw;
   private final IntakeConeIO io;
   private final IntakeConeIOInputs inputs = new IntakeConeIOInputs();
   public IntakeCone(IntakeConeIO io) 
@@ -47,7 +37,7 @@ public class IntakeCone extends SubsystemBase {
     //pistonTwo = new DoubleSolenoid(PneumaticsModuleType.REVPH, 3, 2);
     linebreak = new DigitalInput(3);
 
-    m_Claw = Claw.getInstance();
+    claw = Claw.getInstance();
 
   }
 
@@ -77,14 +67,11 @@ public class IntakeCone extends SubsystemBase {
 
   public void Extend() {
     pistonOne.set(Value.kForward);
-    //pistonTwo.set(Value.kForward);
-    this.isExtended = true;
+
   }
 
   public void Retract() {
     pistonOne.set(Value.kReverse);
-    //pistonTwo.set(Value.kReverse);
-    this.isExtended = false;
   }
 
   public boolean getLinebreak()
@@ -116,7 +103,7 @@ public class IntakeCone extends SubsystemBase {
 
    public Command coneToClaw() {  
     return this.run(() ->  {spit();})
-                .until(() -> this.m_Claw.getLinebreakTwo() == false)
+                .until(() -> this.claw.getLinebreakTwo() == false)
                 .andThen(new WaitCommand(0.5))
                 .andThen(this.runOnce(()->idle())).withTimeout(2.0).finallyDo((b)->idle());
 }

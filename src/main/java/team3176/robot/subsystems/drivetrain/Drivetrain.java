@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package team3176.robot.subsystems.drivetrain;
-import com.pathplanner.lib.PathPlannerTrajectory;
 
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,8 +16,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -34,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import team3176.robot.Constants;
 import team3176.robot.Constants.Mode;
 import team3176.robot.constants.DrivetrainConstants;
+import team3176.robot.constants.DrivetrainHardwareMap;
 import team3176.robot.constants.SwervePodHardwareID;
 import team3176.robot.subsystems.drivetrain.GyroIO.GyroIOInputs;
 import team3176.robot.subsystems.vision.VisionDual;
@@ -44,13 +42,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drivetrain extends SubsystemBase {
   private static Drivetrain instance;
-  public SwerveDriveOdometry odom;
-  public SwerveDrivePoseEstimator poseEstimator;
-
-  public NetworkTableInstance inst;
-  public NetworkTable table;
-  public DoubleTopic dblTopic;
-  public DoublePublisher dblPub;
+  private SwerveDriveOdometry odom;
+  private SwerveDrivePoseEstimator poseEstimator;
 
   // private Controller controller = Controller.getInstance();
   // private Vision m_Vision = Vision.getInstance();
@@ -58,7 +51,7 @@ public class Drivetrain extends SubsystemBase {
     FIELD_CENTRIC, ROBOT_CENTRIC
   }
 
-  public coordType currentCoordType = coordType.FIELD_CENTRIC;
+  private coordType currentCoordType = coordType.FIELD_CENTRIC;
   //private PowerDistribution PDH = new PowerDistribution();
   // PowerDistribution(PowerManagementConstants.PDP_CAN_ID, ModuleType.kCTRE);
 
@@ -68,7 +61,7 @@ public class Drivetrain extends SubsystemBase {
 
   
 
-  Rotation2d FieldAngleOffset = Rotation2d.fromDegrees(0.0);
+  Rotation2d fieldAngleOffset = Rotation2d.fromDegrees(0.0);
 
 
   private double forwardCommand;
@@ -87,19 +80,18 @@ public class Drivetrain extends SubsystemBase {
   double angleAvgRollingWindow;
 
   public enum driveMode {
-    DEFENSE, DRIVE, VISION
+    DEFENSE, DRIVE, VISION, CUBECHASE
   }
 
   private SwervePod podFR;
   private SwervePod podFL;
   private SwervePod podBL;
   private SwervePod podBR;
-  public PathPlannerTrajectory teleopTraj;
 
 
   NetworkTable vision;
-  NetworkTableEntry vision_pose;
-  Pose2d last_pose = new Pose2d();
+  NetworkTableEntry visionPose;
+  Pose2d lastPose = new Pose2d();
   double lastVisionTimeStamp = 0.0;
   double lastVisionX = 0.0;
   Rotation2d wheelOnlyHeading = new Rotation2d();
@@ -113,30 +105,24 @@ public class Drivetrain extends SubsystemBase {
   private Drivetrain(GyroIO io) {
     this.io = io;
     inputs = new GyroIOInputs();
-    inst = NetworkTableInstance.getDefault();
-    table = inst.getTable("datatable");
-
-    dblTopic = table.getDoubleTopic("Angle");
-
-    dblPub = dblTopic.publish();
 
     field = new Field2d();
     // check for duplicates
-    assert (!SwervePodHardwareID.check_duplicates_all(DrivetrainConstants.FR, DrivetrainConstants.FL,
-        DrivetrainConstants.BR, DrivetrainConstants.BL));
+    assert (!SwervePodHardwareID.check_duplicates_all(DrivetrainHardwareMap.FR, DrivetrainHardwareMap.FL,
+        DrivetrainHardwareMap.BR, DrivetrainHardwareMap.BL));
     // Instantiate pods
     if(Constants.getMode() != Mode.REPLAY) {
       switch(Constants.getRobot()){
         case ROBOT_2023C:
           System.out.println("[init] normal swervePods");
-          DrivetrainConstants.FR.OFFSET += 180;
-          DrivetrainConstants.FL.OFFSET += 90;
-          DrivetrainConstants.BL.OFFSET += 0;
-          DrivetrainConstants.BR.OFFSET += -90;
-          podFR = new SwervePod(0, new SwervePodIOFalconSpark(DrivetrainConstants.FR,DrivetrainConstants.STEER_FR_CID));
-          podFL = new SwervePod(1, new SwervePodIOFalconSpark(DrivetrainConstants.FL,DrivetrainConstants.STEER_FL_CID));
-          podBL = new SwervePod(2, new SwervePodIOFalconSpark(DrivetrainConstants.BL,DrivetrainConstants.STEER_BL_CID));
-          podBR = new SwervePod(3, new SwervePodIOFalconSpark(DrivetrainConstants.BR,DrivetrainConstants.STEER_BR_CID));
+          DrivetrainHardwareMap.FR.OFFSET += 180;
+          DrivetrainHardwareMap.FL.OFFSET += 90;
+          DrivetrainHardwareMap.BL.OFFSET += 0;
+          DrivetrainHardwareMap.BR.OFFSET += -90;
+          podFR = new SwervePod(0, new SwervePodIOFalconSpark(DrivetrainHardwareMap.FR,DrivetrainHardwareMap.STEER_FR_CID));
+          podFL = new SwervePod(1, new SwervePodIOFalconSpark(DrivetrainHardwareMap.FL,DrivetrainHardwareMap.STEER_FL_CID));
+          podBL = new SwervePod(2, new SwervePodIOFalconSpark(DrivetrainHardwareMap.BL,DrivetrainHardwareMap.STEER_BL_CID));
+          podBR = new SwervePod(3, new SwervePodIOFalconSpark(DrivetrainHardwareMap.BR,DrivetrainHardwareMap.STEER_BR_CID));
           break;
         case ROBOT_2023P:
           break;
@@ -159,7 +145,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     // Instantiate array list then add instantiated pods to list
-    pods = new ArrayList<SwervePod>();
+    pods = new ArrayList<>();
     pods.add(podFR);
     pods.add(podFL);
     pods.add(podBL);
@@ -244,50 +230,50 @@ public class Drivetrain extends SubsystemBase {
    */
   private void calculateNSetPodPositions() {
     if (currentDriveMode != driveMode.DEFENSE) {
-      ChassisSpeeds curr_chassisSpeeds = new ChassisSpeeds(forwardCommand, strafeCommand, spinCommand);
+      ChassisSpeeds currChassisSpeeds = new ChassisSpeeds(forwardCommand, strafeCommand, spinCommand);
       if (this.currentCoordType == coordType.FIELD_CENTRIC) {
         Rotation2d fieldOffset = this.getPose().getRotation();
         if (DriverStation.getAlliance() == Alliance.Red) {
           fieldOffset.plus(Rotation2d.fromDegrees(180));
         }
-        curr_chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(curr_chassisSpeeds, fieldOffset);
+        currChassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currChassisSpeeds, fieldOffset);
       }
       if (isSpinLocked) {
-        curr_chassisSpeeds.omegaRadiansPerSecond = spinLockPID.calculate(getPoseYawWrapped().getDegrees(), spinLockAngle.getDegrees());
+        currChassisSpeeds.omegaRadiansPerSecond = spinLockPID.calculate(getPoseYawWrapped().getDegrees(), spinLockAngle.getDegrees());
         SmartDashboard.putNumber("SpinLockYaw",getPoseYawWrapped().getDegrees());
       }
-      SwerveModuleState[] pod_states = DrivetrainConstants.DRIVE_KINEMATICS.toSwerveModuleStates(curr_chassisSpeeds);
-      Logger.getInstance().recordOutput("Drive/pod0", pod_states[0].angle.getDegrees());
-      SwerveDriveKinematics.desaturateWheelSpeeds(pod_states, DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND);
+      SwerveModuleState[] podStates = DrivetrainConstants.DRIVE_KINEMATICS.toSwerveModuleStates(currChassisSpeeds);
+      Logger.getInstance().recordOutput("Drive/pod0", podStates[0].angle.getDegrees());
+      SwerveDriveKinematics.desaturateWheelSpeeds(podStates, DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND);
       SwerveModuleState[] optimizedStates = new SwerveModuleState[4];
       SwerveModuleState[] realStates = new SwerveModuleState[4];
       for (int idx = 0; idx < (pods.size()); idx++) {
-        optimizedStates[idx]=pods.get(idx).set_module(pod_states[idx]);
+        optimizedStates[idx]=pods.get(idx).setModule(podStates[idx]);
         realStates[idx] = new SwerveModuleState(pods.get(idx).getVelocity(),Rotation2d.fromDegrees(pods.get(idx).getAzimuth()));
       }
-      Logger.getInstance().recordOutput("SwerveStates/Setpoints", pod_states);
+      Logger.getInstance().recordOutput("SwerveStates/Setpoints", podStates);
       Logger.getInstance().recordOutput("SwerveStates/real", realStates);
       Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
       Logger.getInstance().recordOutput("Drive/SpinCommand", spinCommand);
       SmartDashboard.putNumber("spinCommand", spinCommand);
-      SmartDashboard.putNumber("pod0 m/s", pod_states[0].speedMetersPerSecond);
+      SmartDashboard.putNumber("pod0 m/s", podStates[0].speedMetersPerSecond);
 
-    } else if (currentDriveMode == driveMode.DEFENSE) { // Enter defensive position
+    } else { // Enter defensive position
       double smallNum = Math.pow(10, -5);
-      pods.get(0).set_module(smallNum, Rotation2d.fromRadians(1.0 * Math.PI / 8.0));
-      pods.get(1).set_module(smallNum, Rotation2d.fromRadians(-1.0 * Math.PI / 8.0));
-      pods.get(2).set_module(smallNum, Rotation2d.fromRadians(-3.0 * Math.PI / 8.0));
-      pods.get(3).set_module(smallNum, Rotation2d.fromRadians(3.0 * Math.PI / 8.0));
+      pods.get(0).setModule(smallNum, Rotation2d.fromRadians(1.0 * Math.PI / 8.0));
+      pods.get(1).setModule(smallNum, Rotation2d.fromRadians(-1.0 * Math.PI / 8.0));
+      pods.get(2).setModule(smallNum, Rotation2d.fromRadians(-3.0 * Math.PI / 8.0));
+      pods.get(3).setModule(smallNum, Rotation2d.fromRadians(3.0 * Math.PI / 8.0));
     }
   }
 
 
   public void setDriveMode(driveMode wantedDriveMode) {
-    currentDriveMode = wantedDriveMode;
+    this.currentDriveMode = wantedDriveMode;
   }
 
   public driveMode getCurrentDriveMode() {
-    return currentDriveMode;
+    return this.currentDriveMode;
   }
 
   public Pose2d getPose() {
@@ -314,7 +300,7 @@ public class Drivetrain extends SubsystemBase {
 
   public void setModuleStates(SwerveModuleState[] states) {
     for (int idx = 0; idx < (pods.size()); idx++) {
-      pods.get(idx).set_module(states[idx]);
+      pods.get(idx).setModule(states[idx]);
     }
   }
 
@@ -397,11 +383,11 @@ public class Drivetrain extends SubsystemBase {
     // do not need to invert because the navx rotation2D call returns a NWU
     // coordsys!
     //this.FieldAngleOffset = m_NavX.getRotation2d();
-    Rotation2d RedorBlue_Zero = new Rotation2d();
+    Rotation2d redOrBlueZero = new Rotation2d();
     if (DriverStation.getAlliance() == Alliance.Red) {
-      RedorBlue_Zero.plus(Rotation2d.fromDegrees(180));
+      redOrBlueZero.plus(Rotation2d.fromDegrees(180));
     }
-    resetPose(new Pose2d(getPose().getTranslation(),RedorBlue_Zero));
+    resetPose(new Pose2d(getPose().getTranslation(),redOrBlueZero));
   }
 
   public double getPodVelocity(int podID) {
@@ -479,7 +465,7 @@ public class Drivetrain extends SubsystemBase {
 
     //   SmartDashboard.putNumber("camX",cam_pose.getX());
     // }
-    last_pose = odom.getPoseMeters();
+    lastPose = odom.getPoseMeters();
     SwerveModulePosition[] deltas = new SwerveModulePosition[4];
     for(int i=0;i<  pods.size(); i++) {
       deltas[i] = pods.get(i).getDelta();
@@ -493,12 +479,12 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("NavYaw",getPoseYawWrapped().getDegrees());
 
     //Liam and Andrews work!
-    double[] vision_pose = NetworkTableInstance.getDefault().getTable("limelight-rfov").getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
-    Pose3d visionPose3dNT = new Pose3d(vision_pose[0], vision_pose[1], vision_pose[2], new Rotation3d( Units.degreesToRadians(vision_pose[3]), Units.degreesToRadians(vision_pose[4]), Units.degreesToRadians(vision_pose[5])));
-    Logger.getInstance().recordOutput("Drive/vision_pose", visionPose3dNT);
+    //double[] visionPoseArray = NetworkTableInstance.getDefault().getTable("limelight-rfov").getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
+    //Pose3d visionPose3dNT = new Pose3d(visionPoseArray[0], visionPoseArray[1], visionPoseArray[2], new Rotation3d( Units.degreesToRadians(visionPoseArray[3]), Units.degreesToRadians(visionPoseArray[4]), Units.degreesToRadians(visionPoseArray[5])));
+    //Logger.getInstance().recordOutput("Drive/vision_pose", visionPose3dNT);
 
     //new vision proposal 
-    visionPose3d = VisionDual.getInstance().getPose3d();
+    //visionPose3d = VisionDual.getInstance().getPose3d();
 
     // double[] default_pose = {0.0,0.0,0.0,0.0,0.0,0.0};
     // try {
@@ -557,23 +543,23 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void publishSwervePodPIDErrors(){
-    double FRAzError = podFR.getAzimuthSetpoint() - podFR.getAzimuth();
-    double FRThrustError = podFR.getThrustSetpoint() - podFR.getThrustEncoderVelocity();
+    final double FRAzError = podFR.getAzimuthSetpoint() - podFR.getAzimuth();
+    final double FRThrustError = podFR.getThrustSetpoint() - podFR.getThrustEncoderVelocity();
     SmartDashboard.putNumber("FRAzError", FRAzError);
     SmartDashboard.putNumber("FRThrustError", FRThrustError);
 
-    double FLAzError = podFL.getAzimuthSetpoint() - podFL.getAzimuth();
-    double FLThrustError = podFL.getThrustSetpoint() - podFL.getThrustEncoderVelocity();
+    final double FLAzError = podFL.getAzimuthSetpoint() - podFL.getAzimuth();
+    final double FLThrustError = podFL.getThrustSetpoint() - podFL.getThrustEncoderVelocity();
     SmartDashboard.putNumber("FLAzError", FLAzError);
     SmartDashboard.putNumber("FLThrustError", FLThrustError);
 
-    double BRAzError = podBR.getAzimuthSetpoint() - podBR.getAzimuth();
-    double BRThrustError = podBR.getThrustSetpoint() - podBR.getThrustEncoderVelocity();
+    final double BRAzError = podBR.getAzimuthSetpoint() - podBR.getAzimuth();
+    final double BRThrustError = podBR.getThrustSetpoint() - podBR.getThrustEncoderVelocity();
     SmartDashboard.putNumber("BRAzError", BRAzError);
     SmartDashboard.putNumber("BRThrustError", BRThrustError);
 
-    double BLAzError = podBL.getAzimuthSetpoint() - podBL.getAzimuth();
-    double BLThrustError = podBL.getThrustSetpoint() - podBL.getThrustEncoderVelocity();
+    final double BLAzError = podBL.getAzimuthSetpoint() - podBL.getAzimuth();
+    final double BLThrustError = podBL.getThrustSetpoint() - podBL.getThrustEncoderVelocity();
     SmartDashboard.putNumber("BLAzError", BLAzError);
     SmartDashboard.putNumber("BLThrustError", BLThrustError);
 

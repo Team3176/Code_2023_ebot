@@ -1,24 +1,24 @@
 package team3176.robot.subsystems.vision;
 
-import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.math.geometry.Pose3d;
+
 import team3176.robot.subsystems.drivetrain.LimelightHelpers;
 
 public class VisionDualIOLime implements VisionDualIO {
-  public static final String rfov = "rfov-limelight";
-  public static final String lfov = "lfov-limelight";
+  public static final String RFOV = "rfov-limelight";
+  public static final String LFOV = "lfov-limelight";
     /** Updates the set of loggable inputs. */
+  @Override
   public void updateInputs(VisionDualInputs inputs) {
-    inputs.rfovBlue = LimelightHelpers.getBotPose3d_wpiBlue(rfov);
-    inputs.rfovRed = LimelightHelpers.getBotPose3d_wpiRed(rfov);
-    inputs.lfovBlue = LimelightHelpers.getBotPose3d_wpiBlue(lfov);
-    inputs.lfovRed = LimelightHelpers.getBotPose3d_wpiRed(lfov);
-    inputs.lLatency = LimelightHelpers.getLatency_Capture(lfov) + LimelightHelpers.getLatency_Pipeline(lfov);
-    inputs.rLatency = LimelightHelpers.getLatency_Capture(rfov) + LimelightHelpers.getLatency_Pipeline(rfov);
-    inputs.rNumTags = LimelightHelpers.getLatestResults(rfov).targetingResults.targets_Fiducials.length;
-    inputs.lNumTags = LimelightHelpers.getLatestResults(lfov).targetingResults.targets_Fiducials.length;
-    inputs.rValid = LimelightHelpers.getTV(rfov);
-    inputs.lValid = LimelightHelpers.getTV(lfov);
+    inputs.rfovBlue = LimelightHelpers.getBotPose3d_wpiBlue(RFOV);
+    inputs.rfovRed = LimelightHelpers.getBotPose3d_wpiRed(RFOV);
+    inputs.lfovBlue = LimelightHelpers.getBotPose3d_wpiBlue(LFOV);
+    inputs.lfovRed = LimelightHelpers.getBotPose3d_wpiRed(LFOV);
+    inputs.lLatency = LimelightHelpers.getLatency_Capture(LFOV) + LimelightHelpers.getLatency_Pipeline(LFOV);
+    inputs.rLatency = LimelightHelpers.getLatency_Capture(RFOV) + LimelightHelpers.getLatency_Pipeline(RFOV);
+    inputs.rNumTags = LimelightHelpers.getLatestResults(RFOV).targetingResults.targets_Fiducials.length;
+    inputs.lNumTags = LimelightHelpers.getLatestResults(LFOV).targetingResults.targets_Fiducials.length;
+    inputs.rValid = LimelightHelpers.getTV(RFOV);
+    inputs.lValid = LimelightHelpers.getTV(LFOV);
   }
 }

@@ -8,14 +8,14 @@ import team3176.robot.subsystems.superstructure.Arm;
 
 public class ArmFollowTrajectory  extends CommandBase {
     /** Creates a new IntakeExtendSpin. */
-    private Arm m_Arm = Arm.getInstance();
+    private Arm arm = Arm.getInstance();
     TrapezoidProfile traj;
     double goalAngle;
     Timer timeElapsed;
 
     public ArmFollowTrajectory(double goalAngle) {
       // Use addRequirements() here to declare subsystem dependencies.
-      addRequirements(m_Arm);
+      addRequirements(arm);
       this.goalAngle = goalAngle;
     }
   
@@ -24,7 +24,7 @@ public class ArmFollowTrajectory  extends CommandBase {
     public void initialize() {
         traj = new TrapezoidProfile(new Constraints(20, 20), 
                                     new State(goalAngle,0.0),
-                                    new State(m_Arm.getArmPosition(),0.0));
+                                    new State(arm.getArmPosition(),0.0));
         timeElapsed.start();
     }
   
@@ -32,14 +32,9 @@ public class ArmFollowTrajectory  extends CommandBase {
     @Override
     public void execute() {
         State setpoint = traj.calculate(timeElapsed.get());
-        m_Arm.setAngleSetpoint(setpoint.position);
+        arm.setAngleSetpoint(setpoint.position);
     }
      
-      
-  
-    // Called once the command ends or is interrupted.
-    @Override
-    public void end(boolean interrupted) {}
   
     // Returns true when the command should end.
     @Override

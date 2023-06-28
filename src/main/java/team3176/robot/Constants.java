@@ -12,13 +12,13 @@ import java.util.Map;
 
 public final class Constants {
   private static final RobotType robot = RobotType.ROBOT_SIMBOT;
-  public static final double loopPeriodSecs = 0.02;
-  public static final boolean tuningMode = false;
+  public static final double LOOP_PERIODIC_SECS = 0.02;
+  public static final boolean TUNING_MODE = true;
 
   public static boolean invalidRobotAlertSent = false;
 
   public static RobotType getRobot() {
-    if (!disableHAL && RobotBase.isReal()) {
+    if (!isHALdisable && RobotBase.isReal()) {
       if (robot == RobotType.ROBOT_SIMBOT) { // Invalid robot selected
         if (!invalidRobotAlertSent) {
           invalidRobotAlertSent = true;
@@ -62,10 +62,10 @@ public final class Constants {
   }
 
   // Function to disable HAL interaction when running without native libs
-  public static boolean disableHAL = false;
+  public static boolean isHALdisable = false;
 
   public static void disableHAL() {
-    disableHAL = true;
+    isHALdisable = true;
   }
 
   /** Checks whether the robot the correct robot is selected when deploying. */

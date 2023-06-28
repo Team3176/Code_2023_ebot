@@ -8,17 +8,16 @@ import team3176.robot.subsystems.drivetrain.Drivetrain;
 import team3176.robot.subsystems.drivetrain.Drivetrain.driveMode;
 
 public class AutoBalance extends CommandBase {
-    private Drivetrain m_Drivetrain;
-    private boolean isDone = false;
-    private int num_balanced = 0;
+    private Drivetrain drivetrain;
+    //private boolean isDone = false;
+    //private int numBalanced = 0;
     public AutoBalance() {
-        m_Drivetrain = Drivetrain.getInstance();
-        addRequirements(m_Drivetrain);
+        drivetrain = Drivetrain.getInstance();
+        addRequirements(drivetrain);
     }
     @Override
     public void initialize() {
-        // TODO Auto-generated method stub
-        m_Drivetrain.setBrakeMode();
+        drivetrain.setBrakeMode();
 
     }
     @Override
@@ -26,9 +25,9 @@ public class AutoBalance extends CommandBase {
         //double Kp = 0.1;
 
         //Bang Bang controller! 
-        double forward = 0.0;
+        double forward;
         double deadbandDegrees = 8;
-        SmartDashboard.putNumber("pitch", m_Drivetrain.getChassisPitch());
+        SmartDashboard.putNumber("pitch", drivetrain.getChassisPitch());
         // if(m_Drivetrain.getChassisPitch() > 0 + deadbandDegrees) {
         //     forward = 0.37 * Math.pow(.96,num_balanced);
         // } else if(m_Drivetrain.getChassisPitch() < 0 - deadbandDegrees) {
@@ -37,19 +36,19 @@ public class AutoBalance extends CommandBase {
         //     num_balanced ++;
         // }
         //P loop option
-        if(Math.abs(m_Drivetrain.getChassisPitch()) > 0 + deadbandDegrees) {
-            forward = 0.03 * m_Drivetrain.getChassisPitch();
+        if(Math.abs(drivetrain.getChassisPitch()) > 0 + deadbandDegrees) {
+            forward = 0.03 * drivetrain.getChassisPitch();
             forward = MathUtil.clamp(forward, -0.5, 0.5);
         }
         else {
             forward = 0.0;
         }
 
-        m_Drivetrain.drive(forward, 0, 0, Drivetrain.coordType.ROBOT_CENTRIC);
+        drivetrain.drive(forward, 0, 0, Drivetrain.coordType.ROBOT_CENTRIC);
     }
     @Override
     public void end(boolean interrupted) {
-        m_Drivetrain.setDriveMode(driveMode.DEFENSE);
+        drivetrain.setDriveMode(driveMode.DEFENSE);
     }
     @Override
     public boolean isFinished() {

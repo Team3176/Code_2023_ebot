@@ -1,10 +1,12 @@
 package team3176.robot.subsystems.drivetrain;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import team3176.robot.constants.DrivetrainConstants;
@@ -15,7 +17,7 @@ public class SwervePodIOFalconSpark implements SwervePodIO{
     private CANSparkMax turnSparkMax;
     private TalonFX thrustFalcon;
     private CANCoder azimuthEncoder;
-    public static double conversion_feet_to_tics = 12.0 * (1.0/ (DrivetrainConstants.WHEEL_DIAMETER_INCHES * Math.PI)) * (1.0 /DrivetrainConstants.THRUST_GEAR_RATIO) * DrivetrainConstants.THRUST_ENCODER_UNITS_PER_REVOLUTION;
+    public static final double FEET2TICS = 12.0 * (1.0/ (DrivetrainConstants.WHEEL_DIAMETER_INCHES * Math.PI)) * (1.0 /DrivetrainConstants.THRUST_GEAR_RATIO) * DrivetrainConstants.THRUST_ENCODER_UNITS_PER_REVOLUTION;
     public SwervePodIOFalconSpark(SwervePodHardwareID id,int sparkMaxID) {
         turnSparkMax = new CANSparkMax(sparkMaxID, MotorType.kBrushless);
         thrustFalcon = new TalonFX(id.THRUST_CID);
@@ -41,6 +43,7 @@ public class SwervePodIOFalconSpark implements SwervePodIO{
         azimuthEncoder.configSensorDirection(true,100);
         
     }
+    @Override
     public void updateInputs(SwervePodIOInputs inputs) {
         inputs.drivePositionRad = thrustFalcon.getSelectedSensorPosition() * (DrivetrainConstants.THRUST_GEAR_RATIO) * 1.0/DrivetrainConstants.THRUST_ENCODER_UNITS_PER_REVOLUTION* 2 * Math.PI;
         inputs.driveVelocityRadPerSec = thrustFalcon.getSelectedSensorVelocity() * (DrivetrainConstants.THRUST_GEAR_RATIO) * 1.0/DrivetrainConstants.THRUST_ENCODER_UNITS_PER_REVOLUTION * 10 * 2 * Math.PI;
@@ -64,13 +67,28 @@ public class SwervePodIOFalconSpark implements SwervePodIO{
     }
 
     /** Run the turn motor at the specified voltage. */
+    @Override
     public void setTurn(double volts) {
         turnSparkMax.set(volts);
     }
 
     /** Enable or disable brake mode on the drive motor. */
-    public void setDriveBrakeMode(boolean enable) {}
+    @Override
+    public void setDriveBrakeMode(boolean enable) {
+        if(enable){
+            thrustFalcon.setNeutralMode(NeutralMode.Brake);
+        } else {
+            thrustFalcon.setNeutralMode(NeutralMode.Coast);
+        }
+    }
 
     /** Enable or disable brake mode on the turn motor. */
-    public void setTurnBrakeMode(boolean enable) {}
+    @Override
+    public void setTurnBrakeMode(boolean enable) {
+        if(enable) {
+            turnSparkMax.setIdleMode(IdleMode.kBrake);
+        } else {
+            turnSparkMax.setIdleMode(IdleMode.kCoast);
+        }
+    }
 }

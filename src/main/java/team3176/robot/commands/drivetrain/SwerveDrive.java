@@ -1,8 +1,6 @@
 package team3176.robot.commands.drivetrain;
 
 import java.util.function.DoubleSupplier;
-
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
@@ -40,7 +38,4 @@ public class SwerveDrive extends CommandBase {
 
   @Override
   public boolean isFinished() { return false; }
-
-  @Override
-  public void end(boolean interrupted) {  }
 }

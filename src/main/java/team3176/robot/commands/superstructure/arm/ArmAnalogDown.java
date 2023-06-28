@@ -4,47 +4,36 @@
 
 package team3176.robot.commands.superstructure.arm;
 
-import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import team3176.robot.subsystems.superstructure.Arm;
 
-public class armAnalogIdle  extends CommandBase {
+public class ArmAnalogDown  extends CommandBase {
   /** Creates a new IntakeExtendSpin. */
-  private Arm m_Arm = Arm.getInstance();
-  private DoubleSupplier analogInput;
-  private Double analogInputDeadband;
+  private Arm arm = Arm.getInstance();
+  // private DoubleSupplier analogInput;
+  // private Double analogInputDeadband;
 
-  public armAnalogIdle() {
+  public ArmAnalogDown() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_Arm);
+    addRequirements(arm);
 
   }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-      m_Arm.idle();
-
-  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+      arm.armAnalogDown();
   }
    
     //if ((updatedAnalogInput < (0 + analogInputDeadband)) && (updatedAnalogInput > (0 + analogInputDeadband))) {
     //  m_Arm.
     //}
-    
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-      return true;
+      return false;
   }
 }

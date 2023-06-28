@@ -11,12 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
+import team3176.robot.Constants;
+
 /**
  * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
  * value not in dashboard.
  */
 public class LoggedTunableNumber {
-  private static final String tableKey = "TunableNumbers";
+  private static final String TABLE_KEY = "TunableNumbers";
 
   private final String key;
   private boolean hasDefault = false;
@@ -30,7 +32,7 @@ public class LoggedTunableNumber {
    * @param dashboardKey Key on dashboard
    */
   public LoggedTunableNumber(String dashboardKey) {
-    this.key = tableKey + "/" + dashboardKey;
+    this.key = TABLE_KEY + "/" + dashboardKey;
   }
 
   /**
@@ -68,7 +70,7 @@ public class LoggedTunableNumber {
     if (!hasDefault) {
       return 0.0;
     } else {
-      return true ? dashboardNumber.get() : defaultValue;
+      return Constants.TUNING_MODE ? dashboardNumber.get() : defaultValue;
     }
   }
 

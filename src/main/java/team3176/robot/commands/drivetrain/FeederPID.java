@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.InterpolatingTreeMap;
@@ -13,11 +12,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 
 import team3176.robot.subsystems.drivetrain.Drivetrain;
-import team3176.robot.subsystems.drivetrain.Drivetrain.coordType;
-import team3176.robot.subsystems.superstructure.Superstructure.GamePiece;
 
 public class FeederPID extends CommandBase{
-    Drivetrain m_Drivetrain;
+    Drivetrain drivetrain;
     PIDController xController = new PIDController(2.0,0.0,0.0);
     PIDController yController = new PIDController(.5,0.0,0.0);
     PIDController wController = new PIDController(.5,0.0,0.0);
@@ -33,8 +30,8 @@ public class FeederPID extends CommandBase{
     public FeederPID(String side) {
         this.side = side;
         alliance = DriverStation.getAlliance();
-        m_Drivetrain = Drivetrain.getInstance();
-        addRequirements(m_Drivetrain);
+        drivetrain = Drivetrain.getInstance();
+        addRequirements(drivetrain);
         //vision = NetworkTableInstance.getDefault().getTable("limelight");
         limelight_lfov = NetworkTableInstance.getDefault().getTable("limelight-lfov");
         limelight_rfov = NetworkTableInstance.getDefault().getTable("limelight-rfov");
@@ -49,7 +46,7 @@ public class FeederPID extends CommandBase{
         offsetTreeL.put(0.19,2.0);
         offsetTreeL.put(0.0,0.0);
         
-        if(side == "right") {
+        if(side.equals("right")) {
             offsetTree = offsetTreeR;
         } else {
             offsetTree = offsetTreeL;
@@ -61,7 +58,7 @@ public class FeederPID extends CommandBase{
         deadband = 1;
         
         txSetpoint = 0.0;
-        if (ta > 1.1 );{
+        if (ta > 1.1 ){
             if(side == "right") {
                 txSetpoint = 0 ; //-20;
             } else {
@@ -69,13 +66,13 @@ public class FeederPID extends CommandBase{
             }
         }
 
-        m_Drivetrain.setSpinLock(true);
-        if (alliance == Alliance.Red) {
+        drivetrain.setSpinLock(true);
+        if(alliance == Alliance.Red) {
             wSetpoint = 0;
-            m_Drivetrain.setSpinLockAngle(wSetpoint);
+            drivetrain.setSpinLockAngle(wSetpoint);
         } else { 
             wSetpoint = 0;
-            m_Drivetrain.setSpinLockAngle(wSetpoint);
+            drivetrain.setSpinLockAngle(wSetpoint);
         };  
         
     }
@@ -115,17 +112,17 @@ public class FeederPID extends CommandBase{
         SmartDashboard.putNumber("ty", ty);
         SmartDashboard.putNumber("ta", ta);
         SmartDashboard.putNumber("tv", tv);
-        SmartDashboard.putNumber("yawWrapped", m_Drivetrain.getPoseYawWrapped().getDegrees());
+        SmartDashboard.putNumber("yawWrapped", drivetrain.getPoseYawWrapped().getDegrees());
         
         //if (Math.abs(m_Drivetrain.getPoseYawWrapped().getDegrees()) > 0 && tv != 0.0) {
         //    m_Drivetrain.drive (MathUtil.clamp(xController.calculate(ta, 1.5),-1.5,1.5),
         //                    (MathUtil.clamp(yController.calculate(tx,txSetpoint),-1.5,1.5)),
         //                    0.0, coordType.ROBOT_CENTRIC);
-            if ((tx < (txSetpoint-deadband) || (tx > (txSetpoint+deadband)))) {
-                m_Drivetrain.drive(0,
-                    (MathUtil.clamp(-1 * yController.calculate(tx,txSetpoint), -1.5, 1.5)),
-                    (MathUtil.clamp(-1 * wController.calculate(m_Drivetrain.getPoseYawWrapped().getDegrees(), wSetpoint), -1.5, 1.5)));
-            }
+        if ((tx < (txSetpoint-deadband) || (tx > (txSetpoint+deadband)))) {
+            drivetrain.drive(0,
+                (MathUtil.clamp(-1 * yController.calculate(tx,txSetpoint), -1.5, 1.5)),
+                (MathUtil.clamp(-1 * wController.calculate(drivetrain.getPoseYawWrapped().getDegrees(), wSetpoint), -1.5, 1.5)));
+        }
         //} else m_Drivetrain.drive (Math.pow(10,-7),Math.pow(10,-7),Math.pow(10,-7));
     }
 
@@ -138,6 +135,6 @@ public class FeederPID extends CommandBase{
 
     @Override
     public void end(boolean interrupted) {
-        m_Drivetrain.setSpinLock(false);
+        drivetrain.setSpinLock(false);
     }
 }

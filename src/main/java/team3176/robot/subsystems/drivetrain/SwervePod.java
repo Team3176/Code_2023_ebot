@@ -6,16 +6,15 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 import team3176.robot.constants.DrivetrainConstants;
+import team3176.robot.constants.DrivetrainHardwareMap;
 import team3176.robot.util.LoggedTunableNumber;
 import team3176.robot.util.God.*;
 
@@ -26,7 +25,7 @@ public class SwervePod {
     /** Current value in radians of the azimuthEncoder's position */
     double azimuthEncoderRelPosition;
     double azimuthEncoderAbsPosition;
-    double desired_optimized_azimuth_position;
+    double desiredOptimizedAzimuthPosition;
     double velTicsPer100ms;
     boolean lastHasResetOccurred;
     
@@ -44,20 +43,14 @@ public class SwervePod {
 
     private double lastEncoderPos;
 
-    public int kSlotIdx_Azimuth, kPIDLoopIdx_Azimuth, kTimeoutMs_Azimuth,kSlotIdx_Thrust, kPIDLoopIdx_Thrust, kTimeoutMs_Thrust;
-
-    public double podThrust, podAzimuth, podAbsAzimuth;
-
     //private double kP_Azimuth;
-    private LoggedTunableNumber kP_azimuth = new LoggedTunableNumber("kP_azimuth");
-    private LoggedTunableNumber kI_Azimuth = new LoggedTunableNumber("kI_azimuth");
-    private double kD_Azimuth;
+    private LoggedTunableNumber kPAzimuth = new LoggedTunableNumber("kP_azimuth");
+    private LoggedTunableNumber kIAzimuth = new LoggedTunableNumber("kI_azimuth");
+    private double kDAzimuth;
     private double lastDistance =0.0;
     private double delta = 0.0;
     private LoggedTunableNumber velMax = new LoggedTunableNumber("az_vel");
     private LoggedTunableNumber velAcc = new LoggedTunableNumber("az_acc");
-
-    private double turnOutput;
 
     private final PIDController  turningPIDController;
     //private final ProfiledPIDController m_turningProfiledPIDController;
@@ -69,71 +62,71 @@ public class SwervePod {
     public SwervePod(int id, SwervePodIO io) {
         this.id = id;
         this.io = io;
-        this.desired_optimized_azimuth_position = 0.0;
+        this.desiredOptimizedAzimuthPosition = 0.0;
 
         //this.kP_Azimuth = 0.006;
-        kP_azimuth.initDefault(.007);
-        this.kI_Azimuth.initDefault(0.0);
-        this.kD_Azimuth = 0.0;
+        kPAzimuth.initDefault(.007);
+        this.kIAzimuth.initDefault(0.0);
+        this.kDAzimuth = 0.0;
         velMax.initDefault(900);
         velAcc.initDefault(900);
 
-        turningPIDController = new PIDController(kP_azimuth.get(), kI_Azimuth.get(), kD_Azimuth);//,new Constraints(velMax.get(), velAcc.get()));
+        turningPIDController = new PIDController(kPAzimuth.get(), kIAzimuth.get(), kDAzimuth);//,new Constraints(velMax.get(), velAcc.get()));
         turningPIDController.setTolerance(4);
         turningPIDController.enableContinuousInput(-180, 180);
         turningPIDController.setIntegratorRange(-0.1,0.1);
-        turningPIDController.setP(this.kP_azimuth.get());
-        turningPIDController.setI(this.kI_Azimuth.get());
-        turningPIDController.setD(this.kD_Azimuth);
+        turningPIDController.setP(this.kPAzimuth.get());
+        turningPIDController.setI(this.kIAzimuth.get());
+        turningPIDController.setD(this.kDAzimuth);
         
     }
 
 
-    public void set_module(double speedMetersPerSecond, Rotation2d angle) {
-        set_module(new SwerveModuleState(speedMetersPerSecond,angle));
+    public void setModule(double speedMetersPerSecond, Rotation2d angle) {
+        setModule(new SwerveModuleState(speedMetersPerSecond,angle));
     }
 
     /**
      *  alternative method for setting swervepod in line with WPILIB standard library
      * @param desiredState 
      */
-    public SwerveModuleState set_module(SwerveModuleState desiredState) {
+    public SwerveModuleState setModule(SwerveModuleState desiredState) {
         io.updateInputs(inputs);
         Logger.getInstance().processInputs("Drive/Module" + Integer.toString(this.id), inputs);
         
         this.azimuthEncoderAbsPosition = inputs.turnAbsolutePositionDegrees;
-        SwerveModuleState desired_optimized = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(this.azimuthEncoderAbsPosition));
-        this.desired_optimized_azimuth_position = desired_optimized.angle.getDegrees();
-        
+        SwerveModuleState desiredOptimized = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(this.azimuthEncoderAbsPosition));
+        this.desiredOptimizedAzimuthPosition = desiredOptimized.angle.getDegrees();
+        double turnOutput;
         if (desiredState.speedMetersPerSecond > (-Math.pow(10,-10)) && desiredState.speedMetersPerSecond  < (Math.pow(10,-10))) {      
-            this.turnOutput = turningPIDController.calculate(this.azimuthEncoderAbsPosition, this.lastEncoderPos);
+            turnOutput = turningPIDController.calculate(this.azimuthEncoderAbsPosition, this.lastEncoderPos);
         } else {
-            this.turnOutput = turningPIDController.calculate(this.azimuthEncoderAbsPosition, desired_optimized.angle.getDegrees());
-            this.lastEncoderPos = desired_optimized.angle.getDegrees(); 
+            turnOutput = turningPIDController.calculate(this.azimuthEncoderAbsPosition, desiredOptimized.angle.getDegrees());
+            this.lastEncoderPos = desiredOptimized.angle.getDegrees(); 
         }
         // reduce output if the error is high
         double currentDistance = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
         this.delta = currentDistance - this.lastDistance;
         this.lastDistance = currentDistance;
         
-        desired_optimized.speedMetersPerSecond *= Math.abs(Math.cos(desired_optimized.angle.minus(Rotation2d.fromDegrees(azimuthEncoderAbsPosition)).getRadians()));
+        desiredOptimized.speedMetersPerSecond *= Math.abs(Math.cos(desiredOptimized.angle.minus(Rotation2d.fromDegrees(azimuthEncoderAbsPosition)).getRadians()));
         //Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "", id);
         
-        io.setTurn(MathUtil.clamp(this.turnOutput, -0.4, 0.4));
+        io.setTurn(MathUtil.clamp(turnOutput, -0.4, 0.4));
         Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/error",turningPIDController.getPositionError());
         //Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/setpoint",turningPIDController.getSetpoint().position);
-        this.velTicsPer100ms = Units3176.mps2ums(desired_optimized.speedMetersPerSecond);
-        io.setDrive(desired_optimized.speedMetersPerSecond);
+        this.velTicsPer100ms = Units3176.mps2ums(desiredOptimized.speedMetersPerSecond);
+        io.setDrive(desiredOptimized.speedMetersPerSecond);
 
-        if(kP_azimuth.hasChanged(hashCode()) || kI_Azimuth.hasChanged(hashCode())) {
-            turningPIDController.setP(kP_azimuth.get());
-            turningPIDController.setI(kI_Azimuth.get());
+        if(kPAzimuth.hasChanged(hashCode()) || kIAzimuth.hasChanged(hashCode())) {
+            turningPIDController.setP(kPAzimuth.get());
+            turningPIDController.setI(kIAzimuth.get());
         }
         // if(velAcc.hasChanged(hashCode()) || velMax.hasChanged(hashCode())){
         //     turningPIDController.setConstraints(new Constraints(velMax.get(),velAcc.get()));
         // }
 
-        return desired_optimized;
+        return desiredOptimized;
     }   
     /*
      * odometry calls
@@ -148,8 +141,8 @@ public class SwervePod {
     
     public double getVelocity() {
         double wheelVelocityInFeetPerSecond = inputs.driveVelocityRadPerSec / (Math.PI *2) * DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI;   
-        double wheelVelocityInMetersPerSecond = Units3176.feetPerSecond2metersPerSecond(wheelVelocityInFeetPerSecond);
-        return wheelVelocityInMetersPerSecond;
+        return Units3176.feetPerSecond2metersPerSecond(wheelVelocityInFeetPerSecond);
+    
     }
 
     /**
@@ -169,7 +162,7 @@ public class SwervePod {
     }
 
     public double getAzimuthSetpoint() {
-        return this.desired_optimized_azimuth_position;
+        return this.desiredOptimizedAzimuthPosition;
     }
     public double getThrustSetpoint() {
         return this.velTicsPer100ms;
@@ -180,24 +173,24 @@ public class SwervePod {
 
     public void setupShuffleboard() {
         Shuffleboard.getTab(this.idString)
-            .add(idString+"/podAzimuth_setpoint_angle",DrivetrainConstants.AZIMUTH_ABS_ENCODER_OFFSET_POSITION[id])
+            .add(idString+"/podAzimuth_setpoint_angle",DrivetrainHardwareMap.AZIMUTH_ABS_ENCODER_OFFSET_POSITION[id])
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", -3.16, "max", 3.16))
             .withSize(2,1)
             .withPosition(2,1)
             .getEntry();
         Shuffleboard.getTab(this.idString)
-            .add(idString+"/kP_Azimuth", this.kP_azimuth.get())
+            .add(idString+"/kP_Azimuth", this.kPAzimuth.get())
             .withSize(1,1)
             .withPosition(4,1)
             .getEntry();
         Shuffleboard.getTab(this.idString)
-            .add(idString+"/kI_Azimuth", this.kI_Azimuth)
+            .add(idString+"/kI_Azimuth", this.kIAzimuth)
             .withSize(1,1)
             .withPosition(5,1)
             .getEntry();
         Shuffleboard.getTab(this.idString)
-            .add(idString+"/kD_Azimuth", this.kD_Azimuth)
+            .add(idString+"/kD_Azimuth", this.kDAzimuth)
             .withSize(1,1)
             .withPosition(6,1)
             .getEntry();

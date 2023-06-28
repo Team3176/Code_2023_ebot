@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
 
-import team3176.robot.subsystems.superstructure.IntakeCubeIO;
 import team3176.robot.subsystems.superstructure.IntakeCubeIO.IntakeCubeIOInputs;
 import org.littletonrobotics.junction.Logger;
 
@@ -28,11 +27,8 @@ public class IntakeCube extends SubsystemBase {
   private TalonFX rollermotor = new TalonFX(Hardwaremap.intake_CID);
   private TalonSRX conveyor = new TalonSRX(61); //TODO: Add to HArdwareMap
   private DoubleSolenoid pistonOne;
-  private DoubleSolenoid pistonTwo;
   private DigitalInput linebreak;
 
-  private boolean isExtended;
-  private boolean isInIntake;
   private static IntakeCube instance;
   private final IntakeCubeIO io;
   private final IntakeCubeIOInputs inputs = new IntakeCubeIOInputs();
@@ -67,13 +63,11 @@ public class IntakeCube extends SubsystemBase {
   public void Extend() {
     pistonOne.set(Value.kForward);
     //pistonTwo.set(Value.kForward);
-    this.isExtended = true;
   }
 
   public void Retract() {
     pistonOne.set(Value.kReverse);
     //pistonTwo.set(Value.kReverse);
-    this.isExtended = false;
   }
 
   public boolean getLinebreak()

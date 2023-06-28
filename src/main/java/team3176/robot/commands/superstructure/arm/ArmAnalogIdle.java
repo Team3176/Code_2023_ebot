@@ -2,28 +2,32 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package team3176.robot.commands.superstructure.claw;
+package team3176.robot.commands.superstructure.arm;
+
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import team3176.robot.subsystems.superstructure.Claw;
+import team3176.robot.subsystems.superstructure.Arm;
 
-public class ClawIdle extends CommandBase {
-  /** Creates a new ClawInhale. */
-  Claw claw = Claw.getInstance();
+public class ArmAnalogIdle  extends CommandBase {
+  /** Creates a new IntakeExtendSpin. */
+  private Arm arm = Arm.getInstance();
 
-  public ClawIdle() {
+  public ArmAnalogIdle() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(claw);
+    addRequirements(arm);
+
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    claw.idle();
+      arm.idle();
+
   }
+
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+      return true;
   }
 }

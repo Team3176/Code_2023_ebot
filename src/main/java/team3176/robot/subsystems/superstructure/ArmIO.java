@@ -8,12 +8,6 @@
 package team3176.robot.subsystems.superstructure;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.LogTable;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
-
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 
 /** Template hardware interface for a closed loop subsystem. */
 public interface ArmIO{

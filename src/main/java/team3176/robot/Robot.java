@@ -17,10 +17,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import team3176.robot.Constants.RobotType;
-import team3176.robot.subsystems.superstructure.Arm;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.cscore.CvSource;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -29,11 +27,11 @@ import edu.wpi.first.cscore.CvSource;
  * project.
  */
 public class Robot extends LoggedRobot{
-  private Command m_autonomousCommand;
+  private Command autonomousCommand;
 
-  private RobotContainer m_robotContainer;
-  Thread m_fisheyeThread;
-
+  private RobotContainer robotContainer;
+  Thread fisheyeThread;
+  private static final boolean FISHEYE_CAMERA = false;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -43,23 +41,24 @@ public class Robot extends LoggedRobot{
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     Logger logger = Logger.getInstance();
-    logger.recordMetadata("Robot", Constants.getRobot().toString());
     System.out.println("[Init] Starting AdvantageKit");
+    logger.recordMetadata("Robot", Constants.getRobot().toString());
     logger.recordMetadata("RuntimeType", getRuntimeType().toString());
     logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
     logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
     logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
     logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    final String GitDirty = "GitDirty";
     switch (BuildConstants.DIRTY) {
       case 0:
-        logger.recordMetadata("GitDirty", "All changes committed");
+        logger.recordMetadata(GitDirty, "All changes committed");
         break;
       case 1:
-        logger.recordMetadata("GitDirty", "Uncomitted changes");
+        logger.recordMetadata(GitDirty, "Uncomitted changes");
         break;
       default:
-        logger.recordMetadata("GitDirty", "Unknown");
+        logger.recordMetadata(GitDirty, "Unknown");
         break;
     }
     switch (Constants.getMode()) {
@@ -90,15 +89,21 @@ public class Robot extends LoggedRobot{
     logger.start();
 
 
-    m_robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
     SmartDashboard.putData(CommandScheduler.getInstance());
-    // m_fisheyeThread = new Thread( () -> {
-    //   UsbCamera fisheye = CameraServer.startAutomaticCapture();
-    //   fisheye.setResolution(640,480);
-    //   CvSource outputStream = CameraServer.putVideo("fisheye", 640, 480);
-    // });
-    // m_fisheyeThread.setDaemon(true);
-    // m_fisheyeThread.start();
+    
+    if(FISHEYE_CAMERA)
+    {
+      fisheyeThread = new Thread( () -> {
+        UsbCamera fisheye = CameraServer.startAutomaticCapture();
+        fisheye.setResolution(640,480);
+        //not using this at the return so commenting for linting: CvSource outputStream = 
+        CameraServer.putVideo("fisheye", 640, 480);
+      });
+      fisheyeThread.setDaemon(true);
+      fisheyeThread.start();
+    }
+    
 
   }
 
@@ -121,29 +126,33 @@ public class Robot extends LoggedRobot{
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    m_robotContainer.setArmCoast();
+    robotContainer.setArmCoast();
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    //nan
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_robotContainer.clearCanFaults();
-    m_robotContainer.setArmBrake();
-    m_robotContainer.setThrustBrake();
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    robotContainer.clearCanFaults();
+    robotContainer.setArmBrake();
+    robotContainer.setThrustBrake();
+    autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (autonomousCommand != null) {
+      autonomousCommand.schedule();
     }
   }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    //scheduled command executes from init()
+  }
 
   @Override
   public void teleopInit() {
@@ -151,17 +160,19 @@ public class Robot extends LoggedRobot{
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    m_robotContainer.clearCanFaults();
-        m_robotContainer.setArmBrake();
-    m_robotContainer.setThrustCoast();
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    robotContainer.clearCanFaults();
+        robotContainer.setArmBrake();
+    robotContainer.setThrustCoast();
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    //command scheduler is responsible for actions
+  }
 
   @Override
   public void testInit() {
@@ -171,13 +182,19 @@ public class Robot extends LoggedRobot{
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    //nan
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    //nan
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    //nan
+  }
 }

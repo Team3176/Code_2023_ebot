@@ -15,7 +15,6 @@ public class TurtleSpeed extends CommandBase {
   private DoubleSupplier forwardCommand;
   private DoubleSupplier strafeCommand;
   private DoubleSupplier spinCommand;
-  private Double SpeedReductionFactor;
 
   public TurtleSpeed( DoubleSupplier forwardCommand, DoubleSupplier strafeCommand, DoubleSupplier spinCommand) {
     this.forwardCommand = forwardCommand;
@@ -40,6 +39,4 @@ public class TurtleSpeed extends CommandBase {
   @Override
   public boolean isFinished() { return false; }
 
-  @Override
-  public void end(boolean interrupted) {  }
 }

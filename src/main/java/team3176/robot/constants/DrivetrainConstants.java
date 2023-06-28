@@ -38,11 +38,5 @@ public class DrivetrainConstants extends DrivetrainHardwareMap {
             //MAX_ROT_SPEED_RADIANS_PER_SECOND, MAX_ROT_ACCELERATION_RADIANS_PER_SECOND_SQUARED);
             2*Math.PI, 2*Math.PI
         );
-
-    public static final double P_X_Controller = 1;
-    public static final double P_Y_Controller = 1;
-    public static final double P_Theta_Controller = 1;
-
-
     
 }

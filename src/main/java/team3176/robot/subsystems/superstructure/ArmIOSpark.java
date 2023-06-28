@@ -7,17 +7,12 @@
 
 package team3176.robot.subsystems.superstructure;
 
-import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.LogTable;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
-
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import team3176.robot.constants.SuperStructureConstants;
 import team3176.robot.constants.Hardwaremap;
@@ -36,6 +31,7 @@ public class ArmIOSpark implements ArmIO{
     armEncoder.configSensorDirection(true,100);
   }
   /** Updates the set of loggable inputs. */
+  @Override
   public void updateInputs(ArmIOInputs inputs) {
     inputs.Position = armEncoder.getAbsolutePosition();
     inputs.VelocityRadPerSec = Units.degreesToRadians(armEncoder.getVelocity());
@@ -43,9 +39,11 @@ public class ArmIOSpark implements ArmIO{
     inputs.CurrentAmps = new double[] {armController.getOutputCurrent()};
     inputs.TempCelcius = new double[] {armController.getMotorTemperature()};
   }
+  @Override
   public void set(double percentOuput) {
     armController.set(percentOuput);
   }
+  @Override
   public void setCoastMode(boolean isCoastMode) {
     if(isCoastMode) {
       armController.setIdleMode(IdleMode.kCoast);
@@ -53,6 +51,9 @@ public class ArmIOSpark implements ArmIO{
       armController.setIdleMode(IdleMode.kBrake);
     }
   }
-  public void reset() {}
+  @Override
+  public void reset() {
+    //to be implemented
+  }
 }
 
