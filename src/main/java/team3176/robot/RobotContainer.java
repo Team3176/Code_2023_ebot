@@ -29,7 +29,8 @@ import team3176.robot.subsystems.superstructure.IntakeCube;
 import team3176.robot.subsystems.superstructure.IntakeCone;
 
 import team3176.robot.subsystems.superstructure.Superstructure;
-import team3176.robot.subsystems.vision.VisionDual;
+//import team3176.robot.subsystems.vision.VisionDual;
+import team3176.robot.subsystems.vision.VisionCubeChase;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -53,7 +54,7 @@ public class RobotContainer {
   
   // is this why we don't have a compressor? private final Compressor m_Compressor
   private final Drivetrain drivetrain;
-  private final VisionDual vision;
+  private final VisionCubeChase vision;
   private final Superstructure superstructure;
   private SendableChooser<String> autonChooser;
   
@@ -70,7 +71,7 @@ public class RobotContainer {
     intakeCone = IntakeCone.getInstance();
     pdh = new PowerDistribution(Hardwaremap.PDH_CID, ModuleType.kRev);
 
-    vision = VisionDual.getInstance();
+    vision = VisionCubeChase.getInstance();
     superstructure = Superstructure.getInstance();
     drivetrain.setDefaultCommand(new SwerveDrive(
         controller::getForward,
@@ -107,13 +108,13 @@ public class RobotContainer {
 
     controller.transStick.button(4).whileTrue(superstructure.prepareScoreHigh());
     controller.transStick.button(4).onFalse((superstructure.prepareCarry()));
-    controller.transStick.button(5).onTrue(new InstantCommand(drivetrain::resetPoseToVision,drivetrain));
+//    controller.transStick.button(5).onTrue(new InstantCommand(drivetrain::resetPoseToVision,drivetrain));
     controller.transStick.button(10).whileTrue(new InstantCommand(drivetrain::setBrakeMode).andThen(new SwerveDefense()));
      //m_Controller.getTransStick_Button10()
      //    .onFalse(new InstantCommand(() -> m_Drivetrain.setDriveMode(driveMode.DRIVE), m_Drivetrain));
 
     // m_Controller.getRotStick_Button2().whileTrue(new FlipField);
-    controller.rotStick.button(1).whileTrue(new Turbo(
+    controller.rotStick.button(1).whileTrue(new CubeChase(
       controller::getForward,
       controller::getStrafe,
       controller::getSpin

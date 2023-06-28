@@ -80,7 +80,7 @@ public class Drivetrain extends SubsystemBase {
   double angleAvgRollingWindow;
 
   public enum driveMode {
-    DEFENSE, DRIVE, VISION
+    DEFENSE, DRIVE, VISION, CUBECHASE
   }
 
   private SwervePod podFR;
@@ -479,12 +479,12 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("NavYaw",getPoseYawWrapped().getDegrees());
 
     //Liam and Andrews work!
-    double[] visionPoseArray = NetworkTableInstance.getDefault().getTable("limelight-rfov").getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
-    Pose3d visionPose3dNT = new Pose3d(visionPoseArray[0], visionPoseArray[1], visionPoseArray[2], new Rotation3d( Units.degreesToRadians(visionPoseArray[3]), Units.degreesToRadians(visionPoseArray[4]), Units.degreesToRadians(visionPoseArray[5])));
-    Logger.getInstance().recordOutput("Drive/vision_pose", visionPose3dNT);
+    //double[] visionPoseArray = NetworkTableInstance.getDefault().getTable("limelight-rfov").getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
+    //Pose3d visionPose3dNT = new Pose3d(visionPoseArray[0], visionPoseArray[1], visionPoseArray[2], new Rotation3d( Units.degreesToRadians(visionPoseArray[3]), Units.degreesToRadians(visionPoseArray[4]), Units.degreesToRadians(visionPoseArray[5])));
+    //Logger.getInstance().recordOutput("Drive/vision_pose", visionPose3dNT);
 
     //new vision proposal 
-    visionPose3d = VisionDual.getInstance().getPose3d();
+    //visionPose3d = VisionDual.getInstance().getPose3d();
 
     // double[] default_pose = {0.0,0.0,0.0,0.0,0.0,0.0};
     // try {
