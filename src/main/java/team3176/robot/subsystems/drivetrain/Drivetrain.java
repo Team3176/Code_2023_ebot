@@ -70,11 +70,14 @@ public class Drivetrain extends SubsystemBase {
 
   // spin lock
   private PIDController spinLockPID;
+
   private Rotation2d spinLockAngle = Rotation2d.fromDegrees(0.0);
   private boolean isSpinLocked = false;
 
   private boolean isTurboOn = false;
-
+  PIDController CubeChaseController = new PIDController(.01, 0, 0);
+  double cubeChaseSpinCommand;
+  double cubeTx;
   private int arraytrack;
   double[] angleHist = { 0.0, 0.0, 0.0, 0.0, 0.0 };
   double angleAvgRollingWindow;
@@ -230,6 +233,9 @@ public class Drivetrain extends SubsystemBase {
    */
   private void calculateNSetPodPositions() {
     if (currentDriveMode != driveMode.DEFENSE) {
+      if (currentDriveMode == driveMode.CUBECHASE) {
+        this.spinCommand = calcCubeChaseSpinCommand();
+      }
       ChassisSpeeds currChassisSpeeds = new ChassisSpeeds(forwardCommand, strafeCommand, spinCommand);
       if (this.currentCoordType == coordType.FIELD_CENTRIC) {
         Rotation2d fieldOffset = this.getPose().getRotation();
@@ -428,6 +434,12 @@ public class Drivetrain extends SubsystemBase {
    * }
    */
 
+
+  private double calcCubeChaseSpinCommand() {  
+      this.cubeTx = LimelightHelpers.getTX("limelight-three");
+      cubeChaseSpinCommand = 1 * CubeChaseController.calculate(cubeTx, 0.0);
+      return cubeChaseSpinCommand;
+  }
   
   @Override
   public void periodic() {
@@ -527,6 +539,8 @@ public class Drivetrain extends SubsystemBase {
     if (this.arraytrack > 3) {
       this.arraytrack = 0;
     }
+
+  
     
     SmartDashboard.putNumber("odomx", getPose().getX());
     SmartDashboard.putNumber("odomy", getPose().getY());
