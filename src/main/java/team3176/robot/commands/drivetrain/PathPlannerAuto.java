@@ -35,6 +35,9 @@ public class PathPlannerAuto {
         }));
         eventMap.put("groundCube",superstructure.groundCube().withTimeout(3));
         eventMap.put("poopCube",new PoopCube().withTimeout(.7));
+        eventMap.put("CubeAlignAtPoint", new CubeAlignAtPoint());
+        eventMap.put("CubeChaseOn", new CubeChaseOn());
+        eventMap.put("CubeChaseOff", new CubeChaseOff());
         // eventMap.put("intakeDown", new IntakeDown());
         // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.
         SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
