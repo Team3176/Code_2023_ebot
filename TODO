@@ -1,14 +1,36 @@
 
-Todo:
 ## Top Priority 
 
-  ✔ Rebolt & loctite Arm Gearbox @done(23-03-29 22:30)
-  ☐ Build backup Arm Gearbox
-  ✘ Lower backside of poop chute @cancelled(23-03-07 15:36)
+  ☐ Fix bug causing autos to end in RobotCentric instead of FieldCentric
+  ☐ Create /mnt/sda2 for log files
+  ☐ Double-check Logfile fxning, contents, and replay
+  ☐ Create delay in center-cone/cube-delay-exit
   ☐ Mount fisheye camera 
+
+## High Priority
+  ☐ Create CubeChase versions of wall autos
+  ☐ Test CubeChase versions of wall autos
+
+
+## Mid Priority
+
+  ☐ Create auto-assist for HP station 
+  ☐ Fault Accommodation for software (what happens if a line break fails or encoder does our code “fail gracefully” and are there manual backups)
+  ☐ Check limelight data and ensure it doesn’t cause a runtime error if unplugged
+
+## Low Priority 
+
+  ☐ Create "Drive off chargeStation safely/(azimumth lock)" (Chris)
+  ☐ Implement HAT input to SwerveLock to set cardinal direction of SwerveLock (Jon)
+  ☐ Build new drivestation for 2ndary bots
+
+Archive:
+  ✔ Rebolt & loctite Arm Gearbox @done(23-03-29 22:30)
+  ✘ Build backup Arm Gearbox @cancelled(23-06-30 00:00)
+  ✘ Lower backside of poop chute @cancelled(23-03-07 15:36)
   ✔ Clean out inside of pods @done(23-03-03 23:14)
   ✔ Rebuild 4 pods w/ new encoder shafts @done(23-03-03 23:14)
-    ✔ Remeasure offsets for the 4 pods after rebuild @done(23-03-03 23:14)
+  ✔ Remeasure offsets for the 4 pods after rebuild @done(23-03-03 23:14)
   ✔ Rewheel 4 pods @done(23-03-03 23:14)
   ✔ Retread 4 other pods, and extra wheels @done(23-03-03 23:14)
   ✔ Reattach battery strap.  Fold it several times at the end and re-revit with washers @done(23-03-03 23:14)
@@ -21,9 +43,6 @@ Todo:
   ✔ Confirm LED Code on bot (Code looks correct now) (Chris/Caleb) @done(23-02-27 23:05)
   ✔ restore momentary robotCentric button on joys @done(23-02-28 20:36)
   ✔ Loctite & tighten bolts @done(23-02-28 19:49)
-
-  ## High Priority
-
   ✘ Double check / restore SwerveLock (Chris/Jon) @cancelled(23-03-29 22:30)
   ✔ 3D Print component mounts @done(23-03-29 22:30)
   ✔ CAN connection exception check (Jon/Chris) @done(23-03-29 22:30)
@@ -31,20 +50,20 @@ Todo:
   ✔ Make pit checklist (Nathan) @done(23-03-03 23:15)
   ✔ Impact Presentation practice (Cate & Elliot) @done(23-03-03 23:15)
   ✔ Autons Debugged (Chris/Jon + Zack/Custer/Caleb) @done(23-03-03 23:15)
-    ✔ center_auto @done(23-03-01 23:47)
-    ✔ barrier_cone_exit_balance @done(23-03-01 23:47)
-    ✔ wall_cone_xwire_balance @done(23-03-01 23:47)
-    ✔ barrier_cone_exit_hpload @done(23-03-03 23:15)
-    ✘ 2_cube_balance @cancelled(23-03-01 23:48)
-    ✘ speed_cube_3 @cancelled(23-03-01 23:48)
-    ✘ speed_cube_4 @cancelled(23-03-01 23:48)
+  ✔ center_auto @done(23-03-01 23:47)
+  ✔ barrier_cone_exit_balance @done(23-03-01 23:47)
+  ✔ wall_cone_xwire_balance @done(23-03-01 23:47)
+  ✔ barrier_cone_exit_hpload @done(23-03-03 23:15)
+  ✘ 2_cube_balance @cancelled(23-03-01 23:48)
+  ✘ speed_cube_3 @cancelled(23-03-01 23:48)
+  ✘ speed_cube_4 @cancelled(23-03-01 23:48)
   ✔ Make decision about going to 1741 Wed for Auto Practice / tuning (Ben) @done(23-02-28 19:50)
   ✔ Go to RedAlert and practice autons Wed 4:30 - 9:00 @done(23-03-29 22:31)
-    ✘ Confirm limelight camera coordinates are set correctly for ebot @cancelled(23-03-29 22:31)
-    ✔ run Calibration Auto to confirm effective wheel diameter (turn vision off for this run) @done(23-03-29 22:31)
-    ✔ test basic scoreHigh Command on Cones and Cubes without moving @done(23-03-01 23:48)
-    ✔ test autoBalance command @done(23-03-01 23:48)
-    ✔ begin testing full autos above @done(23-03-01 23:48)
+  ✘ Confirm limelight camera coordinates are set correctly for ebot @cancelled(23-03-29 22:31)
+  ✔ run Calibration Auto to confirm effective wheel diameter (turn vision off for this run) @done(23-03-29 22:31)
+  ✔ test basic scoreHigh Command on Cones and Cubes without moving @done(23-03-01 23:48)
+  ✔ test autoBalance command @done(23-03-01 23:48)
+  ✔ begin testing full autos above @done(23-03-01 23:48)
   ✔ Find fisheye camera cable (USBA Fem to USBA Male) to run from top to LL @done(23-02-28 23:52)
   ✔ Debug Pod Swap Code/Procedure (Jon) @done(23-02-27 23:05)
   ✔ Zip tie and tie-down loose wires into bundles (Jay) @done(23-02-27 23:05)
@@ -55,21 +74,7 @@ Todo:
   ✔ Fix Claw so spit works when cone manually inserted (see Command DetermineGamePiece()). @done(23-03-01 09:40)
   ✔ Put arm in coast mode when disabled, and convert to brake mode when in telopInt or autoInit @done(23-02-28 23:37)
   ✔ Put Thrust motors in coast in disabled, but in brake in auton & teleop. @done(23-02-28 23:51)
-
-## Mid Priority
-
   ✔ Handles added to drivestation @done(23-03-29 22:30)
-  ☐ Create auto-assist for HP station 
-  ☐ Fault Accommodation for software (what happens if a line break fails or encoder does our code “fail gracefully” and are there manual backups)
-  ☐ Check limelight data and ensure it doesn’t cause a runtime error if unplugged
   ✔ Leds add ground cube state @done(23-02-27 23:06)
   ✔ Print 3 more LL covers (Chris) @done(23-02-28 19:55)
-
-## Low Priority
-
-  ☐ Create "Drive off chargeStation safely/(azimumth lock)" (Chris)
-  ☐ Implement HAT input to SwerveLock to set cardinal direction of SwerveLock (Jon)
-  ☐ Build new drivestation for 2ndary bots
   ✔ Mount eye-level screen on primary drivestation @done(23-02-28 19:55)
-
-
