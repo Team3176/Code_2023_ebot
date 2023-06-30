@@ -15,7 +15,7 @@ import team3176.robot.subsystems.drivetrain.LimelightHelpers;
 
 
 
-public class CubeChase extends CommandBase {
+public class CubeChaseTeleop extends CommandBase {
   private Drivetrain drivetrain = Drivetrain.getInstance();
   private VisionCubeChase visionCubeChase = VisionCubeChase.getInstance();
 
@@ -28,7 +28,7 @@ public class CubeChase extends CommandBase {
   PIDController txController = new PIDController(.01, 0, 0);
   double tx;
 
-  public CubeChase( DoubleSupplier forwardCommand, DoubleSupplier strafeCommand, DoubleSupplier spinCommand) {
+  public CubeChaseTeleop( DoubleSupplier forwardCommand, DoubleSupplier strafeCommand, DoubleSupplier spinCommand) {
     this.forwardCommand = forwardCommand;
     this.strafeCommand = strafeCommand;
     this.spinCommand = spinCommand;
