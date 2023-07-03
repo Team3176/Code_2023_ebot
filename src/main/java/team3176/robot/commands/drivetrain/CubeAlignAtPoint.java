@@ -32,8 +32,8 @@ public class CubeAlignAtPoint extends CommandBase {
 
   //PIDController txController = new PIDController(.01, 0, 0);
   //double tx;
-  boolean tv; 
-  boolean[] tvArray = {false, false, false, false, false, false, false, false, false, false};
+  double tx; 
+  double[] txArray = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   int arrayIdx;
 
   public CubeAlignAtPoint() {
@@ -54,21 +54,21 @@ public class CubeAlignAtPoint extends CommandBase {
   @Override
   public void execute() {
     drivetrain.drive(smallNum, smallNum, 1.0);
-    tv = LimelightHelpers.getTV("limelight-three");
-    tvArray[arrayIdx] = tv;
-    if (arrayIdx == (tvArray.length + 1)) {arrayIdx = 0;} else {arrayIdx++;};
+    tx = LimelightHelpers.getTX("limelight-three");
+    txArray[arrayIdx] = tx;
+    if (arrayIdx == (txArray.length + 1)) {arrayIdx = 0;} else {arrayIdx++;};
   }
 
   @Override
   public boolean isFinished() {
     boolean tvArrayTripwire = true;
-    for (int idx = 0; idx < tvArray.length; idx++) {
-      tv = LimelightHelpers.getTV("limelight-three");
-      tvArray[idx] = tv;
+    for (int idx = 0; idx < txArray.length; idx++) {
+      tx = LimelightHelpers.getTX("limelight-three");
+      txArray[idx] = tx;
     } 
-    for (int idx = 0; idx < tvArray.length; idx++) {
-      tv = LimelightHelpers.getTV("limelight-three");
-      if (!tvArray[idx]) { 
+    for (int idx = 0; idx < txArray.length; idx++) {
+      tx = LimelightHelpers.getTX("limelight-three");
+      if (txArray[idx] >= -XX && txArray[idx] <= +XX) { 
         tvArrayTripwire = false; 
       };
     }
