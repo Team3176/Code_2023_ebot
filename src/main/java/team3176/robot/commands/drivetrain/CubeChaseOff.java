@@ -15,7 +15,7 @@ public class CubeChaseOff extends CommandBase {
   private Drivetrain drivetrain = Drivetrain.getInstance();
 
   public CubeChaseOff() {
-    addRequirements(drivetrain);
+    //addRequirements(drivetrain);
   }
 
   @Override

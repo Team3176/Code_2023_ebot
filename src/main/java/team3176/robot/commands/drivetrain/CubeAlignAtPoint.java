@@ -68,7 +68,7 @@ public class CubeAlignAtPoint extends CommandBase {
     } 
     for (int idx = 0; idx < txArray.length; idx++) {
       tx = LimelightHelpers.getTX("limelight-three");
-      if (txArray[idx] >= -XX && txArray[idx] <= +XX) { 
+      if (txArray[idx] >= -19 && txArray[idx] <= +19) { 
         tvArrayTripwire = false; 
       };
     }
