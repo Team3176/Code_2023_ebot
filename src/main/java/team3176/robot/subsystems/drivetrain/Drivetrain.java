@@ -27,7 +27,8 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import team3176.robot.Constants;
 import team3176.robot.Constants.Mode;
 import team3176.robot.constants.DrivetrainConstants;
@@ -439,6 +440,15 @@ public class Drivetrain extends SubsystemBase {
       this.cubeTx = LimelightHelpers.getTX("limelight-three");
       cubeChaseSpinCommand = 1 * CubeChaseController.calculate(cubeTx, 0.0);
       return cubeChaseSpinCommand;
+  }
+
+
+  public Command setCubeChaseOn() {
+    return new InstantCommand(() -> setDriveMode(driveMode.CUBECHASE)); 
+  }
+  
+  public Command setCubeChaseOff() {
+    return new InstantCommand(() -> setDriveMode(driveMode.DRIVE)); 
   }
   
   @Override
