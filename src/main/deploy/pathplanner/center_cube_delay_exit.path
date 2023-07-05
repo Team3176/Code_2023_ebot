@@ -30,12 +30,12 @@
         "y": 2.194073654688893
       },
       "prevControl": {
-        "x": 2.1845156235304333,
-        "y": 2.1383509361694593
+        "x": 2.1742162685341575,
+        "y": 2.1431653542327496
       },
       "nextControl": {
-        "x": 2.519775916117128,
-        "y": 3.0831753971200255
+        "x": 2.48387454521388,
+        "y": 2.6673809685647547
       },
       "holonomicAngle": -178.60281897328534,
       "isReversal": false,
@@ -45,8 +45,8 @@
       "stopEvent": {
         "names": [],
         "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
+        "waitBehavior": "minimum",
+        "waitTime": 10.0
       }
     },
     {
@@ -102,12 +102,5 @@
   "maxVelocity": 2.0,
   "maxAcceleration": null,
   "isReversed": null,
-  "markers": [
-    {
-      "position": 0.7636363636363637,
-      "names": [
-        "event"
-      ]
-    }
-  ]
+  "markers": []
 }
