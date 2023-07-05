@@ -35,7 +35,6 @@ public class IntakeGroundCube extends CommandBase {
     m_IntakeCube.spinIntake(-.85);
     m_Claw.intake();
     m_IntakeCube.spinConveyor(-0.4);
-    m_Drivetrain.setCubeChaseOn();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -66,7 +65,6 @@ public class IntakeGroundCube extends CommandBase {
     m_IntakeCube.spinConveyor(0);
     m_Claw.hold();
     m_Arm.setAngleSetpoint(SuperStructureConstants.ARM_ZERO_POS);
-    m_Drivetrain.setCubeChaseOff();
   }
 
   // Returns true when the command should end.
