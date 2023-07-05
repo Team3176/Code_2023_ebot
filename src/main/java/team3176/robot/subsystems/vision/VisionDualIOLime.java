@@ -16,8 +16,8 @@ public class VisionDualIOLime implements VisionDualIO {
     inputs.lfovRed = LimelightHelpers.getBotPose3d_wpiRed(LFOV);
     inputs.lLatency = LimelightHelpers.getLatency_Capture(LFOV) + LimelightHelpers.getLatency_Pipeline(LFOV);
     inputs.rLatency = LimelightHelpers.getLatency_Capture(RFOV) + LimelightHelpers.getLatency_Pipeline(RFOV);
-    inputs.rNumTags = LimelightHelpers.getLatestResults(RFOV).targetingResults.targets_Fiducials.length;
-    inputs.lNumTags = LimelightHelpers.getLatestResults(LFOV).targetingResults.targets_Fiducials.length;
+    //inputs.rNumTags = LimelightHelpers.getLatestResults(RFOV).targetingResults.targets_Fiducials.length;
+    //inputs.lNumTags = LimelightHelpers.getLatestResults(LFOV).targetingResults.targets_Fiducials.length;
     inputs.rValid = LimelightHelpers.getTV(RFOV);
     inputs.lValid = LimelightHelpers.getTV(LFOV);
   }

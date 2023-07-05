@@ -79,7 +79,7 @@ public class Drivetrain extends SubsystemBase {
   PIDController CubeChaseController = new PIDController(.01, 0, 0);
   double cubeChaseSpinCommand;
   double cubeTx;
-  private int arraytrack;
+  //private int arraytrack;
   double[] angleHist = { 0.0, 0.0, 0.0, 0.0, 0.0 };
   double angleAvgRollingWindow;
 
@@ -170,7 +170,7 @@ public class Drivetrain extends SubsystemBase {
     // set for max and min of degrees for Rotation2D
     spinLockPID.enableContinuousInput(-180, 180);
 
-    arraytrack = 0;
+    //arraytrack = 0;
     angleAvgRollingWindow = 0;
 
 
@@ -258,10 +258,10 @@ public class Drivetrain extends SubsystemBase {
         optimizedStates[idx]=pods.get(idx).setModule(podStates[idx]);
         realStates[idx] = new SwerveModuleState(pods.get(idx).getVelocity(),Rotation2d.fromDegrees(pods.get(idx).getAzimuth()));
       }
-      Logger.getInstance().recordOutput("SwerveStates/Setpoints", podStates);
-      Logger.getInstance().recordOutput("SwerveStates/real", realStates);
-      Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
-      Logger.getInstance().recordOutput("Drive/SpinCommand", spinCommand);
+      //Logger.getInstance().recordOutput("SwerveStates/Setpoints", podStates);
+      //Logger.getInstance().recordOutput("SwerveStates/real", realStates);
+      //Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
+      //Logger.getInstance().recordOutput("Drive/SpinCommand", spinCommand);
       SmartDashboard.putNumber("spinCommand", spinCommand);
       SmartDashboard.putNumber("pod0 m/s", podStates[0].speedMetersPerSecond);
 
@@ -544,11 +544,13 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putData(field);
     
     // This method will be called once per scheduler every 500ms
-    
+   
+    /* 
     this.arraytrack++;
     if (this.arraytrack > 3) {
       this.arraytrack = 0;
     }
+    */
 
   
     
@@ -557,7 +559,7 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("v_odomx", poseEstimator.getEstimatedPosition().getX());
     SmartDashboard.putNumber("v_odomy", poseEstimator.getEstimatedPosition().getY());
     SmartDashboard.putBoolean("Turbo", isTurboOn);
-    publishSwervePodPIDErrors();
+    //publishSwervePodPIDErrors();
     // SmartDashboard.putBoolean("Defense", currentDriveMode == driveMode.DEFENSE);
   }
 

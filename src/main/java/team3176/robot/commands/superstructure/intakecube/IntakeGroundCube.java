@@ -7,6 +7,7 @@ package team3176.robot.commands.superstructure.intakecube;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
+import team3176.robot.subsystems.drivetrain.*;
 import team3176.robot.subsystems.superstructure.IntakeCube;
 import team3176.robot.subsystems.superstructure.Superstructure.GamePiece;
 import team3176.robot.subsystems.superstructure.Claw;
@@ -18,6 +19,7 @@ public class IntakeGroundCube extends CommandBase {
   IntakeCube m_IntakeCube = IntakeCube.getInstance();
   Claw m_Claw = Claw.getInstance();
   Arm m_Arm = Arm.getInstance();
+  Drivetrain m_Drivetrain = Drivetrain.getInstance();
   public IntakeGroundCube() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_IntakeCube, m_Claw, m_Arm);
@@ -33,6 +35,7 @@ public class IntakeGroundCube extends CommandBase {
     m_IntakeCube.spinIntake(-.85);
     m_Claw.intake();
     m_IntakeCube.spinConveyor(-0.4);
+    m_Drivetrain.setCubeChaseOn();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -63,6 +66,7 @@ public class IntakeGroundCube extends CommandBase {
     m_IntakeCube.spinConveyor(0);
     m_Claw.hold();
     m_Arm.setAngleSetpoint(SuperStructureConstants.ARM_ZERO_POS);
+    m_Drivetrain.setCubeChaseOff();
   }
 
   // Returns true when the command should end.
