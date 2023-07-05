@@ -98,7 +98,7 @@ public class RobotContainer {
     
     controller.transStick.button(1).whileTrue(claw.scoreGamePiece());
     //m_Controller.getTransStick_Button1().onFalse(new InstantCommand(() -> m_Drivetrain.setTurbo(false), m_Drivetrain));
-    controller.transStick.button(2).whileTrue(new IntakeGroundCube());
+    controller.transStick.button(2).whileTrue(new IntakeGroundCubeGuided());
     controller.transStick.button(2).onFalse(new IntakeRetractSpinot().andThen(superstructure.prepareCarry()));
     controller.transStick.button(2).onFalse(superstructure.prepareCarry());
     controller.transStick.button(3).whileTrue(new SetColorWantState(3));
