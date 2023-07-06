@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import team3176.robot.subsystems.drivetrain.*;
 import team3176.robot.subsystems.drivetrain.Drivetrain.coordType;
+import team3176.robot.subsystems.drivetrain.Drivetrain.driveMode;
 import team3176.robot.subsystems.superstructure.IntakeCube;
 import team3176.robot.subsystems.superstructure.Superstructure.GamePiece;
 import team3176.robot.subsystems.superstructure.Claw;
@@ -36,7 +37,7 @@ public class IntakeGroundCubeGuided extends CommandBase {
     m_IntakeCube.spinIntake(-.85);
     m_Claw.intake();
     m_IntakeCube.spinConveyor(-0.4);
-    m_Drivetrain.setCubeChaseOn();
+    m_Drivetrain.setDriveMode(driveMode.CUBECHASETELEOP);
     m_Drivetrain.setCoordType(coordType.ROBOT_CENTRIC);
   }
 
@@ -68,7 +69,7 @@ public class IntakeGroundCubeGuided extends CommandBase {
     m_IntakeCube.spinConveyor(0);
     m_Claw.hold();
     m_Arm.setAngleSetpoint(SuperStructureConstants.ARM_ZERO_POS);
-    m_Drivetrain.setCubeChaseOff();
+    m_Drivetrain.setDriveMode(driveMode.DRIVE);
     m_Drivetrain.setCoordType(coordType.FIELD_CENTRIC);
   }
 

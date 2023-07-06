@@ -16,7 +16,7 @@ import team3176.robot.subsystems.superstructure.Claw;
 
 
 
-public class CubeAlignAtPoint extends CommandBase {
+public class CubeChaseAutonOn extends CommandBase {
   private Drivetrain drivetrain = Drivetrain.getInstance();
   private VisionCubeChase visionCubeChase = VisionCubeChase.getInstance();
   private Claw claw = Claw.getInstance();
@@ -28,18 +28,13 @@ public class CubeAlignAtPoint extends CommandBase {
   private double forwardCommand;
   private double strafeCommand;
   private double splicingSpinCommand;
-  private double smallNum;
 
   //PIDController txController = new PIDController(.01, 0, 0);
   //double tx;
-  double tx; 
-  double[] txArray = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  int arrayIdx;
+  //boolean tv; 
 
-  public CubeAlignAtPoint() {
-    addRequirements(drivetrain);
+  public CubeChaseAutonOn() {
     addRequirements(visionCubeChase);
-    arrayIdx = 0;
   }
 
   @Override
@@ -48,36 +43,20 @@ public class CubeAlignAtPoint extends CommandBase {
     drivetrain.setSpinLock(false);
     //drivetrain.setCoastMode();
     //this.tx = visionCubeChase.getTx();
-    double smallNum = Math.pow(10, -5);
   }
 
   @Override
   public void execute() {
-    drivetrain.drive(smallNum, smallNum, 1.0);
-    tx = LimelightHelpers.getTX("limelight-three");
-    txArray[arrayIdx] = tx;
-    if (arrayIdx == (txArray.length + 1)) {arrayIdx = 0;} else {arrayIdx++;};
+    //this.tx = visionCubeChase.getTx();
+    //System.out.println("tx: "+ this.tx + ", splicingSpinCommand: " + splicingSpinCommand);
   }
 
   @Override
   public boolean isFinished() {
-    boolean tvArrayTripwire = true;
-    for (int idx = 0; idx < txArray.length; idx++) {
-      tx = LimelightHelpers.getTX("limelight-three");
-      txArray[idx] = tx;
-    } 
-    for (int idx = 0; idx < txArray.length; idx++) {
-      tx = LimelightHelpers.getTX("limelight-three");
-      if (txArray[idx] >= -19 && txArray[idx] <= +19) { 
-        tvArrayTripwire = false; 
-      };
-    }
-    if (tvArrayTripwire) { return true;} else {return false;}
-
+    return false;
   }
 
   @Override
   public void end(boolean interrupted) { 
-    drivetrain.setDriveMode(driveMode.DRIVE);
    }
 }

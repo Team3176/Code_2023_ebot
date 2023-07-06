@@ -24,7 +24,9 @@ public class SwerveDrive extends CommandBase {
 
   @Override
   public void initialize() {
-    drivetrain.setDriveMode(driveMode.DRIVE);
+    if (drivetrain.getCurrentDriveMode() != driveMode.CUBECHASETELEOP) {
+      drivetrain.setDriveMode(driveMode.DRIVE);
+    }
     drivetrain.setSpinLock(false);
     //drivetrain.setCoastMode();
   }

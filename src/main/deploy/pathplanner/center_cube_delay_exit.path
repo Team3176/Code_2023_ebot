@@ -34,8 +34,8 @@
         "y": 2.1431653542327496
       },
       "nextControl": {
-        "x": 2.48387454521388,
-        "y": 2.6673809685647547
+        "x": 2.2343601336039947,
+        "y": 2.244981955145036
       },
       "holonomicAngle": -178.60281897328534,
       "isReversal": false,
@@ -46,7 +46,7 @@
         "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "minimum",
-        "waitTime": 10.0
+        "waitTime": 6.0
       }
     },
     {
@@ -99,7 +99,7 @@
       }
     }
   ],
-  "maxVelocity": 2.0,
+  "maxVelocity": 4.0,
   "maxAcceleration": null,
   "isReversed": null,
   "markers": []

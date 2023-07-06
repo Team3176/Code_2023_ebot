@@ -76,7 +76,7 @@ public class Drivetrain extends SubsystemBase {
   private boolean isSpinLocked = false;
 
   private boolean isTurboOn = false;
-  PIDController CubeChaseController = new PIDController(.01, 0, 0);
+  PIDController CubeChaseController = new PIDController(0.08, 0, 0);
   double cubeChaseSpinCommand;
   double cubeTx;
   //private int arraytrack;
@@ -84,7 +84,7 @@ public class Drivetrain extends SubsystemBase {
   double angleAvgRollingWindow;
 
   public enum driveMode {
-    DEFENSE, DRIVE, VISION, CUBECHASE
+    DEFENSE, DRIVE, VISION, CUBECHASETELEOP, CUBECHASEAUTON
   }
 
   private SwervePod podFR;
@@ -234,7 +234,15 @@ public class Drivetrain extends SubsystemBase {
    */
   private void calculateNSetPodPositions() {
     if (currentDriveMode != driveMode.DEFENSE) {
-      if (currentDriveMode == driveMode.CUBECHASE) {
+      if (currentDriveMode == driveMode.CUBECHASETELEOP) {
+        if (LimelightHelpers.getTV("limelight-three")) {
+          this.spinCommand = calcCubeChaseSpinCommand();
+        }
+        this.forwardCommand = -1 * this.forwardCommand;
+        //this.strafeCommand = -1 * this.strafeCommand;
+        this.strafeCommand = 0.0;
+      }
+      if (currentDriveMode == driveMode.CUBECHASEAUTON) {
         this.spinCommand = calcCubeChaseSpinCommand();
       }
       ChassisSpeeds currChassisSpeeds = new ChassisSpeeds(forwardCommand, strafeCommand, spinCommand);
@@ -442,7 +450,7 @@ public class Drivetrain extends SubsystemBase {
       return cubeChaseSpinCommand;
   }
 
-
+/* 
   public Command setCubeChaseOn() {
     return new InstantCommand(() -> setDriveMode(driveMode.CUBECHASE)); 
   }
@@ -450,11 +458,14 @@ public class Drivetrain extends SubsystemBase {
   public Command setCubeChaseOff() {
     return new InstantCommand(() -> setDriveMode(driveMode.DRIVE)); 
   }
+*/
   
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Drive/gyro", inputs);
+
+
     
     //vision_lfov_pose = NetworkTableInstance.getDefault().getTable("limelight-lfov").getEntry("botpose_wpiblue");
     //vision_rfov_pose = NetworkTableInstance.getDefault().getTable("limelight-rfov").getEntry("botpose_wpiblue");

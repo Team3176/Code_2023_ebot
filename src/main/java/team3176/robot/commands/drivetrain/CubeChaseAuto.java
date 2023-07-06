@@ -40,7 +40,7 @@ public class CubeChaseAuto extends CommandBase {
 
   @Override
   public void initialize() {
-    drivetrain.setDriveMode(driveMode.CUBECHASE);
+    drivetrain.setDriveMode(driveMode.CUBECHASEAUTON);
     drivetrain.setSpinLock(false);
     //drivetrain.setCoastMode();
     //this.tx = visionCubeChase.getTx();
