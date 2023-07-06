@@ -61,7 +61,11 @@ public final class RobotConstants {
   }
 
   public static final Map<RobotType, String> logFolders =
-      Map.of(RobotType.PRODBOT, "/media/sda2");
+      Map.of(RobotType.PRODBOT, "/media/sda1 
+      
+      
+      
+      );
 
   public static boolean isEBOT() {
     if (getRobot() == RobotType.EBOT) {
