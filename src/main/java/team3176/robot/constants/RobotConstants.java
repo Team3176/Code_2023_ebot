@@ -61,7 +61,7 @@ public final class RobotConstants {
   }
 
   public static final Map<RobotType, String> logFolders =
-      Map.of(RobotType.PRODBOT, "/media/sda1 
+      Map.of(RobotType.PRODBOT, "/media/sda1"
       
       
       
