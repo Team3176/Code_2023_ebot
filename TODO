@@ -1,11 +1,14 @@
 
 ## Top Priority 
 
-  ☐ Fix bug causing autos to end in RobotCentric instead of FieldCentric
+  ✔ Fix bug causing autos to end in RobotCentric instead of FieldCentric @done(23-07-05 23:49)
   ☐ Create /mnt/sda2 for log files
   ☐ Double-check Logfile fxning, contents, and replay
-  ☐ Create delay in center-cone/cube-delay-exit
-  ☐ Mount fisheye camera 
+  ✔ Create delay in center-cone/cube-delay-exit @done(23-07-05 23:43)
+  ✔ Mount fisheye camera @done(23-07-05 23:44)
+  ☐ Fix sticking at stop-points in cubechasing
+  ☐ Increase cubechase PID kP?
+
 
 ## High Priority
   ☐ Create CubeChase versions of wall autos

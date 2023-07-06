@@ -23,6 +23,7 @@ import team3176.robot.commands.superstructure.intakecube.*;
 import team3176.robot.constants.Hardwaremap;
 import team3176.robot.subsystems.controller.Controller;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
+import team3176.robot.subsystems.drivetrain.Drivetrain.coordType;
 import team3176.robot.subsystems.superstructure.Arm;
 import team3176.robot.subsystems.superstructure.Claw;
 import team3176.robot.subsystems.superstructure.IntakeCube;
@@ -203,9 +204,9 @@ public class RobotContainer {
     drivetrain.setBrakeMode();
   }
 
-//  public void setFieldCentric() {
-//    drivetrain.setCoordType(coordType.);
-//  }
+  public void setFieldCentric() {
+    drivetrain.setCoordType(coordType.FIELD_CENTRIC);
+  }
   public void clearCanFaults(){
     pdh.clearStickyFaults();
   }
