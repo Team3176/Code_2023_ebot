@@ -180,14 +180,12 @@
     {
       "position": 4.645454545454552,
       "names": [
-        "event",
         "groundCube"
       ]
     },
     {
       "position": 0.523636363636371,
       "names": [
-        "event",
         "groundCube"
       ]
     },
@@ -200,7 +198,6 @@
     {
       "position": 2.6181818181816685,
       "names": [
-        "event",
         "groundCube"
       ]
     },

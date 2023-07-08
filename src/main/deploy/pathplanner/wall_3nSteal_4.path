@@ -20,7 +20,7 @@
           "poopCube"
         ],
         "executionBehavior": "parallel",
-        "waitBehavior": "none",
+        "waitBehavior": "before",
         "waitTime": 0
       }
     },
@@ -128,12 +128,12 @@
     },
     {
       "anchorPoint": {
-        "x": 7.338133746034933,
-        "y": 1.0468455999523811
+        "x": 7.180389888507863,
+        "y": 1.0611859506366614
       },
       "prevControl": {
-        "x": 5.610317038815896,
-        "y": 1.82187637102547
+        "x": 5.452573181288825,
+        "y": 1.8362167217097503
       },
       "nextControl": null,
       "holonomicAngle": -178.8950701773238,
@@ -153,7 +153,6 @@
     {
       "position": 0.523636363636371,
       "names": [
-        "event",
         "groundCube"
       ]
     },
@@ -166,7 +165,6 @@
     {
       "position": 2.6181818181816685,
       "names": [
-        "event",
         "groundCube"
       ]
     },
