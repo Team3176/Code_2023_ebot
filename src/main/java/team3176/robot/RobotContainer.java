@@ -115,6 +115,11 @@ public class RobotContainer {
      //    .onFalse(new InstantCommand(() -> m_Drivetrain.setDriveMode(driveMode.DRIVE), m_Drivetrain));
 
     //m_Controller.getRotStick_Button2().whileTrue(new FlipField);
+    controller.transStick.button(14).and(controller.transStick.button(15).onTrue(new CoordTypeFieldCentricOn()));
+    controller.transStick.button(14).and(controller.transStick.button(16).onTrue(new CoordTypeRobotCentricOn()));
+
+    
+    
     //controller.rotStick.button(1).whileTrue(new CubeChase(
     controller.rotStick.button(1).whileTrue(new Turbo(
       controller::getForward,
