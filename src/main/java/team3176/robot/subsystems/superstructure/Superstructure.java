@@ -34,7 +34,7 @@ public class Superstructure extends SubsystemBase {
     
 
     public Command groundCube() {
-        return new IntakeGroundCube().andThen(this.prepareCarry());
+        return new IntakeGroundCube().andThen(this.prepareCarry()).withName("groundCube");
     }
 
     public Command groundCone()
@@ -45,12 +45,12 @@ public class Superstructure extends SubsystemBase {
                     .until(() -> this.claw.getLinebreakThree() == false)
                     .andThen(intakeCone.coneToClaw())
                     .andThen(new IntakeConeRetractSpinot())
-                    .andThen(this.prepareCarry());
+                    .andThen(this.prepareCarry()).withName("groundCone");
     }
 
     public Command clawIntakeCube()
     {
-        return new InstantCommand(() -> claw.intakeGamePiece(GamePiece.CUBE));
+        return new InstantCommand(() -> claw.intakeGamePiece(GamePiece.CUBE)).withName("clawIntakeCube");
     }
 
     /* 
@@ -67,7 +67,7 @@ public class Superstructure extends SubsystemBase {
         return claw.determineGamePiece()
                 .andThen(arm.armSetPositionBlocking(SuperStructureConstants.ARM_HIGH_POS).withTimeout(1.5)
                     .andThen(claw.scoreGamePiece())
-                    .andThen(this.prepareCarry()));
+                    .andThen(this.prepareCarry())).withName("scoreGamePieceAuto");
     }
     public Command scoreFirstGamePieceAuto() {
         return claw.determineGamePiece()
@@ -75,7 +75,7 @@ public class Superstructure extends SubsystemBase {
                 .alongWith(arm.armSetPositionBlocking(SuperStructureConstants.ARM_HIGH_POS).withTimeout(3.0)
                 .andThen(new WaitCommand(0.5))
                     .andThen(claw.scoreGamePiece().withTimeout(1.0))
-                    .andThen(this.prepareCarry())));
+                    .andThen(this.prepareCarry()))).withName("scoreFirstGamePieceAuto");
     }
     public Command scoreGamePieceHigh()
     {
@@ -83,13 +83,13 @@ public class Superstructure extends SubsystemBase {
                 .andThen(arm.armSetPositionBlocking(SuperStructureConstants.ARM_HIGH_POS).withTimeout(3.0))
                 .andThen(new WaitCommand(0.5))
                 .andThen(claw.scoreGamePiece().withTimeout(1.0))
-                .andThen(this.prepareCarry());
+                .andThen(this.prepareCarry()).withName("scoreGamePieceHigh");
     }
     public Command scoreCubeLow() {
         return arm.armSetPosition(SuperStructureConstants.ARM_ZERO_POS)
         .andThen(new WaitCommand(0.5))
         .andThen(claw.scoreGamePiece())
-        .andThen(this.prepareCarry());
+        .andThen(this.prepareCarry()).withName("scoreCubeLow");
     }
     public Command scoreGamePieceLowAuto()
     {
@@ -97,16 +97,16 @@ public class Superstructure extends SubsystemBase {
                 .andThen(arm.armSetPositionBlocking(SuperStructureConstants.ARM_CATCH_POS).withTimeout(3.0))
                 .andThen(new WaitCommand(0.5))
                 .andThen(claw.scoreGamePiece().withTimeout(1.0))
-                .andThen(this.prepareCarry());
+                .andThen(this.prepareCarry()).withName("scoreGamePieceLowAuto");
     }
     public Command intakeCubeHumanPlayer() {
         return new ParallelCommandGroup(new ClawInhaleCube(), arm.armSetPositionOnce(SuperStructureConstants.ARM_HIGH_POS))
-        .andThen(arm.armSetPositionOnce(SuperStructureConstants.ARM_CARRY_POS));
+        .andThen(arm.armSetPositionOnce(SuperStructureConstants.ARM_CARRY_POS)).withName("intakeCubeHumanPlayer");
     }
 
     public Command intakeConeHumanPlayer() {
         return new ParallelCommandGroup(new ClawInhaleCone(), arm.armSetPositionOnce(SuperStructureConstants.ARM_HIGH_POS))
-        .andThen(arm.armSetPositionOnce(SuperStructureConstants.ARM_CARRY_POS));
+        .andThen(arm.armSetPositionOnce(SuperStructureConstants.ARM_CARRY_POS)).withName("intakeConeHumanPlayer");
     }
     
     public Command preparePoop() {

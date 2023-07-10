@@ -110,7 +110,7 @@ public class Claw extends SubsystemBase {
     /**
      * to be called with a whileTrue trigger binding
      */
-    public CommandBase intakeGamePiece(GamePiece piece) {
+    public Command intakeGamePiece(GamePiece piece) {
         return this.startEnd(() ->  {this.currentGamePiece = piece; intake();},() -> hold());
     }
     /**
@@ -121,17 +121,17 @@ public class Claw extends SubsystemBase {
         return this.run(() ->  {score(); this.currentGamePiece = GamePiece.NONE;})
                     .until(() -> this.isEmpty())
                     .andThen(new WaitCommand(0.7))
-                    .andThen(this.runOnce(()->idle())).withTimeout(2.0).finallyDo((b)->idle());
+                    .andThen(this.runOnce(()->idle())).withTimeout(2.0).finallyDo((b)->idle()).withName("scoreGamepiece");
     }
     public Command scoreGamePieceTeleop() {
         return this.runEnd(() ->  {score(); this.currentGamePiece = GamePiece.NONE;},() -> idle());
     }
     //more examples of command composition and why its awesome!!
     public Command intakeCone() {
-        return this.intakeGamePiece(GamePiece.CONE).until(this::getLinebreakTwo);
+        return this.intakeGamePiece(GamePiece.CONE).until(this::getLinebreakTwo).withName("intakeCone");
     }
     public Command intakeCube() {
-        return this.intakeGamePiece(GamePiece.CUBE).until(this::getLinebreakOne);
+        return this.intakeGamePiece(GamePiece.CUBE).until(this::getLinebreakOne).withName("intakeCube");
     }
     public Command determineGamePiece() {
         return this.runOnce( () -> {
@@ -142,7 +142,7 @@ public class Claw extends SubsystemBase {
                 this.currentGamePiece = GamePiece.CUBE;
                 hold();
             }
-        });
+        }).withName("determineGamePiece");
     }
 
 
