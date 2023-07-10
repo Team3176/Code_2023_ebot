@@ -267,8 +267,8 @@ public class Drivetrain extends SubsystemBase {
         realStates[idx] = new SwerveModuleState(pods.get(idx).getVelocity(),Rotation2d.fromDegrees(pods.get(idx).getAzimuth()));
       }
       //Logger.getInstance().recordOutput("SwerveStates/Setpoints", podStates);
-      //Logger.getInstance().recordOutput("SwerveStates/real", realStates);
-      //Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
+      Logger.getInstance().recordOutput("SwerveStates/real", realStates);
+      Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
       //Logger.getInstance().recordOutput("Drive/SpinCommand", spinCommand);
       SmartDashboard.putNumber("spinCommand", spinCommand);
       SmartDashboard.putNumber("pod0 m/s", podStates[0].speedMetersPerSecond);
