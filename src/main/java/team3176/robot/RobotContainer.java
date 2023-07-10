@@ -6,6 +6,7 @@ package team3176.robot;
 
 import java.io.File;
 
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardInput;
 
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -84,7 +86,7 @@ public class RobotContainer {
         controller::getStrafe,
         controller::getSpin));
     arm.setDefaultCommand(arm.armFineTune( () -> controller.operator.getLeftY()));
-    autonChooser.addDefaultOption("wall_3_cube_poop_4_steal", "wall_3_cube_poop_4_steal");
+    //autonChooser.addDefaultOption("wall_3_cube_poop_4_steal", "wall_3_cube_poop_4_steal");
     File paths = new File(Filesystem.getDeployDirectory(), "pathplanner");
     for (File f : paths.listFiles()) {
       if (!f.isDirectory()) {
@@ -226,9 +228,18 @@ public class RobotContainer {
   }
   public void checkAutonomousSelection() {
     if(autonChooser.get() != null && !choosenAutonomousString.equals(autonChooser.get())) {
+      Long start = System.nanoTime();
       choosenAutonomousString = autonChooser.get();
-      choosenAutonomousCommand = new PathPlannerAuto(choosenAutonomousString).getauto();
-      
+      try {
+        choosenAutonomousCommand = new PathPlannerAuto(choosenAutonomousString).getauto();
+      }
+      catch(Exception e){
+        System.out.println("[ERROR] could not find" + choosenAutonomousString);
+        System.out.println(e.toString());
+      }
+     
+      Long totalTime =   System.nanoTime() - start;
+      System.out.println("Autonomous Selected: [" + choosenAutonomousString + "] generated in " + (totalTime / 1000000.0) + "ms");
     }
   }
   /**
@@ -240,8 +251,8 @@ public class RobotContainer {
     // An example command will be run in autonomous
     
     if(choosenAutonomousCommand == null) {
-      //String chosen = autonChooser.getSelected();
-      String chosen = "wall_3nSteal_4";
+      //this is if for some reason checkAutonomousSelection is never called
+      String chosen = autonChooser.get();
 
       PathPlannerAuto ppSwerveAuto = new PathPlannerAuto(chosen);
       return ppSwerveAuto.getauto();
