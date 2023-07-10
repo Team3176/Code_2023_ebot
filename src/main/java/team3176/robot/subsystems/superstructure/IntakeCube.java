@@ -148,7 +148,14 @@ public class IntakeCube extends SubsystemBase {
       this.spinConveyor(-.8);
     }, () -> {
       this.spinConveyor(0);
-    });
+    }).withName("bumpConveyor");
+  }
+  public Command bumpConveyorTimeout(double timeout) {
+    return this.startEnd(() ->{
+      this.spinConveyor(-.8);
+    }, () -> {
+      this.spinConveyor(0);
+    }).withTimeout(timeout).withName("bumpConveyor");
   }
 
 }

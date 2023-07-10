@@ -136,7 +136,7 @@ public class Arm extends SubsystemBase {
      */
     public Command armSetPosition(double angleInDegrees) {
         SmartDashboard.putNumber("armSetPosition",angleInDegrees);
-        return this.run(() -> setPIDPosition(angleInDegrees));
+        return this.run(() -> setPIDPosition(angleInDegrees)).withName("armSetPosition"+angleInDegrees);
     }
     public Command armSetPositionBlocking(double angleInDegrees) {
         return new FunctionalCommand(() -> {
@@ -145,15 +145,15 @@ public class Arm extends SubsystemBase {
             ()-> {}, 
             b -> {}, 
             this::isArmAtPosition, 
-            this);
+            this).withName("armsetPositionBlocking");
     }
     public Command armSetPositionOnce(double angleInDegrees) {
         return this.runOnce(() -> {
             this.currentState = States.CLOSED_LOOP;
-            this.armSetpointAngleRaw = angleInDegrees;});
+            this.armSetpointAngleRaw = angleInDegrees;}).withName("armSetPosition"+angleInDegrees);
     }
     public Command armFineTune(DoubleSupplier angleDeltaCommand) {
-        return this.run(() -> fineTune(angleDeltaCommand.getAsDouble()));
+        return this.run(() -> fineTune(angleDeltaCommand.getAsDouble())).withName("armFineTune");
     }
     public Command armAnalogUpCommand() {
         return this.runEnd(this::armAnalogUp, this::idle);

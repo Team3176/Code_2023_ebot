@@ -78,7 +78,7 @@ public class RobotContainer {
         controller::getForward,
         controller::getStrafe,
         controller::getSpin));
-    arm.setDefaultCommand(arm.armFineTune( () -> controller.operator.getLeftY()));
+    //arm.setDefaultCommand(arm.armFineTune( () -> controller.operator.getLeftY()));
     autonChooser = new SendableChooser<>();
     File paths = new File(Filesystem.getDeployDirectory(), "pathplanner");
     for (File f : paths.listFiles()) {
@@ -87,7 +87,6 @@ public class RobotContainer {
         autonChooser.addOption(s, s);
       }
     }
-
   
     SmartDashboard.putData("Auton Choice", autonChooser);
     
@@ -133,7 +132,7 @@ public class RobotContainer {
     ); 
     
 
-    controller.rotStick.button(3).whileTrue(new InstantCommand(drivetrain::setBrakeMode).andThen(new SwerveDefense()));
+    controller.rotStick.button(3).whileTrue(new InstantCommand(drivetrain::setBrakeMode).andThen(new SwerveDefense()).withName("setBrakeMode"));
 
     controller.rotStick.button(4).whileTrue(superstructure.intakeCubeHumanPlayer());
     controller.rotStick.button(4).onFalse(superstructure.prepareCarry());
@@ -142,13 +141,13 @@ public class RobotContainer {
 
     double conveyorBumpTime = .1;  //In units of seconds
     controller.operator.povUp().whileTrue(superstructure.prepareScoreHigh());
-    controller.operator.povUp().onTrue(intakeCube.bumpConveyor().withTimeout(conveyorBumpTime));
+    controller.operator.povUp().onTrue(intakeCube.bumpConveyorTimeout(conveyorBumpTime));
     controller.operator.povRight().whileTrue(superstructure.prepareCarry());
-    controller.operator.povRight().onTrue(intakeCube.bumpConveyor().withTimeout(conveyorBumpTime));
+    controller.operator.povRight().onTrue(intakeCube.bumpConveyorTimeout(conveyorBumpTime));
     controller.operator.povDown().whileTrue(superstructure.prepareCatch());
-    controller.operator.povDown().onTrue(intakeCube.bumpConveyor().withTimeout(conveyorBumpTime));
+    controller.operator.povDown().onTrue(intakeCube.bumpConveyorTimeout(conveyorBumpTime));
     controller.operator.povLeft().whileTrue(superstructure.prepareScoreMid());
-    controller.operator.povLeft().onTrue(intakeCube.bumpConveyor().withTimeout(conveyorBumpTime));
+    controller.operator.povLeft().onTrue(intakeCube.bumpConveyorTimeout(conveyorBumpTime));
 
     // m_Controller.operator.start().onTrue(new ToggleVisionLEDs());
     // m_Controller.operator.back().onTrue(new SwitchToNextVisionPipeline());
@@ -228,7 +227,6 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     String chosen = autonChooser.getSelected();
-    //String chosen = "wall_cone_exit_balance";
 
     PathPlannerAuto ppSwerveAuto = new PathPlannerAuto(chosen);
     return ppSwerveAuto.getauto();
