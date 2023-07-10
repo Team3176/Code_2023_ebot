@@ -6,6 +6,8 @@ package team3176.robot;
 
 import java.io.File;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedDashboardInput;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
@@ -15,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import team3176.robot.commands.*;
 import team3176.robot.commands.drivetrain.*;
@@ -57,7 +60,9 @@ public class RobotContainer {
   private final Drivetrain drivetrain;
   private final VisionCubeChase vision;
   private final Superstructure superstructure;
-  private SendableChooser<String> autonChooser;
+  private LoggedDashboardChooser<String> autonChooser = new LoggedDashboardChooser<>("AutoSelector");
+  private String choosenAutonomousString = "";
+  private Command choosenAutonomousCommand;
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -79,7 +84,7 @@ public class RobotContainer {
         controller::getStrafe,
         controller::getSpin));
     arm.setDefaultCommand(arm.armFineTune( () -> controller.operator.getLeftY()));
-    autonChooser = new SendableChooser<>();
+    autonChooser.addDefaultOption("wall_3_cube_poop_4_steal", "wall_3_cube_poop_4_steal");
     File paths = new File(Filesystem.getDeployDirectory(), "pathplanner");
     for (File f : paths.listFiles()) {
       if (!f.isDirectory()) {
@@ -89,7 +94,7 @@ public class RobotContainer {
     }
 
   
-    SmartDashboard.putData("Auton Choice", autonChooser);
+    SmartDashboard.putData("Auton Choice", autonChooser.getSendableChooser());
     
     configureBindings();
   }
@@ -219,7 +224,13 @@ public class RobotContainer {
   public void printCanFaults(){
     pdh.getStickyFaults();
   }
-
+  public void checkAutonomousSelection() {
+    if(autonChooser.get() != null && !choosenAutonomousString.equals(autonChooser.get())) {
+      choosenAutonomousString = autonChooser.get();
+      choosenAutonomousCommand = new PathPlannerAuto(choosenAutonomousString).getauto();
+      
+    }
+  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -227,10 +238,15 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    String chosen = autonChooser.getSelected();
-    //String chosen = "wall_cone_exit_balance";
+    
+    if(choosenAutonomousCommand == null) {
+      //String chosen = autonChooser.getSelected();
+      String chosen = "wall_3nSteal_4";
 
-    PathPlannerAuto ppSwerveAuto = new PathPlannerAuto(chosen);
-    return ppSwerveAuto.getauto();
+      PathPlannerAuto ppSwerveAuto = new PathPlannerAuto(chosen);
+      return ppSwerveAuto.getauto();
+    }
+    return choosenAutonomousCommand;
+    
   }
 }
