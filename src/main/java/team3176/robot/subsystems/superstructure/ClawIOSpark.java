@@ -7,9 +7,6 @@
 
 package team3176.robot.subsystems.superstructure;
 
-import org.littletonrobotics.junction.LogTable;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import team3176.robot.constants.Hardwaremap;
@@ -20,13 +17,11 @@ public class ClawIOSpark implements ClawIO{
   private CANSparkMax clawSpark;
   private DigitalInput linebreakOne;
   private DigitalInput linebreakTwo;
-  private DigitalInput linebreakThree;
   /** Contains all of the input data received from hardware. */
   public ClawIOSpark() {
     clawSpark = new CANSparkMax(Hardwaremap.claw_CID, MotorType.kBrushless);
     linebreakOne = new DigitalInput(0);
     linebreakTwo = new DigitalInput(2);
-    linebreakThree = new DigitalInput(1);
   }
 
 

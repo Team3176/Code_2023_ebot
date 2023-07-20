@@ -8,14 +8,12 @@ import java.io.File;
 
 
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import team3176.robot.commands.drivetrain.*;
 import team3176.robot.commands.superstructure.intakecube.*;
 import team3176.robot.constants.Hardwaremap;
@@ -29,8 +27,6 @@ import team3176.robot.subsystems.superstructure.IntakeCube;
 import team3176.robot.subsystems.superstructure.IntakeCone;
 
 import team3176.robot.subsystems.superstructure.Superstructure;
-//import team3176.robot.subsystems.vision.VisionDual;
-import team3176.robot.subsystems.vision.VisionCubeChase;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -54,7 +50,6 @@ public class RobotContainer {
   
   // is this why we don't have a compressor? private final Compressor m_Compressor
   private final Drivetrain drivetrain;
-  private final VisionCubeChase vision;
   private final Superstructure superstructure;
   private final RobotState robotState;
   private SendableChooser<String> autonChooser;
@@ -73,13 +68,11 @@ public class RobotContainer {
     robotState = RobotState.getInstance();
     pdh = new PowerDistribution(Hardwaremap.PDH_CID, ModuleType.kRev);
 
-    vision = VisionCubeChase.getInstance();
     superstructure = Superstructure.getInstance();
     drivetrain.setDefaultCommand(drivetrain.swerveDrivePercent(
         () -> controller.getForward() * 0.7,
         () -> controller.getStrafe() * 0.7,
         () -> controller.getSpin() * 3));
-    //arm.setDefaultCommand(arm.armFineTune( () -> controller.operator.getLeftY()));
     autonChooser = new SendableChooser<>();
     File paths = new File(Filesystem.getDeployDirectory(), "pathplanner");
     for (File f : paths.listFiles()) {
@@ -226,7 +219,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     String chosen = autonChooser.getSelected();
-    chosen = "wall_3nSteal_3";
+    
     PathPlannerAuto ppSwerveAuto = new PathPlannerAuto(chosen);
     return ppSwerveAuto.getauto();
   }

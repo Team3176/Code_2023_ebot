@@ -135,7 +135,7 @@ public class Arm extends SubsystemBase {
      * Commands
      */
     public Command armSetPosition(double angleInDegrees) {
-        SmartDashboard.putNumber("armSetPosition",angleInDegrees);
+        Logger.getInstance().recordOutput("Arm/armSetPosition",angleInDegrees);
         return this.run(() -> setPIDPosition(angleInDegrees)).withName("armSetPosition"+angleInDegrees);
     }
     public Command armSetPositionBlocking(double angleInDegrees) {

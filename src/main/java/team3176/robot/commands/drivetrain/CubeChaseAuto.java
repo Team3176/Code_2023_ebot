@@ -54,7 +54,7 @@ public class CubeChaseAuto extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    if (claw.getLinebreakOne()) {
+    if (claw.getIsLinebreakOne()) {
       return true;
     } else return false;
   }

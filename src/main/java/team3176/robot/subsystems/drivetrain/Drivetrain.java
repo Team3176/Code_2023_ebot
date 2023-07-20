@@ -8,14 +8,12 @@ package team3176.robot.subsystems.drivetrain;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -35,7 +33,6 @@ import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.constants.DrivetrainHardwareMap;
 import team3176.robot.constants.SwervePodHardwareID;
 import team3176.robot.subsystems.drivetrain.GyroIO.GyroIOInputs;
-import team3176.robot.subsystems.vision.VisionDual;
 
 import java.util.ArrayList;
 import java.util.function.DoubleSupplier;
@@ -269,7 +266,6 @@ public class Drivetrain extends SubsystemBase {
       Logger.getInstance().recordOutput("Drive/SpinCommand", spinCommand);
 
     } else { // Enter defensive position
-      double smallNum = Math.pow(10, -5);
       pods.get(0).setModulePositionOnly(Rotation2d.fromDegrees(-45));
       pods.get(1).setModulePositionOnly(Rotation2d.fromDegrees(45));
       pods.get(2).setModulePositionOnly(Rotation2d.fromDegrees(-45));

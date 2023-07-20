@@ -1,18 +1,11 @@
 package team3176.robot.subsystems.superstructure;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import team3176.robot.Constants;
 import team3176.robot.Constants.Mode;
-import team3176.robot.Constants.RobotType;
-import team3176.robot.constants.Hardwaremap;
 import team3176.robot.constants.SuperStructureConstants;
 import team3176.robot.subsystems.superstructure.Superstructure.GamePiece;
 import team3176.robot.util.DelayedBoolean;
@@ -20,20 +13,12 @@ import team3176.robot.subsystems.superstructure.ClawIO.ClawIOInputs;
 import org.littletonrobotics.junction.Logger;
 
 public class Claw extends SubsystemBase {
-    private CANSparkMax clawSpark;
-    private DigitalInput linebreakOne;
-    private DigitalInput linebreakTwo;
-    private DigitalInput linebreakThree;
     private static Claw instance;
     private final ClawIO io;
     private final ClawIOInputs inputs = new ClawIOInputs();
-    public GamePiece currentGamePiece = GamePiece.CONE;
+    private GamePiece currentGamePiece = GamePiece.CONE;
     private Claw(ClawIO io) {
         this.io = io;
-        clawSpark = new CANSparkMax(Hardwaremap.claw_CID, MotorType.kBrushless);
-        linebreakOne = new DigitalInput(0);
-        linebreakTwo = new DigitalInput(2);
-        linebreakThree = new DigitalInput(1);
     }
 
     //states now implemented as functions
@@ -77,23 +62,8 @@ public class Claw extends SubsystemBase {
         this.currentGamePiece = piece;
     }
 
-    public boolean getLinebreakOne()
-    {
-        return linebreakOne.get();
-    }
-    
-    public boolean getLinebreakTwo()
-    {
-        return linebreakTwo.get();
-    }
-
-    public boolean getLinebreakThree()
-    {
-        return linebreakThree.get();
-    }
-
     public boolean isEmpty() {
-        return getLinebreakOne() || getLinebreakTwo();
+        return getIsLinebreakOne() || getIsLinebreakTwo();
     }
 
     public static Claw getInstance()
@@ -130,17 +100,17 @@ public class Claw extends SubsystemBase {
     }
     //more examples of command composition and why its awesome!!
     public Command intakeCone() {
-        return this.intakeGamePiece(GamePiece.CONE).until(new DelayedBoolean(0.5,this::getLinebreakTwo)::get).withName("intakeCone");
+        return this.intakeGamePiece(GamePiece.CONE).until(new DelayedBoolean(0.5,() -> !getIsLinebreakTwo())::get).withName("intakeCone");
     }
     public Command intakeCube() {
-        return this.intakeGamePiece(GamePiece.CUBE).until(new DelayedBoolean(0.5,this::getLinebreakOne)::get ).withName("intakeCube");
+        return this.intakeGamePiece(GamePiece.CUBE).until(new DelayedBoolean(0.5,() -> !getIsLinebreakOne())::get ).withName("intakeCube");
     }
     public Command determineGamePiece() {
         return this.runOnce( () -> {
-            if(this.linebreakOne.get()) {
+            if(this.getIsLinebreakOne()) {
                 this.currentGamePiece = GamePiece.CONE;
                 hold();
-            } else if(this.linebreakTwo.get()) {
+            } else if(this.getIsLinebreakTwo()) {
                 this.currentGamePiece = GamePiece.CUBE;
                 hold();
             }
@@ -161,9 +131,8 @@ public class Claw extends SubsystemBase {
     Logger.getInstance().recordOutput("Claw/LinebreakOne", getIsLinebreakOne());
     Logger.getInstance().recordOutput("Claw/LinebreakTwo", getIsLinebreakTwo());
     // Code stating if something is in the Intake
-    SmartDashboard.putBoolean("linebreakOne",linebreakOne.get());
-    SmartDashboard.putBoolean("linebreakTwo",linebreakTwo.get());
-    SmartDashboard.putBoolean("linebreakThree", linebreakThree.get());
+    SmartDashboard.putBoolean("linebreakOne",getIsLinebreakOne());
+    SmartDashboard.putBoolean("linebreakTwo",getIsLinebreakTwo());
     // SmartDashboard.putBoolean("isExtended", isExtended);
 
    }
