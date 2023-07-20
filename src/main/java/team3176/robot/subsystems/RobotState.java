@@ -372,7 +372,7 @@ public class RobotState extends SubsystemBase {
     }
   }
 
-  public void setColorWantState(int LEDState) {
+  private void setColorWantState(int LEDState) {
     //System.out.println("WAS CALLED");
     wantedLEDState = LEDState;
     if (wantedLEDState == 0) {
@@ -402,6 +402,10 @@ public class RobotState extends SubsystemBase {
   public static RobotState getInstance() {
     if(instance == null) {instance = new RobotState(new RobotStateIO() {});}
     return instance;
+  }
+
+  public Command setColorWantedState(int state) {
+    return this.runOnce(() -> this.setColorWantState(state));
   }
 
   @Override

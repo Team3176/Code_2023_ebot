@@ -21,6 +21,7 @@ import team3176.robot.commands.drivetrain.*;
 import team3176.robot.commands.superstructure.claw.ClawIdle;
 import team3176.robot.commands.superstructure.intakecube.*;
 import team3176.robot.constants.Hardwaremap;
+import team3176.robot.subsystems.RobotState;
 import team3176.robot.subsystems.controller.Controller;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
 import team3176.robot.subsystems.drivetrain.Drivetrain.coordType;
@@ -57,6 +58,7 @@ public class RobotContainer {
   private final Drivetrain drivetrain;
   private final VisionCubeChase vision;
   private final Superstructure superstructure;
+  private final RobotState robotState;
   private SendableChooser<String> autonChooser;
   
   /**
@@ -70,6 +72,7 @@ public class RobotContainer {
     drivetrain = Drivetrain.getInstance();
     intakeCube = IntakeCube.getInstance();
     intakeCone = IntakeCone.getInstance();
+    robotState = RobotState.getInstance();
     pdh = new PowerDistribution(Hardwaremap.PDH_CID, ModuleType.kRev);
 
     vision = VisionCubeChase.getInstance();
@@ -98,20 +101,19 @@ public class RobotContainer {
     
     controller.transStick.button(1).whileTrue(claw.scoreGamePiece());
     //m_Controller.getTransStick_Button1().onFalse(new InstantCommand(() -> m_Drivetrain.setTurbo(false), m_Drivetrain));
-    controller.transStick.button(2).whileTrue(new IntakeGroundCubeGuided());
-    controller.transStick.button(2).onFalse(new IntakeRetractSpinot().andThen(superstructure.prepareCarry()));
-    controller.transStick.button(2).onFalse(superstructure.prepareCarry());
-    controller.transStick.button(3).whileTrue(new SetColorWantState(3));
-    controller.transStick.button(3).whileTrue(superstructure.groundCube());
-    controller.transStick.button(3).onFalse(new IntakeRetractSpinot());
-    controller.transStick.button(3).onFalse(superstructure.prepareCarry());
-
-    controller.transStick.button(4).whileTrue(superstructure.prepareScoreHigh());
-    controller.transStick.button(4).onFalse((superstructure.prepareCarry()));
-//    controller.transStick.button(5).onTrue(new InstantCommand(drivetrain::resetPoseToVision,drivetrain));
+    controller.transStick.button(2).whileTrue(new IntakeGroundCubeGuided())
+                                          .onFalse(intakeCube.retractSpinNot().andThen(superstructure.prepareCarry()))
+                                          .onFalse(superstructure.prepareCarry());
+    controller.transStick.button(3).whileTrue(robotState.setColorWantedState(3))
+                                    .whileTrue(superstructure.groundCube())
+                                    .onFalse(intakeCube.retractSpinNot())
+                                    .onFalse(superstructure.prepareCarry());
+    controller.transStick.button(4).whileTrue(superstructure.prepareScoreHigh())
+                                          .onFalse((superstructure.prepareCarry()));
+    //controller.transStick.button(5).onTrue(new InstantCommand(drivetrain::resetPoseToVision,drivetrain));
     controller.transStick.button(10).whileTrue(new InstantCommand(drivetrain::setBrakeMode).andThen(new SwerveDefense()));
-     //m_Controller.getTransStick_Button10()
-     //    .onFalse(new InstantCommand(() -> m_Drivetrain.setDriveMode(driveMode.DRIVE), m_Drivetrain));
+    //m_Controller.getTransStick_Button10()
+    //    .onFalse(new InstantCommand(() -> m_Drivetrain.setDriveMode(driveMode.DRIVE), m_Drivetrain));
 
     //m_Controller.getRotStick_Button2().whileTrue(new FlipField);
     controller.transStick.button(14).and(controller.transStick.button(15).onTrue(new CoordTypeFieldCentricOn()));
@@ -152,27 +154,27 @@ public class RobotContainer {
     // m_Controller.operator.start().onTrue(new ToggleVisionLEDs());
     // m_Controller.operator.back().onTrue(new SwitchToNextVisionPipeline());
 
-    controller.operator.b().onTrue(new SetColorWantState(1));
+    controller.operator.b().onTrue(robotState.setColorWantedState(1));
     controller.operator.b().whileTrue(superstructure.intakeConeHumanPlayer());
     controller.operator.b().onFalse(superstructure.prepareCarry());
     
-    controller.operator.x().onTrue(new SetColorWantState(2));
+    controller.operator.x().onTrue(robotState.setColorWantedState(2));
     controller.operator.x().whileTrue(superstructure.intakeCubeHumanPlayer());
     controller.operator.x().onFalse(superstructure.prepareCarry());
 
-    controller.operator.a().onTrue(new SetColorWantState(3));
+    controller.operator.a().onTrue(robotState.setColorWantedState(3));
     controller.operator.a().whileTrue(superstructure.groundCube());
-    controller.operator.a().onFalse(new IntakeRetractSpinot());
+    controller.operator.a().onFalse(intakeCube.retractSpinNot());
     controller.operator.a().onFalse(superstructure.prepareCarry());
 
-    controller.operator.y().onTrue(new SetColorWantState(0));
+    controller.operator.y().onTrue(robotState.setColorWantedState(0));
     controller.operator.y().whileTrue(claw.scoreGamePiece());
     controller.operator.y().onFalse(new ClawIdle());
 
 
-    controller.operator.rightBumper().and(controller.operator.leftBumper().negate()).onTrue(new SetColorWantState(3));
+    controller.operator.rightBumper().and(controller.operator.leftBumper().negate()).onTrue(robotState.setColorWantedState(3));
     controller.operator.rightBumper().and(controller.operator.leftBumper().negate()).whileTrue(new IntakeGroundCube());
-    controller.operator.rightBumper().and(controller.operator.leftBumper().negate()).onFalse(new IntakeRetractSpinot());
+    controller.operator.rightBumper().and(controller.operator.leftBumper().negate()).onFalse(intakeCube.retractSpinNot());
     //m_Controller.operator.rightBumper().and(m_Controller.operator.leftBumper().negate()).onFalse(m_Superstructure.prepareCarry());
     
     controller.operator.leftBumper().and(controller.operator.rightBumper()).whileTrue((new PoopCube()));

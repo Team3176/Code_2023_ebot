@@ -131,7 +131,9 @@ public class IntakeCube extends SubsystemBase {
       this.spinIntake(0.0);
     });
   }
-
+  public Command retractSpinNot() {
+    return this.runOnce(() -> {this.Retract(); this.spinIntake(0.0);});
+  }
   
   public Command extendAndFreeSpin() {
     return this.startEnd(() ->{
