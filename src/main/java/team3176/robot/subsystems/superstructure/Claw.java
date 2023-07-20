@@ -9,9 +9,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import team3176.robot.Constants;
+import team3176.robot.Constants.Mode;
+import team3176.robot.Constants.RobotType;
 import team3176.robot.constants.Hardwaremap;
 import team3176.robot.constants.SuperStructureConstants;
 import team3176.robot.subsystems.superstructure.Superstructure.GamePiece;
+import team3176.robot.util.DelayedBoolean;
 import team3176.robot.subsystems.superstructure.ClawIO.ClawIOInputs;
 import org.littletonrobotics.junction.Logger;
 
@@ -31,48 +35,41 @@ public class Claw extends SubsystemBase {
         linebreakTwo = new DigitalInput(2);
         linebreakThree = new DigitalInput(1);
     }
-    public void setClawMotor(double percent, int amps) {
-        clawSpark.set(percent);
-        clawSpark.setSmartCurrentLimit(amps);
-        SmartDashboard.putNumber("intake power (%)", percent);
-        SmartDashboard.putNumber("intake motor current (amps)", clawSpark.getOutputCurrent());
-        SmartDashboard.putNumber("intake motor temperature (C)", clawSpark.getMotorTemperature());
-    }
 
     //states now implemented as functions
     
     public void intake() {
         //System.out.println("m_Claw.intake()");
         if(currentGamePiece == GamePiece.CUBE) {
-            setClawMotor(SuperStructureConstants.CLAW_OUTPUT_POWER_CUBE,SuperStructureConstants.CLAW_CURRENT_LIMIT_A);
+            io.setClawMotor(SuperStructureConstants.CLAW_OUTPUT_POWER_CUBE,SuperStructureConstants.CLAW_CURRENT_LIMIT_A);
          }
          else if(currentGamePiece == GamePiece.CONE) {
-             setClawMotor(-SuperStructureConstants.CLAW_OUTPUT_POWER_CONE,SuperStructureConstants.CLAW_CURRENT_LIMIT_A);
+             io.setClawMotor(-SuperStructureConstants.CLAW_OUTPUT_POWER_CONE,SuperStructureConstants.CLAW_CURRENT_LIMIT_A);
          }
     }
     
     public void hold() {
         //System.out.println("m_Claw.hold()");
         if(currentGamePiece == GamePiece.CUBE) {
-            setClawMotor(SuperStructureConstants.CLAW_HOLD_POWER,SuperStructureConstants.CLAW_HOLD_CURRENT_LIMIT_A);
+            io.setClawMotor(SuperStructureConstants.CLAW_HOLD_POWER,SuperStructureConstants.CLAW_HOLD_CURRENT_LIMIT_A);
             //idle(); 
         } else {
-            setClawMotor(-SuperStructureConstants.CLAW_HOLD_POWER * SuperStructureConstants.CLAW_HOLD_CONE_FACTOR,SuperStructureConstants.CLAW_HOLD_CURRENT_LIMIT_A);
+            io.setClawMotor(-SuperStructureConstants.CLAW_HOLD_POWER * SuperStructureConstants.CLAW_HOLD_CONE_FACTOR,SuperStructureConstants.CLAW_HOLD_CURRENT_LIMIT_A);
         }
     }
 
     public void score() {
         //System.out.println("m_Claw.score()");
         if(currentGamePiece == GamePiece.CUBE) {
-            setClawMotor(-SuperStructureConstants.CLAW_OUTPUT_POWER_CUBE,SuperStructureConstants.CLAW_CURRENT_LIMIT_A);
+            io.setClawMotor(-SuperStructureConstants.CLAW_OUTPUT_POWER_CUBE,SuperStructureConstants.CLAW_CURRENT_LIMIT_A);
         }
         else if(currentGamePiece == GamePiece.CONE) {
-            setClawMotor(SuperStructureConstants.CLAW_OUTPUT_POWER_CONE,SuperStructureConstants.CLAW_CURRENT_LIMIT_A);
+            io.setClawMotor(SuperStructureConstants.CLAW_OUTPUT_POWER_CONE,SuperStructureConstants.CLAW_CURRENT_LIMIT_A);
         }
     }
     public void idle() {
         //System.out.println("m_Claw.idle()");
-        setClawMotor(0, 0);
+        io.setClawMotor(0, 0);
     }
 
     public void setCurrentGamePiece(GamePiece piece) {
@@ -102,7 +99,12 @@ public class Claw extends SubsystemBase {
     public static Claw getInstance()
     {
         if (instance == null ) {
-            instance = new Claw(new ClawIO() {});
+            if(Constants.getMode() == Mode.REAL) {
+                instance = new Claw(new ClawIOSpark());
+            } else {
+                instance = new Claw(new ClawIO() {});
+            }
+            
           }
         return instance;
     }
@@ -128,10 +130,10 @@ public class Claw extends SubsystemBase {
     }
     //more examples of command composition and why its awesome!!
     public Command intakeCone() {
-        return this.intakeGamePiece(GamePiece.CONE).until(this::getLinebreakTwo).withName("intakeCone");
+        return this.intakeGamePiece(GamePiece.CONE).until(new DelayedBoolean(0.5,this::getLinebreakTwo)::get).withName("intakeCone");
     }
     public Command intakeCube() {
-        return this.intakeGamePiece(GamePiece.CUBE).until(this::getLinebreakOne).withName("intakeCube");
+        return this.intakeGamePiece(GamePiece.CUBE).until(new DelayedBoolean(0.5,this::getLinebreakOne)::get ).withName("intakeCube");
     }
     public Command determineGamePiece() {
         return this.runOnce( () -> {
@@ -143,6 +145,9 @@ public class Claw extends SubsystemBase {
                 hold();
             }
         }).withName("determineGamePiece");
+    }
+    public Command idleCommand() {
+        return this.runOnce(this::idle);
     }
 
 
@@ -176,15 +181,5 @@ public class Claw extends SubsystemBase {
    public boolean getIsLinebreakTwo()
    {
     return inputs.isLinebreakTwo;
-   }
-
-   public void runVoltage(double volts)
-   {
-    io.setVoltage(volts);
-   }
-
-   public void setVelocity(double velocity)
-   {
-    io.setVelocity(velocity);
    }
 }

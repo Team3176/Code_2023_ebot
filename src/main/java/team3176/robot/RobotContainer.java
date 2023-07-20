@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import team3176.robot.commands.drivetrain.*;
-import team3176.robot.commands.superstructure.claw.ClawIdle;
 import team3176.robot.commands.superstructure.intakecube.*;
 import team3176.robot.constants.Hardwaremap;
 import team3176.robot.subsystems.RobotState;
@@ -76,10 +75,10 @@ public class RobotContainer {
 
     vision = VisionCubeChase.getInstance();
     superstructure = Superstructure.getInstance();
-    drivetrain.setDefaultCommand(new SwerveDrive(
-        controller::getForward,
-        controller::getStrafe,
-        controller::getSpin));
+    drivetrain.setDefaultCommand(drivetrain.swerveDrive(
+        () -> controller.getForward() * 0.7,
+        () -> controller.getStrafe() * 0.7,
+        () -> controller.getSpin() * 3));
     //arm.setDefaultCommand(arm.armFineTune( () -> controller.operator.getLeftY()));
     autonChooser = new SendableChooser<>();
     File paths = new File(Filesystem.getDeployDirectory(), "pathplanner");
@@ -110,7 +109,7 @@ public class RobotContainer {
     controller.transStick.button(4).whileTrue(superstructure.prepareScoreHigh())
                                           .onFalse((superstructure.prepareCarry()));
     //controller.transStick.button(5).onTrue(new InstantCommand(drivetrain::resetPoseToVision,drivetrain));
-    controller.transStick.button(10).onTrue(new InstantCommand(drivetrain::setBrakeMode).andThen(drivetrain.swerveDefenseCommand()));
+    controller.transStick.button(10).whileTrue(new InstantCommand(drivetrain::setBrakeMode).andThen(drivetrain.swerveDefenseCommand()).withName("swerveDefense"));
     //m_Controller.getTransStick_Button10()
     //    .onFalse(new InstantCommand(() -> m_Drivetrain.setDriveMode(driveMode.DRIVE), m_Drivetrain));
 
@@ -121,11 +120,10 @@ public class RobotContainer {
     
     
     //controller.rotStick.button(1).whileTrue(new CubeChase(
-    controller.rotStick.button(1).whileTrue(new Turbo(
-      controller::getForward,
-      controller::getStrafe,
-      controller::getSpin
-    ));
+    controller.rotStick.button(1).whileTrue(drivetrain.swerveDrive(
+      () -> controller.getForward() * 1.0,
+      () -> controller.getStrafe() * 1.0,
+      () -> controller.getSpin() * 7));
  
     controller.rotStick.button(2).whileTrue(new SpinLockDrive(
       controller::getForward,
@@ -133,7 +131,7 @@ public class RobotContainer {
     ); 
     
 
-    controller.rotStick.button(3).whileTrue(new InstantCommand(drivetrain::setBrakeMode).andThen(new SwerveDefense()).withName("setBrakeMode"));
+    controller.rotStick.button(3).whileTrue(new InstantCommand(drivetrain::setBrakeMode).andThen(drivetrain.swerveDefenseCommand()).withName("setBrakeMode"));
 
     controller.rotStick.button(4).whileTrue(superstructure.intakeCubeHumanPlayer());
     controller.rotStick.button(4).onFalse(superstructure.prepareCarry());
@@ -168,15 +166,15 @@ public class RobotContainer {
 
     controller.operator.y().onTrue(robotState.setColorWantedState(0));
     controller.operator.y().whileTrue(claw.scoreGamePiece());
-    controller.operator.y().onFalse(new ClawIdle());
+    controller.operator.y().onFalse(claw.idleCommand());
 
 
-    controller.operator.rightBumper().and(controller.operator.leftBumper().negate()).onTrue(robotState.setColorWantedState(3));
-    controller.operator.rightBumper().and(controller.operator.leftBumper().negate()).whileTrue(new IntakeGroundCube());
-    controller.operator.rightBumper().and(controller.operator.leftBumper().negate()).onFalse(intakeCube.retractSpinNot());
+    // controller.operator.rightBumper().and(controller.operator.leftBumper().negate()).onTrue(robotState.setColorWantedState(3));
+    // controller.operator.rightBumper().and(controller.operator.leftBumper().negate()).whileTrue(new IntakeGroundCube());
+    // controller.operator.rightBumper().and(controller.operator.leftBumper().negate()).onFalse(intakeCube.retractSpinNot());
     //m_Controller.operator.rightBumper().and(m_Controller.operator.leftBumper().negate()).onFalse(m_Superstructure.prepareCarry());
     
-    controller.operator.leftBumper().and(controller.operator.rightBumper()).whileTrue((new PoopCube()));
+    controller.operator.leftBumper().and(controller.operator.rightBumper()).whileTrue(superstructure.poopCube());
 //    m_Controller.operator.leftBumper().and(m_Controller.operator.rightBumper()).onFalse(new InstantCommand( () -> m_IntakeCone.idle())); 
     
 
@@ -228,7 +226,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     String chosen = autonChooser.getSelected();
-
+    chosen = "barrier_cone_exit_HP";
     PathPlannerAuto ppSwerveAuto = new PathPlannerAuto(chosen);
     return ppSwerveAuto.getauto();
   }

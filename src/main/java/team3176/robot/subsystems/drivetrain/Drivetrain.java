@@ -38,6 +38,7 @@ import team3176.robot.subsystems.drivetrain.GyroIO.GyroIOInputs;
 import team3176.robot.subsystems.vision.VisionDual;
 
 import java.util.ArrayList;
+import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -469,7 +470,9 @@ public class Drivetrain extends SubsystemBase {
   public Command swerveDefenseCommand() {
     return this.runEnd(() -> this.setDriveMode(driveMode.DEFENSE), () -> this.setDriveMode(driveMode.DRIVE));
   }
-
+  public Command swerveDrive(DoubleSupplier forward, DoubleSupplier strafe, DoubleSupplier spin) {
+    return this.runOnce(() -> this.setDriveMode(driveMode.DRIVE)).andThen(this.run(() -> drive(forward.getAsDouble(),strafe.getAsDouble(),spin.getAsDouble())));
+  }
   
   @Override
   public void periodic() {

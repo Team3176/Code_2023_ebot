@@ -121,7 +121,10 @@ public class IntakeCube extends SubsystemBase {
    {
     io.setVelocity(velocity);
    }
-
+  public Command spit() {
+    return this.runEnd(() -> {spinConveyor(0.6); spinIntake(1);},
+     () -> {spinConveyor(0.0);spinIntake(0);});
+  }
   public Command extendAndSpin() {
     return this.startEnd(() ->{
       this.Extend();
