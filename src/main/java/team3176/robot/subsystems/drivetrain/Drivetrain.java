@@ -258,28 +258,27 @@ public class Drivetrain extends SubsystemBase {
         SmartDashboard.putNumber("SpinLockYaw",getPoseYawWrapped().getDegrees());
       }
       SwerveModuleState[] podStates = DrivetrainConstants.DRIVE_KINEMATICS.toSwerveModuleStates(currChassisSpeeds);
-      Logger.getInstance().recordOutput("Drive/pod0", podStates[0].angle.getDegrees());
       SwerveDriveKinematics.desaturateWheelSpeeds(podStates, DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND);
       SwerveModuleState[] optimizedStates = new SwerveModuleState[4];
-      SwerveModuleState[] realStates = new SwerveModuleState[4];
       for (int idx = 0; idx < (pods.size()); idx++) {
         optimizedStates[idx]=pods.get(idx).setModule(podStates[idx]);
-        realStates[idx] = new SwerveModuleState(pods.get(idx).getVelocity(),Rotation2d.fromDegrees(pods.get(idx).getAzimuth()));
       }
-      //Logger.getInstance().recordOutput("SwerveStates/Setpoints", podStates);
-      //Logger.getInstance().recordOutput("SwerveStates/real", realStates);
-      //Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
-      //Logger.getInstance().recordOutput("Drive/SpinCommand", spinCommand);
-      SmartDashboard.putNumber("spinCommand", spinCommand);
-      SmartDashboard.putNumber("pod0 m/s", podStates[0].speedMetersPerSecond);
+      Logger.getInstance().recordOutput("SwerveStates/Setpoints", podStates);
+      Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
+      Logger.getInstance().recordOutput("Drive/SpinCommand", spinCommand);
 
     } else { // Enter defensive position
       double smallNum = Math.pow(10, -5);
-      pods.get(0).setModule(smallNum, Rotation2d.fromRadians(1.0 * Math.PI / 8.0));
-      pods.get(1).setModule(smallNum, Rotation2d.fromRadians(-1.0 * Math.PI / 8.0));
-      pods.get(2).setModule(smallNum, Rotation2d.fromRadians(-3.0 * Math.PI / 8.0));
-      pods.get(3).setModule(smallNum, Rotation2d.fromRadians(3.0 * Math.PI / 8.0));
+      pods.get(0).setModulePositionOnly(Rotation2d.fromDegrees(-45));
+      pods.get(1).setModulePositionOnly(Rotation2d.fromDegrees(45));
+      pods.get(2).setModulePositionOnly(Rotation2d.fromDegrees(-45));
+      pods.get(3).setModulePositionOnly(Rotation2d.fromDegrees(45));
     }
+    SwerveModuleState[] realStates = new SwerveModuleState[4];
+    for (int idx = 0; idx < (pods.size()); idx++) {
+      realStates[idx] = new SwerveModuleState(pods.get(idx).getVelocity(),Rotation2d.fromDegrees(pods.get(idx).getAzimuth()));
+    }
+    Logger.getInstance().recordOutput("SwerveStates/real", realStates);
   }
 
 
@@ -459,6 +458,18 @@ public class Drivetrain extends SubsystemBase {
     return new InstantCommand(() -> setDriveMode(driveMode.DRIVE)); 
   }
 */
+  public Command setFieldCentric() {
+     // using instant command because I do not want these to interupt other drivetrain commands
+    return new InstantCommand(() -> this.setCoordType(coordType.FIELD_CENTRIC)).withName("setFieldCentric");
+  }
+  public Command setRobotCentric() {
+    // using instant command because I do not want these to interupt other drivetrain commands
+    return new InstantCommand(() -> this.setCoordType(coordType.ROBOT_CENTRIC)).withName("setRobotCentric");
+  }
+  public Command swerveDefenseCommand() {
+    return this.runEnd(() -> this.setDriveMode(driveMode.DEFENSE), () -> this.setDriveMode(driveMode.DRIVE));
+  }
+
   
   @Override
   public void periodic() {

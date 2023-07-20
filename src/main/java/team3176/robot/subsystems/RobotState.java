@@ -405,7 +405,7 @@ public class RobotState extends SubsystemBase {
   }
 
   public Command setColorWantedState(int state) {
-    return this.runOnce(() -> this.setColorWantState(state));
+    return this.runOnce(() -> this.setColorWantState(state)).withName("setColorWantedState");
   }
 
   @Override

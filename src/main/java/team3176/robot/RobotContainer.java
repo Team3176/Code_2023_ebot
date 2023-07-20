@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import team3176.robot.commands.*;
 import team3176.robot.commands.drivetrain.*;
 import team3176.robot.commands.superstructure.claw.ClawIdle;
 import team3176.robot.commands.superstructure.intakecube.*;
@@ -111,13 +110,13 @@ public class RobotContainer {
     controller.transStick.button(4).whileTrue(superstructure.prepareScoreHigh())
                                           .onFalse((superstructure.prepareCarry()));
     //controller.transStick.button(5).onTrue(new InstantCommand(drivetrain::resetPoseToVision,drivetrain));
-    controller.transStick.button(10).whileTrue(new InstantCommand(drivetrain::setBrakeMode).andThen(new SwerveDefense()));
+    controller.transStick.button(10).onTrue(new InstantCommand(drivetrain::setBrakeMode).andThen(drivetrain.swerveDefenseCommand()));
     //m_Controller.getTransStick_Button10()
     //    .onFalse(new InstantCommand(() -> m_Drivetrain.setDriveMode(driveMode.DRIVE), m_Drivetrain));
 
     //m_Controller.getRotStick_Button2().whileTrue(new FlipField);
-    controller.transStick.button(14).and(controller.transStick.button(15).onTrue(new CoordTypeFieldCentricOn()));
-    controller.transStick.button(14).and(controller.transStick.button(16).onTrue(new CoordTypeRobotCentricOn()));
+    controller.transStick.button(14).and(controller.transStick.button(15)).onTrue(drivetrain.setFieldCentric());
+    controller.transStick.button(14).and(controller.transStick.button(16)).onTrue(drivetrain.setRobotCentric());
 
     
     
