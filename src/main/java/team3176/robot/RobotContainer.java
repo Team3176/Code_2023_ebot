@@ -245,7 +245,7 @@ public class RobotContainer {
     if(choosenAutonomousCommand == null) {
       //this is if for some reason checkAutonomousSelection is never called
       String chosen = autonChooser.get();
-
+      chosen = "wall_3nSteal_3";
       PathPlannerAuto ppSwerveAuto = new PathPlannerAuto(chosen);
       return ppSwerveAuto.getauto();
     }

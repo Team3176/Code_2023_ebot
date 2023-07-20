@@ -82,7 +82,7 @@ public class Drivetrain extends SubsystemBase {
   double angleAvgRollingWindow;
 
   public enum driveMode {
-    DEFENSE, DRIVE, VISION, CUBECHASETELEOP, CUBECHASEAUTON
+    DEFENSE, DRIVE, CUBECHASETELEOP, CUBECHASEAUTON
   }
 
   private SwervePod podFR;
@@ -221,7 +221,21 @@ public class Drivetrain extends SubsystemBase {
     drive(forwardCommand, strafeCommand, spinCommand, currentCoordType);
   }
 
-
+  private ChassisSpeeds getCurrentChassisSpeedRequest() {
+    ChassisSpeeds currChassisSpeeds = new ChassisSpeeds(forwardCommand, strafeCommand, spinCommand);
+    if (this.currentCoordType == coordType.FIELD_CENTRIC) {
+      Rotation2d fieldOffset = this.getPose().getRotation();
+      if (DriverStation.getAlliance() == Alliance.Red) {
+        fieldOffset.plus(Rotation2d.fromDegrees(180));
+      }
+      currChassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currChassisSpeeds, fieldOffset);
+    }
+    if (isSpinLocked) {
+      currChassisSpeeds.omegaRadiansPerSecond = spinLockPID.calculate(getPoseYawWrapped().getDegrees(), spinLockAngle.getDegrees());
+      SmartDashboard.putNumber("SpinLockYaw",getPoseYawWrapped().getDegrees());
+    }
+    return currChassisSpeeds;
+  }
   /**
    * Robot Centric Forward, strafe, and spin to set individual pods commanded spin
    * speed and drive speed
@@ -231,46 +245,19 @@ public class Drivetrain extends SubsystemBase {
    * @param spinCommand    meters per second
    */
   private void calculateNSetPodPositions() {
-    if (currentDriveMode != driveMode.DEFENSE) {
-      if (currentDriveMode == driveMode.CUBECHASETELEOP) {
-        if (LimelightHelpers.getTV("limelight-three")) {
-          this.spinCommand = calcCubeChaseSpinCommand();
-        }
-        this.forwardCommand = -1 * this.forwardCommand;
-        //this.strafeCommand = -1 * this.strafeCommand;
-        this.strafeCommand = 0.0;
-      }
-      if (currentDriveMode == driveMode.CUBECHASEAUTON) {
-        this.spinCommand = calcCubeChaseSpinCommand();
-      }
-      ChassisSpeeds currChassisSpeeds = new ChassisSpeeds(forwardCommand, strafeCommand, spinCommand);
-      if (this.currentCoordType == coordType.FIELD_CENTRIC) {
-        Rotation2d fieldOffset = this.getPose().getRotation();
-        if (DriverStation.getAlliance() == Alliance.Red) {
-          fieldOffset.plus(Rotation2d.fromDegrees(180));
-        }
-        currChassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currChassisSpeeds, fieldOffset);
-      }
-      if (isSpinLocked) {
-        currChassisSpeeds.omegaRadiansPerSecond = spinLockPID.calculate(getPoseYawWrapped().getDegrees(), spinLockAngle.getDegrees());
-        SmartDashboard.putNumber("SpinLockYaw",getPoseYawWrapped().getDegrees());
-      }
-      SwerveModuleState[] podStates = DrivetrainConstants.DRIVE_KINEMATICS.toSwerveModuleStates(currChassisSpeeds);
-      SwerveDriveKinematics.desaturateWheelSpeeds(podStates, DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND);
-      SwerveModuleState[] optimizedStates = new SwerveModuleState[4];
-      for (int idx = 0; idx < (pods.size()); idx++) {
-        optimizedStates[idx]=pods.get(idx).setModule(podStates[idx]);
-      }
-      Logger.getInstance().recordOutput("SwerveStates/Setpoints", podStates);
-      Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
-      Logger.getInstance().recordOutput("Drive/SpinCommand", spinCommand);
-
-    } else { // Enter defensive position
-      pods.get(0).setModulePositionOnly(Rotation2d.fromDegrees(-45));
-      pods.get(1).setModulePositionOnly(Rotation2d.fromDegrees(45));
-      pods.get(2).setModulePositionOnly(Rotation2d.fromDegrees(-45));
-      pods.get(3).setModulePositionOnly(Rotation2d.fromDegrees(45));
+    ChassisSpeeds currChassisSpeeds = getCurrentChassisSpeedRequest();
+    SwerveModuleState[] podStates = DrivetrainConstants.DRIVE_KINEMATICS.toSwerveModuleStates(currChassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(podStates, DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND);
+    SwerveModuleState[] optimizedStates = new SwerveModuleState[4];
+    for (int idx = 0; idx < (pods.size()); idx++) {
+      optimizedStates[idx]=pods.get(idx).setModule(podStates[idx]);
     }
+    Logger.getInstance().recordOutput("SwerveStates/Setpoints", podStates);
+    Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
+    Logger.getInstance().recordOutput("Drive/SpinCommand", spinCommand);
+  }
+
+  private void recordRealPods() {
     SwerveModuleState[] realStates = new SwerveModuleState[4];
     for (int idx = 0; idx < (pods.size()); idx++) {
       realStates[idx] = new SwerveModuleState(pods.get(idx).getVelocity(),Rotation2d.fromDegrees(pods.get(idx).getAzimuth()));
@@ -475,39 +462,6 @@ public class Drivetrain extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Drive/gyro", inputs);
 
-
-    
-    //vision_lfov_pose = NetworkTableInstance.getDefault().getTable("limelight-lfov").getEntry("botpose_wpiblue");
-    //vision_rfov_pose = NetworkTableInstance.getDefault().getTable("limelight-rfov").getEntry("botpose_wpiblue");
-
-    // double[] vision_pose_array=vision_pose.getDoubleArray(new double[6]);
-    // //System.out.println(vision_pose_array[0]);
-    // Pose2d cam_pose =new Pose2d(vision_pose_array[0],vision_pose_array[1],Rotation2d.fromDegrees(vision_pose_array[5]));
-    // //poseEstimator.addVisionMeasurement(cam_pose,  Timer.getFPGATimestamp() - (15) / 1000);
-    
-    //commenting out because I believe we should update the limelight apriltag map
-
-    // double xoffset = Units.inchesToMeters(285.16+ 40.45);
-    // double yoffset = Units.inchesToMeters(115.59 + 42.49);
-    // cam_pose = cam_pose.transformBy(new Transform2d(new Translation2d(xoffset,yoffset),new Rotation2d()));
-    
-    //update the pose estimator with correct timestamped values
-    
-
-    
-
-    //testing new limelight command
-    //LimelightHelpers.LimelightResults r = LimelightHelpers.getLatestResults("limelight");
-    // LimelightHelpers.LimelightResults r = LimelightHelpers.getLatestResults("limelight");
-    // SmartDashboard.putNumber("lastTimeStamp",r.targetingResults.timestamp_LIMELIGHT_publish);
-    // if(lastVisionTimeStamp != r.targetingResults.timestamp_LIMELIGHT_publish) {
-    //   lastVisionTimeStamp = r.targetingResults.timestamp_LIMELIGHT_publish;
-    //   Pose2d cam_pose = r.targetingResults.getBotPose2d();
-    //   //adding a fudge factor for pipeline and capture of 15 ms
-    //   poseEstimator.addVisionMeasurement(cam_pose,  Timer.getFPGATimestamp() - (15) / 1000);
-
-    //   SmartDashboard.putNumber("camX",cam_pose.getX());
-    // }
     lastPose = odom.getPoseMeters();
     SwerveModulePosition[] deltas = new SwerveModulePosition[4];
     for(int i=0;i<  pods.size(); i++) {
@@ -521,65 +475,39 @@ public class Drivetrain extends SubsystemBase {
     Logger.getInstance().recordOutput("Drive/Odom", getPose());
     SmartDashboard.putNumber("NavYaw",getPoseYawWrapped().getDegrees());
 
-    //Liam and Andrews work!
-    //double[] visionPoseArray = NetworkTableInstance.getDefault().getTable("limelight-rfov").getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
-    //Pose3d visionPose3dNT = new Pose3d(visionPoseArray[0], visionPoseArray[1], visionPoseArray[2], new Rotation3d( Units.degreesToRadians(visionPoseArray[3]), Units.degreesToRadians(visionPoseArray[4]), Units.degreesToRadians(visionPoseArray[5])));
-    //Logger.getInstance().recordOutput("Drive/vision_pose", visionPose3dNT);
-
-    //new vision proposal 
-    //visionPose3d = VisionDual.getInstance().getPose3d();
-
-    // double[] default_pose = {0.0,0.0,0.0,0.0,0.0,0.0};
-    // try {
-    //   double[] vision_pose_array = vision_pose.getDoubleArray(default_pose);
-    //   Pose2d cam_pose =new Pose2d(vision_pose_array[0],vision_pose_array[1],Rotation2d.fromDegrees(vision_pose_array[5]));
-    //   //store x value to check if its the same data as before
-      
-    //   double camera_inovation_error = cam_pose.getTranslation().minus(poseEstimator.getEstimatedPosition().getTranslation()).getNorm(); 
-    //   SmartDashboard.putNumber("camInovationError",camera_inovation_error);
-    //   if(camera_inovation_error < 1.0 && lastVisionX != cam_pose.getX() && cam_pose.getX() != 0.0){
-    //     lastVisionX = cam_pose.getX();
-    //     Transform2d diff = last_pose.minus(odom.getPoseMeters());
-    //     double norm = Math.abs(diff.getRotation().getRadians()) + diff.getTranslation().getNorm();
-    //     if(!(getPose().getX() > 3.5 && getPose().getX() < 10.5)){
-    //       double distanceToGrid = getPose().getX() < 7.0 ? getPose().getX() - 1.8 : 14.6 - getPose().getX();
-    //       double translation_cov = MathUtil.clamp(distanceToGrid, 0.9, 3.0); 
-    //       SmartDashboard.putNumber("camTransCov",translation_cov);
-    //       //poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(translation_cov, translation_cov, translation_cov));
-    //       //poseEstimator.addVisionMeasurement(cam_pose, Timer.getFPGATimestamp() - vision_pose_array[6] / 1000.0, VecBuilder.fill(translation_cov, translation_cov, translation_cov));
-    //     }
-    //   }
-    //   SmartDashboard.putNumber("camX",cam_pose.getX());
-    //   SmartDashboard.putNumber("camY",cam_pose.getY());
-    //   SmartDashboard.putNumber("camW",cam_pose.getRotation().getDegrees());
-    //   //System.out.println("cam_pose"+cam_pose.getX());
-    //   //SmartDashboard.putNumber("camX",cam_pose.getX());
-    //   //SmartDashboard.putNumber("camY",cam_pose.getY());
-    // }
-    // catch (ClassCastException e) {
-    //   System.out.println("vision error" + e);
-    // }
-    calculateNSetPodPositions();
+    //set pods
+    recordRealPods();
+    switch(currentDriveMode) {
+      case CUBECHASEAUTON:
+        this.spinCommand = calcCubeChaseSpinCommand();
+        calculateNSetPodPositions();
+        break;
+      case CUBECHASETELEOP:
+        if (LimelightHelpers.getTV("limelight-three")) {
+          this.spinCommand = calcCubeChaseSpinCommand();
+        }
+        this.forwardCommand = -1 * this.forwardCommand;
+        //this.strafeCommand = -1 * this.strafeCommand;
+        this.strafeCommand = 0.0;
+        calculateNSetPodPositions();
+        break;
+      case DEFENSE:
+        pods.get(0).setModulePositionOnly(Rotation2d.fromDegrees(-45));
+        pods.get(1).setModulePositionOnly(Rotation2d.fromDegrees(45));
+        pods.get(2).setModulePositionOnly(Rotation2d.fromDegrees(-45));
+        pods.get(3).setModulePositionOnly(Rotation2d.fromDegrees(45));
+        break;
+      case DRIVE:
+        calculateNSetPodPositions();
+        break;
+      default:
+        calculateNSetPodPositions();
+        break;
+    }
     
     field.setRobotPose(getPose());
     SmartDashboard.putData(field);
-    
-    // This method will be called once per scheduler every 500ms
-   
-    /* 
-    this.arraytrack++;
-    if (this.arraytrack > 3) {
-      this.arraytrack = 0;
-    }
-    */
 
-  
-    
-    SmartDashboard.putNumber("odomx", getPose().getX());
-    SmartDashboard.putNumber("odomy", getPose().getY());
-    SmartDashboard.putNumber("v_odomx", poseEstimator.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("v_odomy", poseEstimator.getEstimatedPosition().getY());
-    SmartDashboard.putBoolean("Turbo", isTurboOn);
     //publishSwervePodPIDErrors();
     // SmartDashboard.putBoolean("Defense", currentDriveMode == driveMode.DEFENSE);
   }
