@@ -470,8 +470,8 @@ public class Drivetrain extends SubsystemBase {
   public Command swerveDefenseCommand() {
     return this.runEnd(() -> this.setDriveMode(driveMode.DEFENSE), () -> this.setDriveMode(driveMode.DRIVE));
   }
-  public Command swerveDrive(DoubleSupplier forward, DoubleSupplier strafe, DoubleSupplier spin) {
-    return this.runOnce(() -> this.setDriveMode(driveMode.DRIVE)).andThen(this.run(() -> drive(forward.getAsDouble(),strafe.getAsDouble(),spin.getAsDouble())));
+  public Command swerveDrivePercent(DoubleSupplier forward, DoubleSupplier strafe, DoubleSupplier spin) {
+    return this.runOnce(() -> this.setDriveMode(driveMode.DRIVE)).andThen(this.run(() -> drive(forward.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND,strafe.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND,spin.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND)));
   }
   
   @Override

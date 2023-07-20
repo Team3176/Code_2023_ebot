@@ -75,7 +75,7 @@ public class RobotContainer {
 
     vision = VisionCubeChase.getInstance();
     superstructure = Superstructure.getInstance();
-    drivetrain.setDefaultCommand(drivetrain.swerveDrive(
+    drivetrain.setDefaultCommand(drivetrain.swerveDrivePercent(
         () -> controller.getForward() * 0.7,
         () -> controller.getStrafe() * 0.7,
         () -> controller.getSpin() * 3));
@@ -120,7 +120,7 @@ public class RobotContainer {
     
     
     //controller.rotStick.button(1).whileTrue(new CubeChase(
-    controller.rotStick.button(1).whileTrue(drivetrain.swerveDrive(
+    controller.rotStick.button(1).whileTrue(drivetrain.swerveDrivePercent(
       () -> controller.getForward() * 1.0,
       () -> controller.getStrafe() * 1.0,
       () -> controller.getSpin() * 7));
@@ -226,7 +226,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     String chosen = autonChooser.getSelected();
-    chosen = "barrier_cone_exit_HP";
+    chosen = "wall_3nSteal_3";
     PathPlannerAuto ppSwerveAuto = new PathPlannerAuto(chosen);
     return ppSwerveAuto.getauto();
   }
