@@ -31,6 +31,7 @@ import team3176.robot.subsystems.superstructure.IntakeCube;
 import team3176.robot.subsystems.superstructure.IntakeCone;
 
 import team3176.robot.subsystems.superstructure.Superstructure;
+import team3176.robot.subsystems.vision.SimVision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -56,6 +57,7 @@ public class RobotContainer {
   private final Drivetrain drivetrain;
   private final Superstructure superstructure;
   private final RobotState robotState;
+  private final SimVision vision_sim;
   private LoggedDashboardChooser<String> autonChooser = new LoggedDashboardChooser<>("AutoSelector");
   private String choosenAutonomousString = "";
   private Command choosenAutonomousCommand;
@@ -73,6 +75,7 @@ public class RobotContainer {
     intakeCube = IntakeCube.getInstance();
     intakeCone = IntakeCone.getInstance();
     robotState = RobotState.getInstance();
+    vision_sim = new SimVision();
     pdh = new PowerDistribution(Hardwaremap.PDH_CID, ModuleType.kRev);
 
     superstructure = Superstructure.getInstance();

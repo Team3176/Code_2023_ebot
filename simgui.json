@@ -32,7 +32,28 @@
       "/SmartDashboard/AutoSelector": "String Chooser",
       "/SmartDashboard/Auton Choice": "String Chooser",
       "/SmartDashboard/Field": "Field2d",
-      "/SmartDashboard/Scheduler": "Scheduler"
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/VisionSystemSim-photonvision/Sim Field": "Field2d",
+      "/SmartDashboard/photonvision Sim Field": "Field2d"
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "northstar": {
+        "calibration": {
+          "open": true
+        },
+        "open": true
+      },
+      "photonvision": {
+        "camera1": {
+          "open": true
+        },
+        "open": true,
+        "photonvision": {
+          "open": true
+        }
+      }
     }
   }
 }
