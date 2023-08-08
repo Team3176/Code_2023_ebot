@@ -3,6 +3,7 @@ package team3176.robot.subsystems.vision;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
@@ -72,7 +73,8 @@ public class SimPhotonVision extends SubsystemBase{
         simVision.update(currentPose);
         var results = realCam.getLatestResult();
         if (results.hasTargets()) {
-            EstimatedRobotPose poseEst = estimator.update(results).orElse(new EstimatedRobotPose(current3d, 0.0,null));
+            
+            Optional<EstimatedRobotPose> poseEst = estimator.update();
             
             ArrayList<Pose3d> targets = new ArrayList<Pose3d>();
             ArrayList<Pose3d> estimates = new ArrayList<Pose3d>();
@@ -81,8 +83,10 @@ public class SimPhotonVision extends SubsystemBase{
                 estimates.add(PhotonUtils.estimateFieldToRobotAprilTag(t.getBestCameraToTarget(), field.getTagPose(t.getFiducialId()).get() , cameratrans.inverse()));
             }
             
-           
-            Logger.getInstance().recordOutput("photonvision/multitag", poseEst.estimatedPose);
+            if(poseEst.isPresent()){
+                Logger.getInstance().recordOutput("photonvision/multitag", poseEst.get().estimatedPose);
+            }
+            
             Logger.getInstance().recordOutput("photonvision/targetposes", targets.toArray(new Pose3d[targets.size()]));
             Logger.getInstance().recordOutput("photonvision/poseEstimates", estimates.toArray(new Pose3d[estimates.size()]));
         }
