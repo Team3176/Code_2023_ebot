@@ -31,6 +31,7 @@ import team3176.robot.subsystems.superstructure.IntakeCube;
 import team3176.robot.subsystems.superstructure.IntakeCone;
 
 import team3176.robot.subsystems.superstructure.Superstructure;
+import team3176.robot.subsystems.vision.PhotonVisionSystem;
 import team3176.robot.subsystems.vision.SimPhotonVision;
 
 /**
@@ -57,7 +58,7 @@ public class RobotContainer {
   private final Drivetrain drivetrain;
   private final Superstructure superstructure;
   private final RobotState robotState;
-  private final SimPhotonVision vision_sim;
+  private final PhotonVisionSystem vision;
   private LoggedDashboardChooser<String> autonChooser = new LoggedDashboardChooser<>("AutoSelector");
   private String choosenAutonomousString = "";
   private Command choosenAutonomousCommand;
@@ -75,7 +76,7 @@ public class RobotContainer {
     intakeCube = IntakeCube.getInstance();
     intakeCone = IntakeCone.getInstance();
     robotState = RobotState.getInstance();
-    vision_sim = new SimPhotonVision();
+    vision = PhotonVisionSystem.getInstance();
     pdh = new PowerDistribution(Hardwaremap.PDH_CID, ModuleType.kRev);
 
     superstructure = Superstructure.getInstance();

@@ -14,12 +14,16 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -35,9 +39,11 @@ import team3176.robot.constants.SwervePodHardwareID;
 import team3176.robot.subsystems.drivetrain.GyroIO.GyroIOInputs;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
 
 public class Drivetrain extends SubsystemBase {
   private static Drivetrain instance;
@@ -277,6 +283,26 @@ public class Drivetrain extends SubsystemBase {
   public Pose2d getPose() {
     return poseEstimator.getEstimatedPosition();
   }
+  public Pose2d getPoseOdomTrue() {
+    return odom.getPoseMeters();
+  }
+  public void addVisionPose(EstimatedRobotPose p) {
+    Matrix<N3,N1> cov = new Matrix<>(Nat.N3(), Nat.N1());
+    double distance = 0.0;
+    for(var t : p.targetsUsed) {
+      distance += t.getBestCameraToTarget().getTranslation().getNorm() / p.targetsUsed.size();
+    }
+    Logger.getInstance().recordOutput("Drivetrain/distance2target", distance);
+    if (p.targetsUsed.size() > 1) {
+      //multi tag
+      double distance2 = Math.max(Math.pow(distance * 0.2,2),0.7);
+      cov = VecBuilder.fill(distance2,distance2,0.9);
+    } else {
+      double distance2 = Math.pow(distance * 0.5, 2);
+      cov = VecBuilder.fill(distance2,distance2,distance2);
+    }
+    poseEstimator.addVisionMeasurement(p.estimatedPose.toPose2d(), p.timestampSeconds,cov);
+  }
 
   public void resetPose(Pose2d pose) {
     wheelOnlyHeading = pose.getRotation();
@@ -396,13 +422,16 @@ public class Drivetrain extends SubsystemBase {
     return pods.get(podID).getAzimuth();
   }
 
-  public SwerveModulePosition[] getSwerveModulePositions() {
+  public SwerveModulePosition[] getSwerveModulePositions(boolean addNoiseIfSim) {
     return new SwerveModulePosition[] {
-        podFR.getPosition(),
-        podFL.getPosition(),
-        podBL.getPosition(),
-        podBR.getPosition()
+        podFR.getPosition(addNoiseIfSim),
+        podFL.getPosition(addNoiseIfSim),
+        podBL.getPosition(addNoiseIfSim),
+        podBR.getPosition(addNoiseIfSim)
     };
+  }
+  public SwerveModulePosition[] getSwerveModulePositions() {
+    return getSwerveModulePositions(true);
   }
 
   public void setCoastMode() {
@@ -461,18 +490,23 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Drive/gyro", inputs);
-
-    lastPose = odom.getPoseMeters();
+    lastPose = poseEstimator.getEstimatedPosition();
     SwerveModulePosition[] deltas = new SwerveModulePosition[4];
     for(int i=0;i<  pods.size(); i++) {
       deltas[i] = pods.get(i).getDelta();
     }
     Twist2d twist = DrivetrainConstants.DRIVE_KINEMATICS.toTwist2d(deltas);
-    wheelOnlyHeading = getPose().exp(twist).getRotation();
+    wheelOnlyHeading = getPoseOdomTrue().exp(twist).getRotation();
     // update encoders
-    this.poseEstimator.update(getSensorYaw(), getSwerveModulePositions());
-    this.odom.update(getSensorYaw(), getSwerveModulePositions());
+    this.poseEstimator.update(getSensorYaw(), getSwerveModulePositions(true));
+    this.odom.update(getSensorYaw(), getSwerveModulePositions(false));
+    
     Logger.getInstance().recordOutput("Drive/Odom", getPose());
+    
+    if(Constants.getMode() == Mode.SIM) {
+      Logger.getInstance().recordOutput("Drive/OdomTrue", getPoseOdomTrue());
+    }
+    
     SmartDashboard.putNumber("NavYaw",getPoseYawWrapped().getDegrees());
 
     //set pods

@@ -1,6 +1,8 @@
 package team3176.robot.subsystems.drivetrain;
 
 import java.util.Map;
+import java.util.Random;
+import java.util.random.RandomGenerator;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -14,6 +16,8 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import team3176.robot.Constants;
+import team3176.robot.Constants.Mode;
 import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.constants.DrivetrainHardwareMap;
 import team3176.robot.util.LoggedTunableNumber;
@@ -48,6 +52,7 @@ public class SwervePod implements Subsystem{
     private double kDAzimuth;
     private double lastDistance =0.0;
     private double delta = 0.0;
+    private double simulatedDistanceNoise = 0.0;
     private LoggedTunableNumber velMax = new LoggedTunableNumber("az_vel");
     private LoggedTunableNumber velAcc = new LoggedTunableNumber("az_acc");
 
@@ -57,6 +62,7 @@ public class SwervePod implements Subsystem{
 
     private SwervePodIO io;
     private SwervePodIOInputsAutoLogged inputs = new SwervePodIOInputsAutoLogged();
+    private Random simNoise = new Random();
 
     public SwervePod(int id, SwervePodIO io) {
         this.id = id;
@@ -107,9 +113,7 @@ public class SwervePod implements Subsystem{
             this.lastEncoderPos = desiredOptimized.angle.getDegrees(); 
         }
         // reduce output if the error is high
-        double currentDistance = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
-        this.delta = currentDistance - this.lastDistance;
-        this.lastDistance = currentDistance;
+        
         
         desiredOptimized.speedMetersPerSecond *= Math.abs(Math.cos(desiredOptimized.angle.minus(Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees)).getRadians()));
         //Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "", id);
@@ -127,8 +131,15 @@ public class SwervePod implements Subsystem{
      * odometry calls
      */
     public SwerveModulePosition getPosition() {
-        double mps = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
-        return new SwerveModulePosition(mps,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
+        return getPosition(true);
+    }
+    public SwerveModulePosition getPosition(boolean addNoiseIfSim) {
+        double m = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
+        if(addNoiseIfSim && Constants.getMode() == Mode.SIM) {
+            m = this.simulatedDistanceNoise;
+            return new SwerveModulePosition(m,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees + simNoise.nextGaussian(0.0, 5.0)));
+        }
+        return new SwerveModulePosition(m,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
     }
     public SwerveModulePosition getDelta() {
         return new SwerveModulePosition(this.delta,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
@@ -169,8 +180,12 @@ public class SwervePod implements Subsystem{
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+        double currentDistance = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
+        this.delta = currentDistance - this.lastDistance;
+        this.lastDistance = currentDistance;
+        this.simulatedDistanceNoise += this.delta + (simNoise.nextGaussian(0.0, 4.0) * this.delta * 0.2);
         Logger.getInstance().processInputs("Drive/Module" + Integer.toString(this.id), inputs);
-
+        Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/simdistance", this.simulatedDistanceNoise);
         if(kPAzimuth.hasChanged(hashCode()) || kIAzimuth.hasChanged(hashCode())) {
             turningPIDController.setP(kPAzimuth.get());
             turningPIDController.setI(kIAzimuth.get());
