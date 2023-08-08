@@ -321,6 +321,9 @@ public class Drivetrain extends SubsystemBase {
           podFL.getPosition(),
           podBL.getPosition(),
           podBR.getPosition() }, pose);
+    if(Constants.getMode() == Mode.SIM) {
+      simNoNoiseOdom.resetSimPose(pose);
+    }
     
   }
   public void resetPoseToVision() {
@@ -593,6 +596,9 @@ public class Drivetrain extends SubsystemBase {
           podBR.getPositionSimNoNoise()
       };
 
+    }
+    public void resetSimPose(Pose2d p) {
+      odomNoNoise.resetPosition(p.getRotation(), getSwerveModulePositionsSimNoNoise(), p);
     }
     public Pose2d getPoseTrue() {
       return odomNoNoise.getPoseMeters();

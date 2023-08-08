@@ -253,6 +253,7 @@ public class RobotContainer {
       PathPlannerAuto ppSwerveAuto = new PathPlannerAuto(chosen);
       return ppSwerveAuto.getauto();
     }
+    choosenAutonomousCommand = new PathPlannerAuto("wall_3nSteal_3").getauto();
     return choosenAutonomousCommand;
   }
 }

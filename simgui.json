@@ -38,9 +38,12 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "transitory": {
       "SmartDashboard": {
-        "AutoSelector": {
+        "Auton Choice": {
           "open": true
         },
         "open": true
