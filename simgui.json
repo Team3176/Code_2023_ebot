@@ -39,6 +39,12 @@
   },
   "NetworkTables": {
     "transitory": {
+      "SmartDashboard": {
+        "AutoSelector": {
+          "open": true
+        },
+        "open": true
+      },
       "northstar": {
         "calibration": {
           "open": true

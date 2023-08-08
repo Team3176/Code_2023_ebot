@@ -41,7 +41,7 @@ public class SimPhotonVision extends SubsystemBase{
     @Override
     public void periodic() {
         
-        Pose2d currentPose = Drivetrain.getInstance().getPoseOdomTrue();
+        Pose2d currentPose = Drivetrain.getInstance().getSimNoNoisePose();
         simVision.update(currentPose);
     }
     
