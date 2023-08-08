@@ -1,5 +1,7 @@
 package team3176.robot.subsystems.drivetrain;
 
+import java.util.Random;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -16,6 +18,9 @@ public class SwervePodIOSim implements SwervePodIO{
     private double driveAppliedVolts = 0.0;
     private double turnAppliedVolts = 0.0;
     private double currentDriveSpeed = 0.0;
+    private Random simNoise = new Random();
+    private static final double moduleErrorBound = 8.0;
+    private double moduleOffsetError = Math.floor(simNoise.nextDouble() * moduleErrorBound) - moduleErrorBound/2.0;
     @Override
     public void updateInputs(SwervePodIOInputs inputs) {
         driveSim.update(Constants.LOOP_PERIODIC_SECS);
@@ -28,17 +33,17 @@ public class SwervePodIOSim implements SwervePodIO{
         while (turnAbsolutePositionRad > 180) {
         turnAbsolutePositionRad -= 360;
         }
-
-        inputs.drivePositionRad =
-            inputs.drivePositionRad
-                + (driveSim.getAngularVelocityRadPerSec() * Constants.LOOP_PERIODIC_SECS);
+        double delta = (driveSim.getAngularVelocityRadPerSec() * Constants.LOOP_PERIODIC_SECS);
+        inputs.drivePositionSimNoNoise += delta;
+        inputs.drivePositionRad += delta + simNoise.nextGaussian(0.0, 4.0) * Math.pow(delta,2) * 0.1;
         inputs.driveVelocityRadPerSec = driveSim.getAngularVelocityRadPerSec();
         inputs.driveAppliedVolts = driveAppliedVolts;
         inputs.driveCurrentAmpsStator = new double[] {Math.abs(driveSim.getCurrentDrawAmps())};
         inputs.driveTempCelcius = new double[] {};
         currentDriveSpeed = driveSim.getAngularVelocityRadPerSec();
 
-        inputs.turnAbsolutePositionDegrees = turnAbsolutePositionRad;
+        inputs.turnAbsolutePositionDegreesSimNoNoise = turnAbsolutePositionRad;
+        inputs.turnAbsolutePositionDegrees = turnAbsolutePositionRad + moduleOffsetError;
         inputs.turnVelocityRPM = turnSim.getAngularVelocityRPM();
         inputs.turnAppliedVolts = turnAppliedVolts;
         inputs.turnCurrentAmps = new double[] {Math.abs(turnSim.getCurrentDrawAmps())};

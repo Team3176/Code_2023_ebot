@@ -51,8 +51,9 @@ public class SwervePod implements Subsystem{
     private LoggedTunableNumber kIAzimuth = new LoggedTunableNumber("kI_azimuth");
     private double kDAzimuth;
     private double lastDistance =0.0;
+    private double lastDistanceSimNoNoise =0.0;
     private double delta = 0.0;
-    private double simulatedDistanceNoise = 0.0;
+    private double deltaSimNoNoise = 0.0;
     private LoggedTunableNumber velMax = new LoggedTunableNumber("az_vel");
     private LoggedTunableNumber velAcc = new LoggedTunableNumber("az_acc");
 
@@ -62,7 +63,6 @@ public class SwervePod implements Subsystem{
 
     private SwervePodIO io;
     private SwervePodIOInputsAutoLogged inputs = new SwervePodIOInputsAutoLogged();
-    private Random simNoise = new Random();
 
     public SwervePod(int id, SwervePodIO io) {
         this.id = id;
@@ -119,6 +119,7 @@ public class SwervePod implements Subsystem{
         //Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "", id);
         io.setTurn(MathUtil.clamp(turnOutput, -0.4, 0.4));
         Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/error",turningPIDController.getPositionError());
+        Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/deltanonoise",this.deltaSimNoNoise);
         //Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/setpoint",turningPIDController.getSetpoint().position);
         this.velTicsPer100ms = Units3176.mps2ums(desiredOptimized.speedMetersPerSecond);
         io.setDrive(desiredOptimized.speedMetersPerSecond);
@@ -131,18 +132,18 @@ public class SwervePod implements Subsystem{
      * odometry calls
      */
     public SwerveModulePosition getPosition() {
-        return getPosition(true);
-    }
-    public SwerveModulePosition getPosition(boolean addNoiseIfSim) {
         double m = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
-        if(addNoiseIfSim && Constants.getMode() == Mode.SIM) {
-            m = this.simulatedDistanceNoise;
-            return new SwerveModulePosition(m,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees + simNoise.nextGaussian(0.0, 5.0)));
-        }
         return new SwerveModulePosition(m,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
+    }
+    public SwerveModulePosition getPositionSimNoNoise() {
+        double m = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionSimNoNoise / (2*Math.PI));
+        return new SwerveModulePosition(m,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegreesSimNoNoise));
     }
     public SwerveModulePosition getDelta() {
         return new SwerveModulePosition(this.delta,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
+    }
+    public SwerveModulePosition getDeltaSimNoNoise() {
+        return new SwerveModulePosition(this.deltaSimNoNoise,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegreesSimNoNoise));
     }
     
     public double getVelocity() {
@@ -183,9 +184,12 @@ public class SwervePod implements Subsystem{
         double currentDistance = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
         this.delta = currentDistance - this.lastDistance;
         this.lastDistance = currentDistance;
-        this.simulatedDistanceNoise += this.delta + (simNoise.nextGaussian(0.0, 4.0) * this.delta * 0.2);
+        if(Constants.getMode() == Mode.SIM) {
+            double currentDistanceSimNoNoise = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionSimNoNoise / (2*Math.PI));
+            this.deltaSimNoNoise = currentDistanceSimNoNoise - this.lastDistanceSimNoNoise; 
+            this.lastDistanceSimNoNoise = currentDistanceSimNoNoise;
+        }
         Logger.getInstance().processInputs("Drive/Module" + Integer.toString(this.id), inputs);
-        Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/simdistance", this.simulatedDistanceNoise);
         if(kPAzimuth.hasChanged(hashCode()) || kIAzimuth.hasChanged(hashCode())) {
             turningPIDController.setP(kPAzimuth.get());
             turningPIDController.setI(kIAzimuth.get());

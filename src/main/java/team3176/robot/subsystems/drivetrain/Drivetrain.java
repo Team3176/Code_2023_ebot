@@ -422,16 +422,21 @@ public class Drivetrain extends SubsystemBase {
     return pods.get(podID).getAzimuth();
   }
 
-  public SwerveModulePosition[] getSwerveModulePositions(boolean addNoiseIfSim) {
+  public SwerveModulePosition[] getSwerveModulePositions() {
     return new SwerveModulePosition[] {
-        podFR.getPosition(addNoiseIfSim),
-        podFL.getPosition(addNoiseIfSim),
-        podBL.getPosition(addNoiseIfSim),
-        podBR.getPosition(addNoiseIfSim)
+        podFR.getPosition(),
+        podFL.getPosition(),
+        podBL.getPosition(),
+        podBR.getPosition()
     };
   }
-  public SwerveModulePosition[] getSwerveModulePositions() {
-    return getSwerveModulePositions(true);
+  public SwerveModulePosition[] getSwerveModulePositionsSimNoNoise() {
+    return new SwerveModulePosition[] {
+        podFR.getPositionSimNoNoise(),
+        podFL.getPositionSimNoNoise(),
+        podBL.getPositionSimNoNoise(),
+        podBR.getPositionSimNoNoise()
+    };
   }
 
   public void setCoastMode() {
@@ -492,14 +497,25 @@ public class Drivetrain extends SubsystemBase {
     Logger.getInstance().processInputs("Drive/gyro", inputs);
     lastPose = poseEstimator.getEstimatedPosition();
     SwerveModulePosition[] deltas = new SwerveModulePosition[4];
+    
     for(int i=0;i<  pods.size(); i++) {
-      deltas[i] = pods.get(i).getDelta();
+      if(Constants.getMode() == Mode.SIM) {
+        deltas[i] = pods.get(i).getDeltaSimNoNoise();
+      } else {
+        deltas[i] = pods.get(i).getDelta();
+      }
+      
     }
     Twist2d twist = DrivetrainConstants.DRIVE_KINEMATICS.toTwist2d(deltas);
     wheelOnlyHeading = getPoseOdomTrue().exp(twist).getRotation();
     // update encoders
-    this.poseEstimator.update(getSensorYaw(), getSwerveModulePositions(true));
-    this.odom.update(getSensorYaw(), getSwerveModulePositions(false));
+    this.poseEstimator.update(getSensorYaw(), getSwerveModulePositions());
+    if(Constants.getMode() == Mode.SIM) {
+      this.odom.update(getSensorYaw(), getSwerveModulePositionsSimNoNoise());
+    } else {
+      this.odom.update(getSensorYaw(), getSwerveModulePositions());
+    }
+   
     
     Logger.getInstance().recordOutput("Drive/Odom", getPose());
     
