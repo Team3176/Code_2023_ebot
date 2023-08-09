@@ -82,7 +82,7 @@ public class Drivetrain extends SubsystemBase {
   double angleAvgRollingWindow;
 
   public enum driveMode {
-    DEFENSE, DRIVE, CUBECHASETELEOP, CUBECHASEAUTON
+    DEFENSE, DRIVE, CUBECHASETELEOP, CUBECHASEAUTON, AUTO
   }
 
   private SwervePod podFR;
@@ -297,6 +297,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void setModuleStates(SwerveModuleState[] states) {
+    currentDriveMode = driveMode.AUTO;
     for (int idx = 0; idx < (pods.size()); idx++) {
       pods.get(idx).setModule(states[idx]);
     }
@@ -499,6 +500,8 @@ public class Drivetrain extends SubsystemBase {
         break;
       case DRIVE:
         calculateNSetPodPositions();
+        break;
+      case AUTO:
         break;
       default:
         calculateNSetPodPositions();
