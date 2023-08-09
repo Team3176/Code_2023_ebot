@@ -10,12 +10,14 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardInput;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import team3176.robot.commands.drivetrain.*;
@@ -58,10 +60,11 @@ public class RobotContainer {
   private final Drivetrain drivetrain;
   private final Superstructure superstructure;
   private final RobotState robotState;
-  private final PhotonVisionSystem vision;
+  private PhotonVisionSystem vision;
   private LoggedDashboardChooser<String> autonChooser = new LoggedDashboardChooser<>("AutoSelector");
   private String choosenAutonomousString = "";
   private Command choosenAutonomousCommand;
+  private Alliance currentAlliance = Alliance.Blue;
 
   
   /**
@@ -222,8 +225,8 @@ public class RobotContainer {
   public void printCanFaults(){
     pdh.getStickyFaults();
   }
-  public void checkAutonomousSelection() {
-    if(autonChooser.get() != null && !choosenAutonomousString.equals(autonChooser.get())) {
+  public void checkAutonomousSelection(Boolean force) {
+    if(autonChooser.get() != null && (!choosenAutonomousString.equals(autonChooser.get()) || force)) {
       Long start = System.nanoTime();
       choosenAutonomousString = autonChooser.get();
       try {
@@ -236,6 +239,19 @@ public class RobotContainer {
      
       Long totalTime =   System.nanoTime() - start;
       System.out.println("Autonomous Selected: [" + choosenAutonomousString + "] generated in " + (totalTime / 1000000.0) + "ms");
+    }
+  }
+  public void checkAutonomousSelection() {
+    checkAutonomousSelection(false);
+  }
+
+  public void checkAllaince() {
+    if(DriverStation.getAlliance() != currentAlliance) {
+      currentAlliance = DriverStation.getAlliance();
+      //Updated any things that need to change
+      System.out.println("changed alliance");
+      checkAutonomousSelection(true);
+      vision.refresh();
     }
   }
   /**

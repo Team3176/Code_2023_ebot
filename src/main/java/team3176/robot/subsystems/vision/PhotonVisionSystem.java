@@ -1,5 +1,6 @@
 package team3176.robot.subsystems.vision;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -12,12 +13,15 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import team3176.robot.Constants;
 import team3176.robot.Constants.Mode;
@@ -36,15 +40,20 @@ public class PhotonVisionSystem extends SubsystemBase{
     EstimatedRobotPose currentEstimate;
     private PhotonVisionSystem() {
         realCam = new PhotonCamera("camera1");
-
-        if(Constants.getMode() == Mode.SIM) {
-            simInstance = new SimPhotonVision(realCam,camera2Robot);
-        }
         try {
             field = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+            if (DriverStation.getAlliance() == Alliance.Blue) {
+                field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+            } else {
+                field.setOrigin(OriginPosition.kRedAllianceWallRightSide);
+            }
         }
         catch(Exception e) {
             System.out.println("woops can't load the field");
+        }
+        
+        if(Constants.getMode() == Mode.SIM) {
+            simInstance = new SimPhotonVision(realCam,camera2Robot,field);
         }
         estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP, realCam, camera2Robot);
     }
@@ -53,6 +62,17 @@ public class PhotonVisionSystem extends SubsystemBase{
             instance = new PhotonVisionSystem();
         }
         return instance;
+    }
+    public void refresh() {
+        if (DriverStation.getAlliance() == Alliance.Blue) {
+            field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+        } else {
+            field.setOrigin(OriginPosition.kRedAllianceWallRightSide);
+        }
+        if(Constants.getMode() == Mode.SIM) {
+            simInstance.switchAllaince(field);
+        }
+        estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP, realCam, camera2Robot);
     }
     @Override
     public void periodic() {
@@ -74,7 +94,6 @@ public class PhotonVisionSystem extends SubsystemBase{
                 Drivetrain.getInstance().addVisionPose(poseEst.get());
                 Logger.getInstance().recordOutput("photonvision/multitag", poseEst.get().estimatedPose);
             }
-            
             Logger.getInstance().recordOutput("photonvision/targetposes", targets.toArray(new Pose3d[targets.size()]));
             Logger.getInstance().recordOutput("photonvision/poseEstimates", estimates.toArray(new Pose3d[estimates.size()]));
         }
