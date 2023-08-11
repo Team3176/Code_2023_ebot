@@ -12,7 +12,6 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import team3176.robot.commands.superstructure.intakecube.PoopCube;
 import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
 import team3176.robot.subsystems.drivetrain.Drivetrain.driveMode;
@@ -31,12 +30,12 @@ public class PathPlannerAuto {
         HashMap<String, Command> eventMap = new HashMap<>();
         eventMap.put("scoreHighFirst", superstructure.scoreGamePieceAuto());
         eventMap.put("scoreHigh", superstructure.scoreGamePieceAuto());
-        eventMap.put("autoBalance", new AutoBalance().andThen(new SwerveDefense()).finallyDo((b) -> {
+        eventMap.put("autoBalance", new AutoBalance().andThen(driveSubsystem.swerveDefenseCommand()).finallyDo((b) -> {
             driveSubsystem.setDriveMode(driveMode.DEFENSE);
             driveSubsystem.drive(0.0,0.0,0.0);
         }));
         eventMap.put("groundCube",superstructure.groundCube().withTimeout(3));
-        eventMap.put("poopCube",new PoopCube().withTimeout(.7));
+        eventMap.put("poopCube",superstructure.poopCube().withTimeout(.7));
         eventMap.put("CubeAlignAtPoint", new CubeAlignAtPoint());
         eventMap.put("CubeChaseOn", new CubeChaseAutonOn());
         eventMap.put("CubeChaseOff", new CubeChaseOff());

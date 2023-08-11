@@ -121,7 +121,10 @@ public class IntakeCube extends SubsystemBase {
    {
     io.setVelocity(velocity);
    }
-
+  public Command spit() {
+    return this.runEnd(() -> {spinConveyor(0.6); spinIntake(1);},
+     () -> {spinConveyor(0.0);spinIntake(0);});
+  }
   public Command extendAndSpin() {
     return this.startEnd(() ->{
       this.Extend();
@@ -131,7 +134,9 @@ public class IntakeCube extends SubsystemBase {
       this.spinIntake(0.0);
     });
   }
-
+  public Command retractSpinNot() {
+    return this.runOnce(() -> {this.Retract(); this.spinIntake(0.0);});
+  }
   
   public Command extendAndFreeSpin() {
     return this.startEnd(() ->{
@@ -148,7 +153,14 @@ public class IntakeCube extends SubsystemBase {
       this.spinConveyor(-.8);
     }, () -> {
       this.spinConveyor(0);
-    });
+    }).withName("bumpConveyor");
+  }
+  public Command bumpConveyorTimeout(double timeout) {
+    return this.startEnd(() ->{
+      this.spinConveyor(-.8);
+    }, () -> {
+      this.spinConveyor(0);
+    }).withTimeout(timeout).withName("bumpConveyor");
   }
 
 }

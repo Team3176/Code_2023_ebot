@@ -1,6 +1,8 @@
 package team3176.robot.subsystems.drivetrain;
 
 import java.util.Map;
+import java.util.Random;
+import java.util.random.RandomGenerator;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -12,19 +14,20 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import team3176.robot.Constants;
+import team3176.robot.Constants.Mode;
 import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.constants.DrivetrainHardwareMap;
 import team3176.robot.util.LoggedTunableNumber;
 import team3176.robot.util.God.*;
 
 
-public class SwervePod {
+public class SwervePod implements Subsystem{
 
     /** Class Object holding the Motor controller for Drive Motor on the SwervePod */
     /** Current value in radians of the azimuthEncoder's position */
-    double azimuthEncoderRelPosition;
-    double azimuthEncoderAbsPosition;
     double desiredOptimizedAzimuthPosition;
     double velTicsPer100ms;
     boolean lastHasResetOccurred;
@@ -48,7 +51,9 @@ public class SwervePod {
     private LoggedTunableNumber kIAzimuth = new LoggedTunableNumber("kI_azimuth");
     private double kDAzimuth;
     private double lastDistance =0.0;
+    private double lastDistanceSimNoNoise =0.0;
     private double delta = 0.0;
+    private double deltaSimNoNoise = 0.0;
     private LoggedTunableNumber velMax = new LoggedTunableNumber("az_vel");
     private LoggedTunableNumber velAcc = new LoggedTunableNumber("az_acc");
 
@@ -78,6 +83,7 @@ public class SwervePod {
         turningPIDController.setP(this.kPAzimuth.get());
         turningPIDController.setI(this.kIAzimuth.get());
         turningPIDController.setD(this.kDAzimuth);
+        CommandScheduler.getInstance().registerSubsystem(this);
         
     }
 
@@ -85,58 +91,59 @@ public class SwervePod {
     public void setModule(double speedMetersPerSecond, Rotation2d angle) {
         setModule(new SwerveModuleState(speedMetersPerSecond,angle));
     }
+    public void setModulePositionOnly(Rotation2d angle) {
+        SwerveModuleState desiredState = new SwerveModuleState(0.0,angle);
+        SwerveModuleState desiredOptimized = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
+        double turnOutput = turningPIDController.calculate(inputs.turnAbsolutePositionDegrees, desiredOptimized.angle.getDegrees());
+        io.setTurn(MathUtil.clamp(turnOutput, -0.4, 0.4));
+    }
 
     /**
      *  alternative method for setting swervepod in line with WPILIB standard library
      * @param desiredState 
      */
     public SwerveModuleState setModule(SwerveModuleState desiredState) {
-        io.updateInputs(inputs);
-        Logger.getInstance().processInputs("Drive/Module" + Integer.toString(this.id), inputs);
-        
-        this.azimuthEncoderAbsPosition = inputs.turnAbsolutePositionDegrees;
-        SwerveModuleState desiredOptimized = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(this.azimuthEncoderAbsPosition));
+        SwerveModuleState desiredOptimized = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
         this.desiredOptimizedAzimuthPosition = desiredOptimized.angle.getDegrees();
         double turnOutput;
         if (desiredState.speedMetersPerSecond > (-Math.pow(10,-10)) && desiredState.speedMetersPerSecond  < (Math.pow(10,-10))) {      
-            turnOutput = turningPIDController.calculate(this.azimuthEncoderAbsPosition, this.lastEncoderPos);
+            turnOutput = turningPIDController.calculate(inputs.turnAbsolutePositionDegrees, this.lastEncoderPos);
         } else {
-            turnOutput = turningPIDController.calculate(this.azimuthEncoderAbsPosition, desiredOptimized.angle.getDegrees());
+            turnOutput = turningPIDController.calculate(inputs.turnAbsolutePositionDegrees, desiredOptimized.angle.getDegrees());
             this.lastEncoderPos = desiredOptimized.angle.getDegrees(); 
         }
         // reduce output if the error is high
-        double currentDistance = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
-        this.delta = currentDistance - this.lastDistance;
-        this.lastDistance = currentDistance;
         
-        desiredOptimized.speedMetersPerSecond *= Math.abs(Math.cos(desiredOptimized.angle.minus(Rotation2d.fromDegrees(azimuthEncoderAbsPosition)).getRadians()));
+        
+        desiredOptimized.speedMetersPerSecond *= Math.abs(Math.cos(desiredOptimized.angle.minus(Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees)).getRadians()));
         //Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "", id);
-        
         io.setTurn(MathUtil.clamp(turnOutput, -0.4, 0.4));
         Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/error",turningPIDController.getPositionError());
+        Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/deltanonoise",this.deltaSimNoNoise);
         //Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/setpoint",turningPIDController.getSetpoint().position);
         this.velTicsPer100ms = Units3176.mps2ums(desiredOptimized.speedMetersPerSecond);
         io.setDrive(desiredOptimized.speedMetersPerSecond);
-
-        if(kPAzimuth.hasChanged(hashCode()) || kIAzimuth.hasChanged(hashCode())) {
-            turningPIDController.setP(kPAzimuth.get());
-            turningPIDController.setI(kIAzimuth.get());
-        }
         // if(velAcc.hasChanged(hashCode()) || velMax.hasChanged(hashCode())){
         //     turningPIDController.setConstraints(new Constraints(velMax.get(),velAcc.get()));
         // }
-
         return desiredOptimized;
     }   
     /*
      * odometry calls
      */
     public SwerveModulePosition getPosition() {
-        double mps = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
-        return new SwerveModulePosition(mps,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
+        double m = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
+        return new SwerveModulePosition(m,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
+    }
+    public SwerveModulePosition getPositionSimNoNoise() {
+        double m = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionSimNoNoise / (2*Math.PI));
+        return new SwerveModulePosition(m,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegreesSimNoNoise));
     }
     public SwerveModulePosition getDelta() {
         return new SwerveModulePosition(this.delta,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
+    }
+    public SwerveModulePosition getDeltaSimNoNoise() {
+        return new SwerveModulePosition(this.deltaSimNoNoise,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegreesSimNoNoise));
     }
     
     public double getVelocity() {
@@ -171,6 +178,25 @@ public class SwervePod {
         return inputs.driveVelocityRadPerSec;
     }
 
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+        double currentDistance = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
+        this.delta = currentDistance - this.lastDistance;
+        this.lastDistance = currentDistance;
+        if(Constants.getMode() == Mode.SIM) {
+            double currentDistanceSimNoNoise = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionSimNoNoise / (2*Math.PI));
+            this.deltaSimNoNoise = currentDistanceSimNoNoise - this.lastDistanceSimNoNoise; 
+            this.lastDistanceSimNoNoise = currentDistanceSimNoNoise;
+        }
+        Logger.getInstance().processInputs("Drive/Module" + Integer.toString(this.id), inputs);
+        if(kPAzimuth.hasChanged(hashCode()) || kIAzimuth.hasChanged(hashCode())) {
+            turningPIDController.setP(kPAzimuth.get());
+            turningPIDController.setI(kIAzimuth.get());
+        }
+
+    }
+
     public void setupShuffleboard() {
         Shuffleboard.getTab(this.idString)
             .add(idString+"/podAzimuth_setpoint_angle",DrivetrainHardwareMap.AZIMUTH_ABS_ENCODER_OFFSET_POSITION[id])
@@ -196,3 +222,4 @@ public class SwervePod {
             .getEntry();
     }
 }
+

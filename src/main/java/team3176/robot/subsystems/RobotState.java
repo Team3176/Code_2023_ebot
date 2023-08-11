@@ -23,8 +23,6 @@ import team3176.robot.constants.RobotConstants.Status;
 import team3176.robot.constants.SignalingConstants;
 
 import team3176.robot.subsystems.superstructure.Claw;
-import team3176.robot.subsystems.vision.Vision.LEDState;
-
 
 
 public class RobotState extends SubsystemBase {
@@ -210,7 +208,7 @@ public class RobotState extends SubsystemBase {
 
   public void setallyellow()
   {
-    if (isFlashing = true)
+    if (isFlashing)
     {
       allflash = true;
     }
@@ -220,7 +218,7 @@ public class RobotState extends SubsystemBase {
 
   public void setallpurple()
   {
-    if (isFlashing = true)
+    if (isFlashing)
     {
       allflash = true;
     }
@@ -230,7 +228,7 @@ public class RobotState extends SubsystemBase {
 
   public void setallred()
   {
-    if (isFlashing = true)
+    if (isFlashing)
     {
       allflash = true;
     }
@@ -372,7 +370,7 @@ public class RobotState extends SubsystemBase {
     }
   }
 
-  public void setColorWantState(int LEDState) {
+  private void setColorWantState(int LEDState) {
     //System.out.println("WAS CALLED");
     wantedLEDState = LEDState;
     if (wantedLEDState == 0) {
@@ -404,13 +402,17 @@ public class RobotState extends SubsystemBase {
     return instance;
   }
 
+  public Command setColorWantedState(int state) {
+    return this.runOnce(() -> this.setColorWantState(state)).withName("setColorWantedState");
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Intake", inputs);
 
     //(m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false)
-    if (m_Claw.getLinebreakOne() == false || m_Claw.getLinebreakTwo() == false) {
+    if (!m_Claw.getIsLinebreakOne() || !m_Claw.getIsLinebreakTwo()) {
       isSolid = true;
       isFlashing = false;
       if (wantedLEDState == 1) {
@@ -420,13 +422,13 @@ public class RobotState extends SubsystemBase {
         setallpurple();
       }
     }
-    else if ((m_Claw.getLinebreakOne() == true && m_Claw.getLinebreakTwo() == true) && isSolid == true)
+    else if ((m_Claw.getIsLinebreakOne() && m_Claw.getIsLinebreakTwo()) && isSolid)
     {
       setallblack();
       wantedLEDState = 0;
       isSolid = false;
     }
-    else if (isSolid == false && isFlashing == true){
+    else if (!isSolid && isFlashing){
       // System.out.println("isSolid == false and isFlashing = true");
       // if (wantedLEDState == 1)
       // {
@@ -444,6 +446,4 @@ public class RobotState extends SubsystemBase {
     }
   }
 
-  @Override
-  public void simulationPeriodic() {}
 }

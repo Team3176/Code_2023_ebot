@@ -48,12 +48,5 @@ public interface ClawIO{
   public default void updateInputs(ClawIOInputs inputs) {}
 
   /** Run open loop at the specified voltage. */
-  public default void setVoltage(double volts) {}
-
-  /**
-   * Run closed loop at the specified velocity.
-   * 
-   * @param velocityRadPerSec Velocity setpoint.
-   */
-  public default void setVelocity(double velocityRadPerSec) {}
+  public default void setClawMotor(double percent, int amps) {}
 }
