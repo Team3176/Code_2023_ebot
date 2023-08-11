@@ -1,5 +1,7 @@
 package team3176.robot.subsystems.vision;
 
+import java.util.List;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.simulation.PhotonCameraSim;
@@ -18,15 +20,16 @@ import team3176.robot.subsystems.drivetrain.Drivetrain;
 public class SimPhotonVision extends SubsystemBase{
     // Simulated Vision System.
     
-    Transform3d camera2Robot;
     VisionSystemSim simVision = new VisionSystemSim("photonvision");
-    PhotonCameraSim simCam;
     PhotonPoseEstimator estimator;
     
-    public SimPhotonVision(PhotonCamera c, Transform3d t, AprilTagFieldLayout field) {
-        camera2Robot = t;
-        simCam = new PhotonCameraSim(c, SimCameraProperties.LL2_960_720(),0.07,Units.feetToMeters(30));
-        simVision.addCamera(simCam, camera2Robot);
+    public SimPhotonVision(List<PhotonCamera> c, List<Transform3d> t, AprilTagFieldLayout field) {
+        for(int i = 0; i < c.size(); i++) {
+            Transform3d camera2Robot = t.get(i);
+            PhotonCameraSim simCam = new PhotonCameraSim(c.get(i), SimCameraProperties.LL2_960_720(),0.07,Units.feetToMeters(30));
+            simVision.addCamera(simCam, camera2Robot);
+        }
+        
         //simVision.addVisionTargets(new VisionTargetSim(t2pose,TargetModel.kTag16h5,2));
         simVision.addVisionTargets(field);
         

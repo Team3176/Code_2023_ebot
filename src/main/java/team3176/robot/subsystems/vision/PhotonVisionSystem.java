@@ -2,6 +2,7 @@ package team3176.robot.subsystems.vision;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
@@ -53,7 +54,7 @@ public class PhotonVisionSystem extends SubsystemBase{
         }
         
         if(Constants.getMode() == Mode.SIM) {
-            simInstance = new SimPhotonVision(realCam,camera2Robot,field);
+            simInstance = new SimPhotonVision(List.of(realCam),List.of(camera2Robot),field);
         }
         estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP, realCam, camera2Robot);
     }
