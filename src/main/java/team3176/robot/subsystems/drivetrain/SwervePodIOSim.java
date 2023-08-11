@@ -35,7 +35,7 @@ public class SwervePodIOSim implements SwervePodIO{
         }
         double delta = (driveSim.getAngularVelocityRadPerSec() * Constants.LOOP_PERIODIC_SECS);
         inputs.drivePositionSimNoNoise += delta;
-        inputs.drivePositionRad += delta + simNoise.nextGaussian(0.0, 4.0) * Math.pow(delta,2) * 0.1;
+        inputs.drivePositionRad += delta + simNoise.nextGaussian(0.0, 2.0) * Math.pow(delta,2) * 0.1;
         inputs.driveVelocityRadPerSec = driveSim.getAngularVelocityRadPerSec();
         inputs.driveAppliedVolts = driveAppliedVolts;
         inputs.driveCurrentAmpsStator = new double[] {Math.abs(driveSim.getCurrentDrawAmps())};

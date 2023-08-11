@@ -18,13 +18,19 @@ public class SimNoNoiseOdom{
     private Rotation2d wheelOnlyHeading;
     public SimNoNoiseOdom(ArrayList<SwervePod> pods) {
       this.pods = pods;
+      System.out.println("pods size " + this.pods.size());
       wheelOnlyHeading = new Rotation2d();
-      odomNoNoise =new SwerveDriveOdometry(DrivetrainConstants.DRIVE_KINEMATICS, Drivetrain.getInstance().getSensorYaw(),getSwerveModulePositionsSimNoNoise(), new Pose2d(0.0, 0.0, new Rotation2d()));
+      odomNoNoise =new SwerveDriveOdometry(DrivetrainConstants.DRIVE_KINEMATICS, new Rotation2d(), new SwerveModulePosition[] {
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition()
+    }, new Pose2d(0.0, 0.0, new Rotation2d()));
     }
     public SwerveModulePosition[] getSwerveModulePositionsSimNoNoise() {
       SwerveModulePosition[] positions = new SwerveModulePosition[pods.size()];
       for(int i = 0; i < pods.size(); ++i) {
-        positions[1] = pods.get(i).getPositionSimNoNoise();
+        positions[i] = pods.get(i).getPositionSimNoNoise();
       }
       return positions;
 

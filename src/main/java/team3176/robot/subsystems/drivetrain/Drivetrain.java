@@ -141,7 +141,7 @@ public class Drivetrain extends SubsystemBase {
           podFL = new SwervePod(1, new SwervePodIOSim());
           podBL = new SwervePod(2, new SwervePodIOSim());
           podBR = new SwervePod(3, new SwervePodIOSim());
-          simNoNoiseOdom = new SimNoNoiseOdom(new ArrayList<>( List.of(podFR, podFL, podBL, podBR)));
+          simNoNoiseOdom = new SimNoNoiseOdom(new ArrayList<>(List.of(podFR, podFL, podBL, podBR)));
           break;
         default:
           break;
@@ -190,7 +190,7 @@ public class Drivetrain extends SubsystemBase {
   // Prevents more than one instance of drivetrian
   public static Drivetrain getInstance() {
     if (instance == null) {
-      if(Constants.getMode() != Mode.REPLAY) {
+      if(Constants.getMode() != Mode.SIM) {
         instance = new Drivetrain(new GyroIONavX());
       }
       else{
