@@ -384,7 +384,7 @@ public class Drivetrain extends SubsystemBase {
       if(this.odom == null || this.poseEstimator == null) {
         return new Rotation2d();
       }
-      return wheelOnlyHeading;
+      return simNoNoiseOdom.getPoseTrue().getRotation();
     } 
     return inputs.rotation2d;
     
