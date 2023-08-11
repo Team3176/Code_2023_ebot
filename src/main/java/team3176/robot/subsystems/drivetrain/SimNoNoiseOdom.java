@@ -1,0 +1,50 @@
+package team3176.robot.subsystems.drivetrain;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import team3176.robot.constants.DrivetrainConstants;
+
+public class SimNoNoiseOdom{
+    private SwerveDriveOdometry odomNoNoise;
+    private ArrayList<SwervePod> pods;
+    private Rotation2d wheelOnlyHeading;
+    public SimNoNoiseOdom(ArrayList<SwervePod> pods) {
+      this.pods = pods;
+      wheelOnlyHeading = new Rotation2d();
+      odomNoNoise =new SwerveDriveOdometry(DrivetrainConstants.DRIVE_KINEMATICS, Drivetrain.getInstance().getSensorYaw(),getSwerveModulePositionsSimNoNoise(), new Pose2d(0.0, 0.0, new Rotation2d()));
+    }
+    public SwerveModulePosition[] getSwerveModulePositionsSimNoNoise() {
+      SwerveModulePosition[] positions = new SwerveModulePosition[pods.size()];
+      for(int i = 0; i < pods.size(); ++i) {
+        positions[1] = pods.get(i).getPositionSimNoNoise();
+      }
+      return positions;
+
+    }
+    public void resetSimPose(Pose2d p) {
+      odomNoNoise.resetPosition(p.getRotation(), getSwerveModulePositionsSimNoNoise(), p);
+    }
+    public Pose2d getPoseTrue() {
+      return odomNoNoise.getPoseMeters();
+    }
+    public void update() {
+      SwerveModulePosition[] deltas = new SwerveModulePosition[4];
+      for(int i=0;i<  pods.size(); i++) {
+          deltas[i] = pods.get(i).getDeltaSimNoNoise();
+      }
+      Twist2d twist = DrivetrainConstants.DRIVE_KINEMATICS.toTwist2d(deltas);
+      wheelOnlyHeading = odomNoNoise.getPoseMeters().exp(twist).getRotation();
+      odomNoNoise.update(wheelOnlyHeading, getSwerveModulePositionsSimNoNoise());
+      Logger.getInstance().recordOutput("Drive/PoseSimNoNoise", getPoseTrue());
+    }
+    
+    
+  }

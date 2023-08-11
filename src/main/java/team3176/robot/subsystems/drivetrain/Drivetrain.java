@@ -141,7 +141,7 @@ public class Drivetrain extends SubsystemBase {
           podFL = new SwervePod(1, new SwervePodIOSim());
           podBL = new SwervePod(2, new SwervePodIOSim());
           podBR = new SwervePod(3, new SwervePodIOSim());
-          simNoNoiseOdom = new SimNoNoiseOdom();
+          simNoNoiseOdom = new SimNoNoiseOdom(new ArrayList<>( List.of(podFR, podFL, podBL, podBR)));
           break;
         default:
           break;
@@ -379,7 +379,7 @@ public class Drivetrain extends SubsystemBase {
    * 
    * @return Rotation2d of the yaw
    */
-  private Rotation2d getSensorYaw() {
+  protected Rotation2d getSensorYaw() {
     if(Constants.getMode() == Mode.SIM) {
       if(this.odom == null || this.poseEstimator == null) {
         return new Rotation2d();
@@ -584,40 +584,6 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("BLThrustError", BLThrustError);
 
   }
-  private class SimNoNoiseOdom{
-    private SwerveDriveOdometry odomNoNoise;
-
-    public SimNoNoiseOdom() {
-      odomNoNoise =new SwerveDriveOdometry(DrivetrainConstants.DRIVE_KINEMATICS, getSensorYaw(), getSwerveModulePositionsSimNoNoise(), new Pose2d(0.0, 0.0, new Rotation2d()));
-    }
-
-    public SwerveModulePosition[] getSwerveModulePositionsSimNoNoise() {
-      return new SwerveModulePosition[] {
-          podFR.getPositionSimNoNoise(),
-          podFL.getPositionSimNoNoise(),
-          podBL.getPositionSimNoNoise(),
-          podBR.getPositionSimNoNoise()
-      };
-
-    }
-    public void resetSimPose(Pose2d p) {
-      odomNoNoise.resetPosition(p.getRotation(), getSwerveModulePositionsSimNoNoise(), p);
-    }
-    public Pose2d getPoseTrue() {
-      return odomNoNoise.getPoseMeters();
-    }
-    public void update() {
-      SwerveModulePosition[] deltas = new SwerveModulePosition[4];
-      for(int i=0;i<  pods.size(); i++) {
-          deltas[i] = pods.get(i).getDeltaSimNoNoise();
-      }
-      Twist2d twist = DrivetrainConstants.DRIVE_KINEMATICS.toTwist2d(deltas);
-      wheelOnlyHeading = getPose().exp(twist).getRotation();
-      odomNoNoise.update(wheelOnlyHeading, getSwerveModulePositionsSimNoNoise());
-      Logger.getInstance().recordOutput("Drive/PoseSimNoNoise", getPoseTrue());
-    }
-    
-    
-  }
+  
   
 }
