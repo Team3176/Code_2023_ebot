@@ -49,7 +49,7 @@ public class VisionDual extends SubsystemBase{
     public void periodic() {
         io.updateInputs(inputs);
         Logger.getInstance().processInputs("Vision", inputs);
-        boolean isRed = DriverStation.getAlliance() == Alliance.Red;
+        boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
         Pose3d rPose = isRed ? inputs.rfovRed : inputs.rfovBlue;
         Pose3d lPose = isRed ? inputs.lfovRed : inputs.lfovBlue;
         if(inputs.lValid && inputs.rValid) {

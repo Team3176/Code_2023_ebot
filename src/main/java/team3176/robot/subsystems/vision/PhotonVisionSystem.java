@@ -43,7 +43,7 @@ public class PhotonVisionSystem extends SubsystemBase{
         realCam = new PhotonCamera("camera1");
         try {
             field = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
-            if (DriverStation.getAlliance() == Alliance.Blue) {
+            if (DriverStation.getAlliance().get() == Alliance.Blue) {
                 field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
             } else {
                 field.setOrigin(OriginPosition.kRedAllianceWallRightSide);
@@ -56,7 +56,7 @@ public class PhotonVisionSystem extends SubsystemBase{
         if(Constants.getMode() == Mode.SIM) {
             simInstance = new SimPhotonVision(List.of(realCam),List.of(camera2Robot),field);
         }
-        estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP, realCam, camera2Robot);
+        estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_RIO, realCam, camera2Robot);
     }
     public static PhotonVisionSystem getInstance() {
         if (instance == null) {
@@ -65,7 +65,7 @@ public class PhotonVisionSystem extends SubsystemBase{
         return instance;
     }
     public void refresh() {
-        if (DriverStation.getAlliance() == Alliance.Blue) {
+        if (DriverStation.getAlliance().get() == Alliance.Blue) {
             field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
         } else {
             field.setOrigin(OriginPosition.kRedAllianceWallRightSide);
@@ -73,7 +73,7 @@ public class PhotonVisionSystem extends SubsystemBase{
         if(Constants.getMode() == Mode.SIM) {
             simInstance.switchAllaince(field);
         }
-        estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP, realCam, camera2Robot);
+        estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_RIO, realCam, camera2Robot);
     }
     @Override
     public void periodic() {

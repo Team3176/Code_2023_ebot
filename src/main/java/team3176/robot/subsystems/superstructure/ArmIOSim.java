@@ -24,7 +24,7 @@ public class ArmIOSim implements ArmIO{
   private SingleJointedArmSim armSim;
   private double appliedVolts;
   public ArmIOSim() {
-    armSim = new SingleJointedArmSim(DCMotor.getNEO(1), 75, 0.5, 0.7, -1.0*Math.PI, 3.14, true);
+    armSim = new SingleJointedArmSim(DCMotor.getNEO(1), 75, 0.5, 0.7, -1.0*Math.PI, 3.14,true,0.0);
   }
   /** Updates the set of loggable inputs. */
   @Override

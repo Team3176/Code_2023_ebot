@@ -233,7 +233,7 @@ public class Drivetrain extends SubsystemBase {
     ChassisSpeeds currChassisSpeeds = new ChassisSpeeds(forwardCommand, strafeCommand, spinCommand);
     if (this.currentCoordType == coordType.FIELD_CENTRIC) {
       Rotation2d fieldOffset = this.getPose().getRotation();
-      if (DriverStation.getAlliance() == Alliance.Red) {
+      if (DriverStation.getAlliance().get() == Alliance.Red) {
         fieldOffset.plus(Rotation2d.fromDegrees(180));
       }
       currChassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currChassisSpeeds, fieldOffset);
@@ -417,7 +417,7 @@ public class Drivetrain extends SubsystemBase {
     // coordsys!
     //this.FieldAngleOffset = m_NavX.getRotation2d();
     Rotation2d redOrBlueZero = new Rotation2d();
-    if (DriverStation.getAlliance() == Alliance.Red) {
+    if (DriverStation.getAlliance().get() == Alliance.Red) {
       redOrBlueZero.plus(Rotation2d.fromDegrees(180));
     }
     resetPose(new Pose2d(getPose().getTranslation(),redOrBlueZero));

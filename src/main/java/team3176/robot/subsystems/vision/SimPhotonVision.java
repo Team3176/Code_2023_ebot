@@ -31,12 +31,12 @@ public class SimPhotonVision extends SubsystemBase{
         }
         
         //simVision.addVisionTargets(new VisionTargetSim(t2pose,TargetModel.kTag16h5,2));
-        simVision.addVisionTargets(field);
+        simVision.addAprilTags(field);
         n = new AprilTagVisionIONorthstar("northstar_0");
     }
     public void switchAllaince(AprilTagFieldLayout field) {
         simVision.removeVisionTargets("apriltags");
-        simVision.addVisionTargets(field);
+        simVision.addAprilTags(field);
     }
     @Override
     public void periodic() {

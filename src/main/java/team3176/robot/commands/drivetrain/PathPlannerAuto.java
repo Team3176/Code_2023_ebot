@@ -3,11 +3,6 @@ package team3176.robot.commands.drivetrain;
 import java.util.HashMap;
 import java.util.List;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.PIDConstants;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -22,8 +17,8 @@ public class PathPlannerAuto {
     public PathPlannerAuto(String autoPathName, Command doBefore) {
         Drivetrain driveSubsystem = Drivetrain.getInstance();
         Superstructure superstructure = Superstructure.getInstance();
-        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(autoPathName, 
-                new PathConstraints(4.5,2.0));  //2.0, 1.5
+        // List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(autoPathName, 
+        //         new PathConstraints(4.5,2.0));  //2.0, 1.5
         //System.out.println("length" + pathGroup.size());
         // This is just an example event map. It would be better to have a constant, global event map
         // in your code that will be used by all path following commands.
@@ -42,27 +37,28 @@ public class PathPlannerAuto {
         eventMap.put("delay", new WaitCommand(10.0));
         // eventMap.put("intakeDown", new IntakeDown());
         // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.
-        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-            driveSubsystem::getPose,
-            driveSubsystem::resetPose,
-            DrivetrainConstants.DRIVE_KINEMATICS,
-            new PIDConstants(5.0,0.0,0.0),
-            new PIDConstants(3.5,0.0,0.0),
-            driveSubsystem::setModuleStates,
-            eventMap,
-            true, driveSubsystem);
-        if (doBefore != null){
-            auto = doBefore.andThen(autoBuilder.fullAuto(pathGroup));
-        } else {
-            auto = autoBuilder.fullAuto(pathGroup);
-        }
+        // SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
+        //     driveSubsystem::getPose,
+        //     driveSubsystem::resetPose,
+        //     DrivetrainConstants.DRIVE_KINEMATICS,
+        //     new PIDConstants(5.0,0.0,0.0),
+        //     new PIDConstants(3.5,0.0,0.0),
+        //     driveSubsystem::setModuleStates,
+        //     eventMap,
+        //     true, driveSubsystem);
+        // if (doBefore != null){
+        //     auto = doBefore.andThen(autoBuilder.fullAuto(pathGroup));
+        // } else {
+        //     auto = autoBuilder.fullAuto(pathGroup);
+        // }
         
     }
     public PathPlannerAuto(String autoPathName) {
         this(autoPathName,null);
     }
     public Command getauto(){
-        return auto;
+        //TODO: Implement new pathplanner auto
+        return new WaitCommand(1.0);
     }
 
 }
