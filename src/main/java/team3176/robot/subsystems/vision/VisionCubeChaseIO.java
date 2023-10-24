@@ -11,7 +11,7 @@ public interface VisionCubeChaseIO {
         //public Pose3d rfovBlue = new Pose3d();
         //public Pose3d rfovRed = new Pose3d();
         public double rLatency = 0.0;
-        public int rNumTags = 0;
+        public double rNumTags = 0;
         public boolean rValid = false;
         public double rTx;
         //constructor if needed for some inputs
