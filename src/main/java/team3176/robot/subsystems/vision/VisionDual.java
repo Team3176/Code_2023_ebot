@@ -49,7 +49,7 @@ public class VisionDual extends SubsystemBase{
     public void periodic() {
         io.updateInputs(inputs);
         Logger.getInstance().processInputs("Vision", inputs);
-        boolean isRed = DriverStation.getAlliance().get() == Alliance.Red;
+        boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
         Pose3d rPose = isRed ? inputs.rfovRed : inputs.rfovBlue;
         Pose3d lPose = isRed ? inputs.lfovRed : inputs.lfovBlue;
         if(inputs.lValid && inputs.rValid) {
@@ -83,7 +83,7 @@ public class VisionDual extends SubsystemBase{
                 break;
         }
         bestVisionPose2d = bestVisionPose3d.toPose2d();
-        Logger.getInstance().recordOutput("Vision/bestPose",bestVisionPose3d);
+        Logger.recordOutput("Vision/bestPose",bestVisionPose3d);
         
         
         // wildstang 111 code for refence

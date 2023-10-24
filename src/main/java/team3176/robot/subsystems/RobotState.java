@@ -366,7 +366,7 @@ public class RobotState extends SubsystemBase {
 
   public void update() {
     if (DriverStation.isFMSAttached() && (alliance == null)) {
-      alliance = DriverStation.getAlliance().get();
+      alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
     }
   }
 

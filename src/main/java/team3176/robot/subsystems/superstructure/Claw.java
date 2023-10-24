@@ -127,9 +127,9 @@ public class Claw extends SubsystemBase {
     // This method will be called once per scheduler run
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Claw", inputs);
-    Logger.getInstance().recordOutput("Claw/Velocity", getVelocity());
-    Logger.getInstance().recordOutput("Claw/LinebreakOne", getIsLinebreakOne());
-    Logger.getInstance().recordOutput("Claw/LinebreakTwo", getIsLinebreakTwo());
+    Logger.recordOutput("Claw/Velocity", getVelocity());
+    Logger.recordOutput("Claw/LinebreakOne", getIsLinebreakOne());
+    Logger.recordOutput("Claw/LinebreakTwo", getIsLinebreakTwo());
     // Code stating if something is in the Intake
     SmartDashboard.putBoolean("linebreakOne",getIsLinebreakOne());
     SmartDashboard.putBoolean("linebreakTwo",getIsLinebreakTwo());

@@ -49,7 +49,7 @@ public class SimNoNoiseOdom{
       Twist2d twist = DrivetrainConstants.DRIVE_KINEMATICS.toTwist2d(deltas);
       wheelOnlyHeading = odomNoNoise.getPoseMeters().exp(twist).getRotation();
       odomNoNoise.update(wheelOnlyHeading, getSwerveModulePositionsSimNoNoise());
-      Logger.getInstance().recordOutput("Drive/PoseSimNoNoise", getPoseTrue());
+      Logger.recordOutput("Drive/PoseSimNoNoise", getPoseTrue());
     }
     
     

@@ -247,8 +247,8 @@ public class RobotContainer {
 
   public void checkAllaince() {
     //TODO: check the optional return instead of just .get()
-    if(DriverStation.getAlliance().get() != currentAlliance) {
-      currentAlliance = DriverStation.getAlliance().get();
+    if(DriverStation.getAlliance().orElse(Alliance.Blue) != currentAlliance) {
+      currentAlliance = DriverStation.getAlliance().orElse(Alliance.Blue);
       //Updated any things that need to change
       System.out.println("changed alliance");
       checkAutonomousSelection(true);

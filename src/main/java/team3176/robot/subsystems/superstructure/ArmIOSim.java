@@ -35,7 +35,7 @@ public class ArmIOSim implements ArmIO{
     inputs.AppliedVolts = appliedVolts;
     inputs.CurrentAmps = new double[] {armSim.getCurrentDrawAmps()};
     inputs.TempCelcius = new double[] {0.0};
-    Logger.getInstance().recordOutput("Arm/SimPos",armSim.getAngleRads());
+    Logger.recordOutput("Arm/SimPos",armSim.getAngleRads());
   }
   @Override
   public void set(double percentOuput) {

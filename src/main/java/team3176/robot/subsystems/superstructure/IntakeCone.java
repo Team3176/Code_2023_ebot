@@ -90,9 +90,9 @@ public class IntakeCone extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("IntakeCone", inputs);
-    Logger.getInstance().recordOutput("IntakeCone/Velocity", getVelocity());
-    Logger.getInstance().recordOutput("IntakeCone/Linebreak", getIsLinebreakLogger());
-    Logger.getInstance().recordOutput("IntakeCone/Extended", getIsExtended());
+    Logger.recordOutput("IntakeCone/Velocity", getVelocity());
+    Logger.recordOutput("IntakeCone/Linebreak", getIsLinebreakLogger());
+    Logger.recordOutput("IntakeCone/Extended", getIsExtended());
     // This method will be called once per scheduler run
     // Code stating if something is in the Intake
     // SmartDashboard.putBoolean("isInIntake", isInIntake);

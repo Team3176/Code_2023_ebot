@@ -116,11 +116,11 @@ public class SwervePod implements Subsystem{
         
         
         desiredOptimized.speedMetersPerSecond *= Math.abs(Math.cos(desiredOptimized.angle.minus(Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees)).getRadians()));
-        //Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "", id);
+        //Logger.recordOutput("Drive/Module" + Integer.toString(this.id) + "", id);
         io.setTurn(MathUtil.clamp(turnOutput, -0.4, 0.4));
-        Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/error",turningPIDController.getPositionError());
-        Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/deltanonoise",this.deltaSimNoNoise);
-        //Logger.getInstance().recordOutput("Drive/Module" + Integer.toString(this.id) + "/setpoint",turningPIDController.getSetpoint().position);
+        Logger.recordOutput("Drive/Module" + Integer.toString(this.id) + "/error",turningPIDController.getPositionError());
+        Logger.recordOutput("Drive/Module" + Integer.toString(this.id) + "/deltanonoise",this.deltaSimNoNoise);
+        //Logger.recordOutput("Drive/Module" + Integer.toString(this.id) + "/setpoint",turningPIDController.getSetpoint().position);
         this.velTicsPer100ms = Units3176.mps2ums(desiredOptimized.speedMetersPerSecond);
         io.setDrive(desiredOptimized.speedMetersPerSecond);
         // if(velAcc.hasChanged(hashCode()) || velMax.hasChanged(hashCode())){

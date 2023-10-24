@@ -44,7 +44,7 @@ public class VisionCubeChase extends SubsystemBase{
         io.updateInputs(inputs);
         //Logger.getInstance().processInputs("VisionCubeChase", inputs);
         
-        //Logger.getInstance().recordOutput("Vision/bestPose",bestVisionPose3d);
+        //Logger.recordOutput("Vision/bestPose",bestVisionPose3d);
         
         
     }

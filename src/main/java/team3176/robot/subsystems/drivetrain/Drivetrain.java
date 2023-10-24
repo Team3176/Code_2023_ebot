@@ -233,7 +233,7 @@ public class Drivetrain extends SubsystemBase {
     ChassisSpeeds currChassisSpeeds = new ChassisSpeeds(forwardCommand, strafeCommand, spinCommand);
     if (this.currentCoordType == coordType.FIELD_CENTRIC) {
       Rotation2d fieldOffset = this.getPose().getRotation();
-      if (DriverStation.getAlliance().get() == Alliance.Red) {
+      if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
         fieldOffset.plus(Rotation2d.fromDegrees(180));
       }
       currChassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(currChassisSpeeds, fieldOffset);
@@ -260,9 +260,9 @@ public class Drivetrain extends SubsystemBase {
     for (int idx = 0; idx < (pods.size()); idx++) {
       optimizedStates[idx]=pods.get(idx).setModule(podStates[idx]);
     }
-    Logger.getInstance().recordOutput("SwerveStates/Setpoints", podStates);
-    Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
-    Logger.getInstance().recordOutput("Drive/SpinCommand", spinCommand);
+    Logger.recordOutput("SwerveStates/Setpoints", podStates);
+    Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
+    Logger.recordOutput("Drive/SpinCommand", spinCommand);
   }
 
   private void recordRealPods() {
@@ -270,7 +270,7 @@ public class Drivetrain extends SubsystemBase {
     for (int idx = 0; idx < (pods.size()); idx++) {
       realStates[idx] = new SwerveModuleState(pods.get(idx).getVelocity(),Rotation2d.fromDegrees(pods.get(idx).getAzimuth()));
     }
-    Logger.getInstance().recordOutput("SwerveStates/real", realStates);
+    Logger.recordOutput("SwerveStates/real", realStates);
   }
 
 
@@ -297,7 +297,7 @@ public class Drivetrain extends SubsystemBase {
     for(var t : p.targetsUsed) {
       distance += t.getBestCameraToTarget().getTranslation().getNorm() / p.targetsUsed.size();
     }
-    Logger.getInstance().recordOutput("Drivetrain/distance2target", distance);
+    Logger.recordOutput("Drivetrain/distance2target", distance);
     if (p.targetsUsed.size() > 1) {
       //multi tag
       double distance2 = Math.max(Math.pow(distance * 0.2,2),0.7);
@@ -417,7 +417,7 @@ public class Drivetrain extends SubsystemBase {
     // coordsys!
     //this.FieldAngleOffset = m_NavX.getRotation2d();
     Rotation2d redOrBlueZero = new Rotation2d();
-    if (DriverStation.getAlliance().get() == Alliance.Red) {
+    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
       redOrBlueZero.plus(Rotation2d.fromDegrees(180));
     }
     resetPose(new Pose2d(getPose().getTranslation(),redOrBlueZero));
@@ -513,8 +513,8 @@ public class Drivetrain extends SubsystemBase {
     }
     
     
-    Logger.getInstance().recordOutput("Drive/Pose", getPose());
-    Logger.getInstance().recordOutput("Drive/Odom", getPoseOdom());
+    Logger.recordOutput("Drive/Pose", getPose());
+    Logger.recordOutput("Drive/Odom", getPoseOdom());
     
     SmartDashboard.putNumber("NavYaw",getPoseYawWrapped().getDegrees());
 

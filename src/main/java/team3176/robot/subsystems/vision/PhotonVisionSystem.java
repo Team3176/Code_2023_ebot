@@ -43,7 +43,7 @@ public class PhotonVisionSystem extends SubsystemBase{
         realCam = new PhotonCamera("camera1");
         try {
             field = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
-            if (DriverStation.getAlliance().get() == Alliance.Blue) {
+            if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
                 field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
             } else {
                 field.setOrigin(OriginPosition.kRedAllianceWallRightSide);
@@ -65,7 +65,7 @@ public class PhotonVisionSystem extends SubsystemBase{
         return instance;
     }
     public void refresh() {
-        if (DriverStation.getAlliance().get() == Alliance.Blue) {
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
             field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
         } else {
             field.setOrigin(OriginPosition.kRedAllianceWallRightSide);
@@ -93,15 +93,15 @@ public class PhotonVisionSystem extends SubsystemBase{
             
             if(poseEst.isPresent()){
                 Drivetrain.getInstance().addVisionPose(poseEst.get());
-                Logger.getInstance().recordOutput("photonvision/multitag", poseEst.get().estimatedPose);
+                Logger.recordOutput("photonvision/multitag", poseEst.get().estimatedPose);
             }
-            Logger.getInstance().recordOutput("photonvision/targetposes", targets.toArray(new Pose3d[targets.size()]));
-            Logger.getInstance().recordOutput("photonvision/poseEstimates", estimates.toArray(new Pose3d[estimates.size()]));
+            Logger.recordOutput("photonvision/targetposes", targets.toArray(new Pose3d[targets.size()]));
+            Logger.recordOutput("photonvision/poseEstimates", estimates.toArray(new Pose3d[estimates.size()]));
         }
         
         else {
-            Logger.getInstance().recordOutput("photonvision/targetposes", new Pose3d[] {});
-            Logger.getInstance().recordOutput("photonvision/poseEstimates", new Pose3d[] {});
+            Logger.recordOutput("photonvision/targetposes", new Pose3d[] {});
+            Logger.recordOutput("photonvision/poseEstimates", new Pose3d[] {});
         }
     }
 }

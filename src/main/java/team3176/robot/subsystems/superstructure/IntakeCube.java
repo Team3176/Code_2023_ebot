@@ -86,9 +86,9 @@ public class IntakeCube extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("IntakeCube", inputs);
-    Logger.getInstance().recordOutput("IntakeCube/Velocity", getVelocity());
-    Logger.getInstance().recordOutput("IntakeCube/Linebreak", getIsLinebreakLogger());
-    Logger.getInstance().recordOutput("IntakeCube/Extended", getIsExtended());
+    Logger.recordOutput("IntakeCube/Velocity", getVelocity());
+    Logger.recordOutput("IntakeCube/Linebreak", getIsLinebreakLogger());
+    Logger.recordOutput("IntakeCube/Extended", getIsExtended());
     // This method will be called once per scheduler run
     // Code stating if something is in the Intake
     SmartDashboard.putBoolean("CubeLinebreak", getLinebreak());

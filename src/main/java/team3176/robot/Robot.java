@@ -119,7 +119,7 @@ public class Robot extends LoggedRobot{
           Logger.getInstance()
               .recordOutput(
                   "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
-          Logger.getInstance().recordOutput("CommandsAll/" + name, count > 0);
+          Logger.recordOutput("CommandsAll/" + name, count > 0);
         };
     CommandScheduler.getInstance()
         .onCommandInitialize(

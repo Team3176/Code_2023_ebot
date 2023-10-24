@@ -135,7 +135,7 @@ public class Arm extends SubsystemBase {
      * Commands
      */
     public Command armSetPosition(double angleInDegrees) {
-        Logger.getInstance().recordOutput("Arm/armSetPosition",angleInDegrees);
+        Logger.recordOutput("Arm/armSetPosition",angleInDegrees);
         return this.run(() -> setPIDPosition(angleInDegrees)).withName("armSetPosition"+angleInDegrees);
     }
     public Command armSetPositionBlocking(double angleInDegrees) {
@@ -170,12 +170,12 @@ public class Arm extends SubsystemBase {
         armSholder.setAngle(Rotation2d.fromDegrees(inputs.Position-SuperStructureConstants.ARM_ZERO_POS-190));
         armElbow.setAngle(Rotation2d.fromDegrees(20 + 100 * (SuperStructureConstants.ARM_HIGH_POS - inputs.Position)/(SuperStructureConstants.ARM_HIGH_POS-SuperStructureConstants.ARM_ZERO_POS)));
         simSholder.setAngle(Rotation2d.fromDegrees(inputs.Position -90 - SuperStructureConstants.ARM_SIM_OFFSET));
-        Logger.getInstance().recordOutput("Arm/mech2d", mech);
+        Logger.recordOutput("Arm/mech2d", mech);
         //SmartDashboard.putNumber("Arm_Position", armEncoder.getAbsolutePosition());
         //SmartDashboard.putNumber("Arm_Position_Relative", armEncoder.getAbsolutePosition() - SuperStructureConstants.ARM_ZERO_POS);
         if(this.currentState == States.CLOSED_LOOP) {
             this.armSetpointAngleRaw = MathUtil.clamp(this.armSetpointAngleRaw, SuperStructureConstants.ARM_ZERO_POS, SuperStructureConstants.ARM_HIGH_POS);
-            Logger.getInstance().recordOutput("Arm/position_error", this.turningPIDController.getPositionError());
+            Logger.recordOutput("Arm/position_error", this.turningPIDController.getPositionError());
             setPIDPosition(armSetpointAngleRaw);
         }
     }
