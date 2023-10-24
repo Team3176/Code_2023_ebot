@@ -1,0 +1,20 @@
+{
+  "NTProvider": {
+    "types": {
+      "/AdvantageKit/RealOutputs/Arm/mech2d": "Mechanism2d",
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/AutoSelector": "String Chooser",
+      "/SmartDashboard/Auton Choice": "String Chooser",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/VisionSystemSim-photonvision/Sim Field": "Field2d"
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "AdvantageKit": {
+        "open": true
+      }
+    }
+  }
+}
