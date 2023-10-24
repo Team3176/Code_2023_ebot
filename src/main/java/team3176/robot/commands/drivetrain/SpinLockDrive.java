@@ -2,14 +2,14 @@ package team3176.robot.commands.drivetrain;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
 import team3176.robot.subsystems.drivetrain.Drivetrain.driveMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.MathUtil;
 
-public class SpinLockDrive extends CommandBase {
+public class SpinLockDrive extends Command {
   private Drivetrain drivetrain = Drivetrain.getInstance();
   private PIDController wController = new PIDController(1.0, 0.0, 0.0);
 

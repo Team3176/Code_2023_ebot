@@ -22,7 +22,7 @@ public class SimPhotonVision extends SubsystemBase{
     
     VisionSystemSim simVision = new VisionSystemSim("photonvision");
     PhotonPoseEstimator estimator;
-    
+    AprilTagVisionIONorthstar n;
     public SimPhotonVision(List<PhotonCamera> c, List<Transform3d> t, AprilTagFieldLayout field) {
         for(int i = 0; i < c.size(); i++) {
             Transform3d camera2Robot = t.get(i);
@@ -32,7 +32,7 @@ public class SimPhotonVision extends SubsystemBase{
         
         //simVision.addVisionTargets(new VisionTargetSim(t2pose,TargetModel.kTag16h5,2));
         simVision.addVisionTargets(field);
-        
+        n = new AprilTagVisionIONorthstar("northstar_0");
     }
     public void switchAllaince(AprilTagFieldLayout field) {
         simVision.removeVisionTargets("apriltags");

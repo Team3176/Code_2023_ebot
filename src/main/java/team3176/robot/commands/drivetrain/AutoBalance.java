@@ -3,11 +3,11 @@ package team3176.robot.commands.drivetrain;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
 import team3176.robot.subsystems.drivetrain.Drivetrain.driveMode;
 
-public class AutoBalance extends CommandBase {
+public class AutoBalance extends Command {
     private Drivetrain drivetrain;
     //private boolean isDone = false;
     //private int numBalanced = 0;

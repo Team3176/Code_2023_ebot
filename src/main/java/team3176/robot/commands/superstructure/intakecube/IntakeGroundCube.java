@@ -4,7 +4,7 @@
 
 package team3176.robot.commands.superstructure.intakecube;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import team3176.robot.subsystems.drivetrain.*;
@@ -14,7 +14,7 @@ import team3176.robot.subsystems.superstructure.Claw;
 import team3176.robot.constants.SuperStructureConstants;
 import team3176.robot.subsystems.superstructure.Arm;
 
-public class IntakeGroundCube extends CommandBase {
+public class IntakeGroundCube extends Command {
   /** Creates a new IntakeExtendSpin. */
   IntakeCube m_IntakeCube = IntakeCube.getInstance();
   Claw m_Claw = Claw.getInstance();
