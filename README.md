@@ -4,17 +4,6 @@
 
 This version has been checked with wpilib beta 2 available [here](https://github.com/wpilibsuite/allwpilib/releases/tag/v2024.1.1-beta-2)
 
-until photonvision releases its beta the library must be downloaded seperatly and compiled. clone photonvision from [here](https://github.com/PhotonVision/photonvision)
-
-from within the photonvision repo build and install the library to local maven
-
-```
-./gradlew generateVendorJson
-./gradlew publishToMavenLocal
-
-```
-
-you may need to replace the photonvision.json in the vendor deps with the generated one in `photon-lib/build/generated/vendordeps/photonlib.json`
 
 Finally open the robot project with the FRC 2024 VS Code and build
 
