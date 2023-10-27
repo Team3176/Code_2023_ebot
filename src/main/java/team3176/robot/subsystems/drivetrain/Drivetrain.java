@@ -37,6 +37,7 @@ import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.constants.DrivetrainHardwareMap;
 import team3176.robot.constants.SwervePodHardwareID;
 import team3176.robot.subsystems.drivetrain.GyroIO.GyroIOInputs;
+import team3176.robot.util.LocalADStarAK;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,12 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.ReplanningConfig;
 
 public class Drivetrain extends SubsystemBase {
   private static Drivetrain instance;
@@ -184,7 +191,25 @@ public class Drivetrain extends SubsystemBase {
     this.strafeCommand = 0.0;
     this.spinCommand = 0.0;
     vision = NetworkTableInstance.getDefault().getTable("limelight");
-
+    
+    AutoBuilder.configureHolonomic(
+        this::getPose,
+        this::resetPose,
+        () -> DrivetrainConstants.DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates()),
+        this::driveSpeeds,
+        new HolonomicPathFollowerConfig(
+            4.0, DrivetrainConstants.EBOT_LENGTH_IN_METERS_2023, new ReplanningConfig()),
+        this);
+    Pathfinding.setPathfinder(new LocalADStarAK());
+    PathPlannerLogging.setLogActivePathCallback(
+        (activePath) -> {
+          Logger.recordOutput(
+              "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+        });
+    PathPlannerLogging.setLogTargetPoseCallback(
+        (targetPose) -> {
+          Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+        });
   }
 
   // Prevents more than one instance of drivetrian
@@ -227,6 +252,10 @@ public class Drivetrain extends SubsystemBase {
    */
   public void drive(double forwardCommand, double strafeCommand, double spinCommand) {
     drive(forwardCommand, strafeCommand, spinCommand, currentCoordType);
+  }
+
+  public void driveSpeeds(ChassisSpeeds speeds) {
+    drive(speeds.vxMetersPerSecond,speeds.vyMetersPerSecond,speeds.omegaRadiansPerSecond,coordType.ROBOT_CENTRIC);
   }
 
   private ChassisSpeeds getCurrentChassisSpeedRequest() {
@@ -335,6 +364,14 @@ public class Drivetrain extends SubsystemBase {
     for (int idx = 0; idx < (pods.size()); idx++) {
       pods.get(idx).setModule(states[idx]);
     }
+  }
+  /** Returns the module states (turn angles and drive velocitoes) for all of the modules. */
+  private SwerveModuleState[] getModuleStates() {
+    SwerveModuleState[] states = new SwerveModuleState[4];
+    for (int i = 0; i < 4; i++) {
+      states[i] = pods.get(i).getState();
+    }
+    return states;
   }
 
   /**

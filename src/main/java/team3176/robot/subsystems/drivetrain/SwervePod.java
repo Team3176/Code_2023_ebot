@@ -135,6 +135,10 @@ public class SwervePod implements Subsystem{
         double m = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
         return new SwerveModulePosition(m,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
     }
+    /** Returns the module state (turn angle and drive velocity). */
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(getVelocity(), Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
+    }
     public SwerveModulePosition getPositionSimNoNoise() {
         double m = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionSimNoNoise / (2*Math.PI));
         return new SwerveModulePosition(m,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegreesSimNoNoise));
