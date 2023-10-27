@@ -10,6 +10,8 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardInput;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import team3176.robot.commands.drivetrain.*;
 import team3176.robot.commands.superstructure.intakecube.*;
 import team3176.robot.constants.Hardwaremap;
@@ -225,12 +228,14 @@ public class RobotContainer {
   public void printCanFaults(){
     pdh.getStickyFaults();
   }
+  
   public void checkAutonomousSelection(Boolean force) {
     if(autonChooser.get() != null && (!choosenAutonomousString.equals(autonChooser.get()) || force)) {
       Long start = System.nanoTime();
       choosenAutonomousString = autonChooser.get();
       try {
-        choosenAutonomousCommand = new PathPlannerAuto(choosenAutonomousString).getauto();
+        //TODO: re implement this
+        choosenAutonomousCommand = new WaitCommand(1.0);//new PathPlannerAuto(choosenAutonomousString).getauto();
       }
       catch(Exception e){
         System.out.println("[ERROR] could not find" + choosenAutonomousString);
@@ -262,15 +267,15 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    
-    if(choosenAutonomousCommand == null) {
-      //this is if for some reason checkAutonomousSelection is never called
-      String chosen = autonChooser.get();
-      chosen = "wall_3nSteal_3";
-      PathPlannerAuto ppSwerveAuto = new PathPlannerAuto(chosen);
-      return ppSwerveAuto.getauto();
-    }
-    choosenAutonomousCommand = new PathPlannerAuto("wall_3nSteal_3").getauto();
-    return choosenAutonomousCommand;
+    return new PathPlannerAuto("exit1");
+    // if(choosenAutonomousCommand == null) {
+    //   //this is if for some reason checkAutonomousSelection is never called
+    //   String chosen = autonChooser.get();
+    //   chosen = "wall_3nSteal_3";
+    //   PathPlannerAuto ppSwerveAuto = new PathPlannerAuto(chosen);
+    //   return ppSwerveAuto.getauto();
+    // }
+    // choosenAutonomousCommand = new PathPlannerAuto("wall_3nSteal_3").getauto();
+    // return choosenAutonomousCommand;
   }
 }

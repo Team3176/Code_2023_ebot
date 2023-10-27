@@ -12,9 +12,9 @@ import team3176.robot.subsystems.drivetrain.Drivetrain;
 import team3176.robot.subsystems.drivetrain.Drivetrain.driveMode;
 import team3176.robot.subsystems.superstructure.Superstructure;
 
-public class PathPlannerAuto {
+public class PathPlannerAutoOld {
     Command auto;
-    public PathPlannerAuto(String autoPathName, Command doBefore) {
+    public PathPlannerAutoOld(String autoPathName, Command doBefore) {
         Drivetrain driveSubsystem = Drivetrain.getInstance();
         Superstructure superstructure = Superstructure.getInstance();
         // List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(autoPathName, 
@@ -53,7 +53,7 @@ public class PathPlannerAuto {
         // }
         
     }
-    public PathPlannerAuto(String autoPathName) {
+    public PathPlannerAutoOld(String autoPathName) {
         this(autoPathName,null);
     }
     public Command getauto(){
