@@ -54,7 +54,7 @@ public class PhotonVisionSystem extends SubsystemBase{
         }
         
         if(Constants.getMode() == Mode.SIM) {
-            simInstance = new SimPhotonVision(List.of(realCam),List.of(camera2Robot),field);
+            //simInstance = new SimPhotonVision(List.of(realCam),List.of(camera2Robot),field);
         }
         estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_RIO, realCam, camera2Robot);
     }
@@ -71,7 +71,7 @@ public class PhotonVisionSystem extends SubsystemBase{
             field.setOrigin(OriginPosition.kRedAllianceWallRightSide);
         }
         if(Constants.getMode() == Mode.SIM) {
-            simInstance.switchAllaince(field);
+            //simInstance.switchAllaince(field);
         }
         estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_RIO, realCam, camera2Robot);
     }
