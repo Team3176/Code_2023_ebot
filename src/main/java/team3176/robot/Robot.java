@@ -45,6 +45,7 @@ public class Robot extends LoggedRobot{
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
+    /*  TODO: Char restore this fxnality  -- mod build.gradle: see prepForState 723516
     System.out.println("[Init] Starting AdvantageKit");
     Logger.recordMetadata("Robot", Constants.getRobot().toString());
     Logger.recordMetadata("RuntimeType", getRuntimeType().toString());
@@ -65,6 +66,7 @@ public class Robot extends LoggedRobot{
         Logger.recordMetadata(GitDirty, "Unknown");
         break;
     }
+    */
     switch (Constants.getMode()) {
       case REAL:
         String folder = Constants.logFolders.get(Constants.getRobot());
