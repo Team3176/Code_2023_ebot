@@ -3,6 +3,7 @@ package team3176.robot.commands.drivetrain;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import team3176.robot.constants.DrivetrainConstants;
@@ -53,7 +54,7 @@ public class CubeAlignAtPoint extends Command {
 
   @Override
   public void execute() {
-    drivetrain.drive(smallNum, smallNum, 1.0);
+    drivetrain.driveVelocity(new ChassisSpeeds(smallNum, smallNum, 1.0));
     tx = LimelightHelpers.getTX("limelight-three");
     txArray[arrayIdx] = tx;
     if (arrayIdx == (txArray.length + 1)) {arrayIdx = 0;} else {arrayIdx++;};

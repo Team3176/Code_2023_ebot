@@ -84,6 +84,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
+    //annotationProcessor "org.littletonrobotics.akit.junction:junction-autologoutput:$akitJson.version"
 }
 project.compileJava.dependsOn(createVersionFile)
 gversion {

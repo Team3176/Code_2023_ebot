@@ -1,6 +1,7 @@
 package team3176.robot.commands.drivetrain;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -44,7 +45,7 @@ public class AutoBalance extends Command {
             forward = 0.0;
         }
 
-        drivetrain.drive(forward, 0, 0, Drivetrain.coordType.ROBOT_CENTRIC);
+        drivetrain.driveVelocity(new ChassisSpeeds(forward,0.0,0.0));
     }
     @Override
     public void end(boolean interrupted) {

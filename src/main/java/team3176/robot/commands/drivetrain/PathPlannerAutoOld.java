@@ -3,7 +3,7 @@ package team3176.robot.commands.drivetrain;
 import java.util.HashMap;
 import java.util.List;
 
-
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -27,7 +27,7 @@ public class PathPlannerAutoOld {
         eventMap.put("scoreHigh", superstructure.scoreGamePieceAuto());
         eventMap.put("autoBalance", new AutoBalance().andThen(driveSubsystem.swerveDefenseCommand()).finallyDo((b) -> {
             driveSubsystem.setDriveMode(driveMode.DEFENSE);
-            driveSubsystem.drive(0.0,0.0,0.0);
+            driveSubsystem.driveVelocity(new ChassisSpeeds(0, 0, 0));
         }));
         eventMap.put("groundCube",superstructure.groundCube().withTimeout(3));
         eventMap.put("poopCube",superstructure.poopCube().withTimeout(.7));

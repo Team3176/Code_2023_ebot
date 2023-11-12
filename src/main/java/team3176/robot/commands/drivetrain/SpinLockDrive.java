@@ -7,6 +7,7 @@ import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
 import team3176.robot.subsystems.drivetrain.Drivetrain.driveMode;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.MathUtil;
 
 public class SpinLockDrive extends Command {
@@ -37,9 +38,9 @@ public class SpinLockDrive extends Command {
   @Override
   public void execute() {
 
-    drivetrain.drive(forwardCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND *0.7, 
+    drivetrain.driveVelocity(new ChassisSpeeds(forwardCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND *0.7, 
                       strafeCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND *0.7, 
-                      MathUtil.clamp(wController.calculate(drivetrain.getPoseYawWrapped().getDegrees(), this.spinLockAngle), -2, 2));
+                      MathUtil.clamp(wController.calculate(drivetrain.getPoseYawWrapped().getDegrees(), this.spinLockAngle), -2, 2)));
     //spinCommand.getAsDouble()*100);
   }
 
