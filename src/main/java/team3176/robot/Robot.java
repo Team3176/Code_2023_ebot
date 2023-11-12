@@ -197,7 +197,6 @@ public class Robot extends LoggedRobot{
     robotContainer.clearCanFaults();
         robotContainer.setArmBrake();
     robotContainer.setThrustCoast();
-    robotContainer.setFieldCentric();
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }

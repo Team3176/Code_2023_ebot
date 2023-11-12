@@ -5,9 +5,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
-import team3176.robot.subsystems.drivetrain.Drivetrain.driveMode;
 import team3176.robot.subsystems.vision.VisionCubeChase;
 import edu.wpi.first.math.controller.PIDController;
 import team3176.robot.subsystems.drivetrain.LimelightHelpers;
@@ -39,8 +37,6 @@ public class CubeChaseAutonOn extends Command {
 
   @Override
   public void initialize() {
-    drivetrain.setDriveMode(driveMode.CUBECHASEAUTON);
-    drivetrain.setSpinLock(false);
     //drivetrain.setCoastMode();
     //this.tx = visionCubeChase.getTx();
   }

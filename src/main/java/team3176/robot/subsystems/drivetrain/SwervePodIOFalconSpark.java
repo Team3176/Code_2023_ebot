@@ -9,15 +9,23 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import team3176.robot.constants.DrivetrainConstants;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import team3176.robot.constants.SwervePodHardwareID;
 import team3176.robot.util.God.Units3176;
 
 public class SwervePodIOFalconSpark implements SwervePodIO{
+    private static final double AZIMUTH_GEAR_RATIO = 70.0 / 1.0; // Is the Versa gearbox btwn motor & encoder
+    public static final double THRUST_GEAR_RATIO = (14.0/22.0) * (15.0/45.0);  
+
+    public static final double AZIMUTH_ENCODER_UNITS_PER_REVOLUTION = 4096;
+    public static final double THRUST_ENCODER_UNITS_PER_REVOLUTION = 2048;
+    
     private CANSparkMax turnSparkMax;
     private TalonFX thrustFalcon;
     private CANCoder azimuthEncoder;
-    public static final double FEET2TICS = 12.0 * (1.0/ (DrivetrainConstants.WHEEL_DIAMETER_INCHES * Math.PI)) * (1.0 /DrivetrainConstants.THRUST_GEAR_RATIO) * DrivetrainConstants.THRUST_ENCODER_UNITS_PER_REVOLUTION;
+
+    //public static final double FEET2TICS = 12.0 * (1.0/ (DrivetrainConstants.WHEEL_DIAMETER_INCHES * Math.PI)) * (1.0 /DrivetrainConstants.THRUST_GEAR_RATIO) * DrivetrainConstants.THRUST_ENCODER_UNITS_PER_REVOLUTION;
     public SwervePodIOFalconSpark(SwervePodHardwareID id,int sparkMaxID) {
         turnSparkMax = new CANSparkMax(sparkMaxID, MotorType.kBrushless);
         thrustFalcon = new TalonFX(id.THRUST_CID);
@@ -45,8 +53,8 @@ public class SwervePodIOFalconSpark implements SwervePodIO{
     }
     @Override
     public void updateInputs(SwervePodIOInputs inputs) {
-        inputs.drivePositionRad = thrustFalcon.getSelectedSensorPosition() * (DrivetrainConstants.THRUST_GEAR_RATIO) * 1.0/DrivetrainConstants.THRUST_ENCODER_UNITS_PER_REVOLUTION* 2 * Math.PI;
-        inputs.driveVelocityRadPerSec = thrustFalcon.getSelectedSensorVelocity() * (DrivetrainConstants.THRUST_GEAR_RATIO) * 1.0/DrivetrainConstants.THRUST_ENCODER_UNITS_PER_REVOLUTION * 10 * 2 * Math.PI;
+        inputs.drivePositionRad = thrustFalcon.getSelectedSensorPosition() * (THRUST_GEAR_RATIO) * 1.0/THRUST_ENCODER_UNITS_PER_REVOLUTION* 2 * Math.PI;
+        inputs.driveVelocityRadPerSec = thrustFalcon.getSelectedSensorVelocity() * (THRUST_GEAR_RATIO) * 1.0/THRUST_ENCODER_UNITS_PER_REVOLUTION * 10 * 2 * Math.PI;
         inputs.driveAppliedVolts = thrustFalcon.getMotorOutputVoltage();
         inputs.driveCurrentAmpsStator = new double[] {thrustFalcon.getStatorCurrent()};
         inputs.driveCurrentAmpsSupply = new double[] {thrustFalcon.getSupplyCurrent()};
@@ -62,7 +70,7 @@ public class SwervePodIOFalconSpark implements SwervePodIO{
 
     @Override
     public void setDrive(double velMetersPerSecond) {
-        double velTicsPer100ms = Units3176.mps2ums(velMetersPerSecond);
+        double velTicsPer100ms = velMetersPerSecond * (1.0/ (SwervePod.WHEEL_DIAMETER * Math.PI)) * (1.0 /THRUST_GEAR_RATIO) * THRUST_ENCODER_UNITS_PER_REVOLUTION  * .1;;
         thrustFalcon.set(TalonFXControlMode.Velocity, velTicsPer100ms);
     }
 

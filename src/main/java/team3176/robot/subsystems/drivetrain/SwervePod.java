@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import team3176.robot.Constants;
 import team3176.robot.Constants.Mode;
-import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.constants.DrivetrainHardwareMap;
 import team3176.robot.util.LoggedTunableNumber;
 import team3176.robot.util.God.*;
@@ -31,6 +30,9 @@ public class SwervePod implements Subsystem{
     double desiredOptimizedAzimuthPosition;
     private SwerveModuleState desiredState = new SwerveModuleState();
     boolean lastHasResetOccurred;
+    public static final double WHEEL_DIAMETER = Units.inchesToMeters(3.00); // Inches
+
+
     
     /** Numerical identifier to differentiate between pods.
      *     For 4 Pods:  0 = FrontRight (FR),
@@ -104,7 +106,7 @@ public class SwervePod implements Subsystem{
      * odometry calls
      */
     public SwerveModulePosition getPosition() {
-        double m = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
+        double m = (WHEEL_DIAMETER * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI);
         return new SwerveModulePosition(m,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
     }
     /** Returns the module state (turn angle and drive velocity). */
@@ -112,7 +114,7 @@ public class SwervePod implements Subsystem{
         return new SwerveModuleState(getVelocity(), Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees));
     }
     public SwerveModulePosition getPositionSimNoNoise() {
-        double m = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionSimNoNoise / (2*Math.PI));
+        double m = (WHEEL_DIAMETER * Math.PI)  *  inputs.drivePositionSimNoNoise / (2*Math.PI);
         return new SwerveModulePosition(m,Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegreesSimNoNoise));
     }
     public SwerveModulePosition getDelta() {
@@ -123,8 +125,8 @@ public class SwervePod implements Subsystem{
     }
     
     public double getVelocity() {
-        double wheelVelocityInFeetPerSecond = inputs.driveVelocityRadPerSec / (Math.PI *2) * DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI;   
-        return Units3176.feetPerSecond2metersPerSecond(wheelVelocityInFeetPerSecond);
+        double wheelVelocity = inputs.driveVelocityRadPerSec / (Math.PI *2) * WHEEL_DIAMETER * Math.PI;   
+        return wheelVelocity;
     
     }
 
@@ -153,11 +155,11 @@ public class SwervePod implements Subsystem{
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        double currentDistance = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI));
+        double currentDistance = (WHEEL_DIAMETER * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI);
         this.delta = currentDistance - this.lastDistance;
         this.lastDistance = currentDistance;
         if(Constants.getMode() == Mode.SIM) {
-            double currentDistanceSimNoNoise = Units.feetToMeters((DrivetrainConstants.WHEEL_DIAMETER_INCHES/12.0 * Math.PI)  *  inputs.drivePositionSimNoNoise / (2*Math.PI));
+            double currentDistanceSimNoNoise = (WHEEL_DIAMETER * Math.PI)  *  inputs.drivePositionSimNoNoise / (2*Math.PI);
             this.deltaSimNoNoise = currentDistanceSimNoNoise - this.lastDistanceSimNoNoise; 
             this.lastDistanceSimNoNoise = currentDistanceSimNoNoise;
         }

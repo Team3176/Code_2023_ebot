@@ -6,9 +6,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import team3176.robot.constants.DrivetrainConstants;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
-import team3176.robot.subsystems.drivetrain.Drivetrain.driveMode;
 import team3176.robot.subsystems.vision.VisionCubeChase;
 import edu.wpi.first.math.controller.PIDController;
 import team3176.robot.subsystems.drivetrain.LimelightHelpers;
@@ -39,8 +37,6 @@ public class CubeChaseTeleop extends Command {
 
   @Override
   public void initialize() {
-    drivetrain.setDriveMode(driveMode.DRIVE);
-    drivetrain.setSpinLock(false);
     //drivetrain.setCoastMode();
     //this.tx = visionCubeChase.getTx();
   }
@@ -54,8 +50,8 @@ public class CubeChaseTeleop extends Command {
     //drivetrain.drive(forwardCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND * 1.0, 
     //#strafeCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND * 1.0, 
     //spinCommand.getAsDouble()*7);
-    drivetrain.driveVelocity(new ChassisSpeeds(forwardCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND * 1.0, 
-    strafeCommand.getAsDouble() * DrivetrainConstants.MAX_WHEEL_SPEED_METERS_PER_SECOND * 1.0, 
+    drivetrain.driveVelocity(new ChassisSpeeds(forwardCommand.getAsDouble() * Drivetrain.MAX_WHEEL_SPEED * 1.0, 
+    strafeCommand.getAsDouble() * Drivetrain.MAX_WHEEL_SPEED, 
     splicingSpinCommand *7));
   }
 

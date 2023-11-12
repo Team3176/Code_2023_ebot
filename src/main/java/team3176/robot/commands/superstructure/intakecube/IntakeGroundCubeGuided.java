@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import team3176.robot.subsystems.drivetrain.*;
-import team3176.robot.subsystems.drivetrain.Drivetrain.coordType;
-import team3176.robot.subsystems.drivetrain.Drivetrain.driveMode;
 import team3176.robot.subsystems.superstructure.IntakeCube;
 import team3176.robot.subsystems.superstructure.Superstructure.GamePiece;
 import team3176.robot.subsystems.superstructure.Claw;
@@ -37,8 +35,6 @@ public class IntakeGroundCubeGuided extends Command {
     m_IntakeCube.spinIntake(-.85);
     m_Claw.intake();
     m_IntakeCube.spinConveyor(-0.4);
-    m_Drivetrain.setDriveMode(driveMode.CUBECHASETELEOP);
-    m_Drivetrain.setCoordType(coordType.ROBOT_CENTRIC);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -69,8 +65,6 @@ public class IntakeGroundCubeGuided extends Command {
     m_IntakeCube.spinConveyor(0);
     m_Claw.hold();
     m_Arm.setAngleSetpoint(SuperStructureConstants.ARM_ZERO_POS);
-    m_Drivetrain.setDriveMode(driveMode.DRIVE);
-    m_Drivetrain.setCoordType(coordType.FIELD_CENTRIC);
   }
 
   // Returns true when the command should end.

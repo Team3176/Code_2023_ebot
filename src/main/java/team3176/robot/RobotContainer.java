@@ -125,8 +125,8 @@ public class RobotContainer {
     //    .onFalse(new InstantCommand(() -> m_Drivetrain.setDriveMode(driveMode.DRIVE), m_Drivetrain));
 
     //m_Controller.getRotStick_Button2().whileTrue(new FlipField);
-    controller.transStick.button(14).and(controller.transStick.button(15)).onTrue(drivetrain.setFieldCentric());
-    controller.transStick.button(14).and(controller.transStick.button(16)).onTrue(drivetrain.setRobotCentric());
+    //controller.transStick.button(14).and(controller.transStick.button(15)).onTrue(drivetrain.setFieldCentric());
+    //controller.transStick.button(14).and(controller.transStick.button(16)).onTrue(drivetrain.setRobotCentric());
 
     
     
@@ -136,7 +136,7 @@ public class RobotContainer {
       () -> controller.getStrafe() * 1.0,
       () -> controller.getSpin() * 7));
  
-    controller.rotStick.button(2).whileTrue(new SpinLockDrive(
+    controller.rotStick.button(2).whileTrue(drivetrain.SpinLockDrive(
       controller::getForward,
       controller::getStrafe)
     ); 
@@ -218,9 +218,6 @@ public class RobotContainer {
     drivetrain.setBrakeMode();
   }
 
-  public void setFieldCentric() {
-    drivetrain.setCoordType(coordType.FIELD_CENTRIC);
-  }
   public void clearCanFaults(){
     pdh.clearStickyFaults();
   }

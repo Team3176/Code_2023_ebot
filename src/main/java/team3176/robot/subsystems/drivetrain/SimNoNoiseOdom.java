@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import team3176.robot.constants.DrivetrainConstants;
 
 public class SimNoNoiseOdom{
     private SwerveDriveOdometry odomNoNoise;
@@ -20,7 +19,7 @@ public class SimNoNoiseOdom{
       this.pods = pods;
       System.out.println("pods size " + this.pods.size());
       wheelOnlyHeading = new Rotation2d();
-      odomNoNoise =new SwerveDriveOdometry(DrivetrainConstants.DRIVE_KINEMATICS, new Rotation2d(), new SwerveModulePosition[] {
+      odomNoNoise =new SwerveDriveOdometry(Drivetrain.kinematics, new Rotation2d(), new SwerveModulePosition[] {
         new SwerveModulePosition(),
         new SwerveModulePosition(),
         new SwerveModulePosition(),
@@ -46,7 +45,7 @@ public class SimNoNoiseOdom{
       for(int i=0;i<  pods.size(); i++) {
           deltas[i] = pods.get(i).getDeltaSimNoNoise();
       }
-      Twist2d twist = DrivetrainConstants.DRIVE_KINEMATICS.toTwist2d(deltas);
+      Twist2d twist = Drivetrain.kinematics.toTwist2d(deltas);
       wheelOnlyHeading = odomNoNoise.getPoseMeters().exp(twist).getRotation();
       odomNoNoise.update(wheelOnlyHeading, getSwerveModulePositionsSimNoNoise());
       Logger.recordOutput("Drive/PoseSimNoNoise", getPoseTrue());

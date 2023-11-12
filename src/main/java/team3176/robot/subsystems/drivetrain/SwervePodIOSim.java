@@ -8,7 +8,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import team3176.robot.Constants;
-import team3176.robot.constants.DrivetrainConstants;
 
 public class SwervePodIOSim implements SwervePodIO{
     private FlywheelSim driveSim = new FlywheelSim(DCMotor.getFalcon500(1), 4.714, 0.025);
@@ -54,8 +53,8 @@ public class SwervePodIOSim implements SwervePodIO{
     @Override
     public void setDrive(double velMetersPerSecond) {
         double freeSpeedRadPerSec = 142.0;
-        double driveSpeedError = velMetersPerSecond - (this.currentDriveSpeed / (2) * Units.inchesToMeters(DrivetrainConstants.WHEEL_DIAMETER_INCHES)); 
-        double voltage = 12 * velMetersPerSecond * 1.0/(freeSpeedRadPerSec / (2*Math.PI) * Units.inchesToMeters(DrivetrainConstants.WHEEL_DIAMETER_INCHES) * Math.PI);
+        double driveSpeedError = velMetersPerSecond - (this.currentDriveSpeed / (2) * SwervePod.WHEEL_DIAMETER); 
+        double voltage = 12 * velMetersPerSecond * 1.0/(freeSpeedRadPerSec / (2*Math.PI) * SwervePod.WHEEL_DIAMETER * Math.PI);
         driveAppliedVolts = MathUtil.clamp(voltage + driveSpeedError*4,-12.0,12.0);
         if(DriverStation.isEnabled()) {
             driveSim.setInputVoltage(driveAppliedVolts);
