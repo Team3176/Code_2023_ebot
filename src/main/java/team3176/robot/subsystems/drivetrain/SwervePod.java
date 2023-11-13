@@ -1,9 +1,5 @@
 package team3176.robot.subsystems.drivetrain;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.random.RandomGenerator;
-
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -12,15 +8,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import team3176.robot.Constants;
 import team3176.robot.Constants.Mode;
-import team3176.robot.constants.DrivetrainHardwareMap;
 import team3176.robot.util.LoggedTunableNumber;
-import team3176.robot.util.God.*;
 
 
 public class SwervePod implements Subsystem{
@@ -47,9 +39,9 @@ public class SwervePod implements Subsystem{
     //private double kAzimuthEncoderUnitsPerRevolution;
 
     //private double kP_Azimuth;
-    private LoggedTunableNumber kPAzimuth = new LoggedTunableNumber("kP_azimuth");
-    private LoggedTunableNumber kIAzimuth = new LoggedTunableNumber("kI_azimuth");
-    private double kDAzimuth;
+    private LoggedTunableNumber kPAzimuth = new LoggedTunableNumber("kP_azimuth",.007);
+    private LoggedTunableNumber kIAzimuth = new LoggedTunableNumber("kI_azimuth",0.0);
+    private LoggedTunableNumber kDAzimuth = new LoggedTunableNumber("kD_azimuth",0.0);
     private double lastDistance =0.0;
     private double lastDistanceSimNoNoise =0.0;
     private double delta = 0.0;
@@ -70,19 +62,17 @@ public class SwervePod implements Subsystem{
         this.desiredOptimizedAzimuthPosition = 0.0;
 
         //this.kP_Azimuth = 0.006;
-        kPAzimuth.initDefault(.007);
-        this.kIAzimuth.initDefault(0.0);
-        this.kDAzimuth = 0.0;
+
         velMax.initDefault(900);
         velAcc.initDefault(900);
 
-        turningPIDController = new PIDController(kPAzimuth.get(), kIAzimuth.get(), kDAzimuth);//,new Constraints(velMax.get(), velAcc.get()));
+        turningPIDController = new PIDController(kPAzimuth.get(), kIAzimuth.get(), kDAzimuth.get());//,new Constraints(velMax.get(), velAcc.get()));
         turningPIDController.setTolerance(4);
         turningPIDController.enableContinuousInput(-180, 180);
         turningPIDController.setIntegratorRange(-0.1,0.1);
         turningPIDController.setP(this.kPAzimuth.get());
         turningPIDController.setI(this.kIAzimuth.get());
-        turningPIDController.setD(this.kDAzimuth);
+        turningPIDController.setD(this.kDAzimuth.get());
         CommandScheduler.getInstance().registerSubsystem(this);
         
     }
@@ -155,64 +145,39 @@ public class SwervePod implements Subsystem{
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+        Logger.processInputs("Drivetrain/Module" + Integer.toString(this.id), inputs);
+        
         double currentDistance = (WHEEL_DIAMETER * Math.PI)  *  inputs.drivePositionRad / (2*Math.PI);
         this.delta = currentDistance - this.lastDistance;
         this.lastDistance = currentDistance;
+
         if(Constants.getMode() == Mode.SIM) {
             double currentDistanceSimNoNoise = (WHEEL_DIAMETER * Math.PI)  *  inputs.drivePositionSimNoNoise / (2*Math.PI);
             this.deltaSimNoNoise = currentDistanceSimNoNoise - this.lastDistanceSimNoNoise; 
             this.lastDistanceSimNoNoise = currentDistanceSimNoNoise;
         }
-        Logger.processInputs("Drive/Module" + Integer.toString(this.id), inputs);
-        if(kPAzimuth.hasChanged(hashCode()) || kIAzimuth.hasChanged(hashCode())) {
+       
+
+        if(kPAzimuth.hasChanged(hashCode()) || kIAzimuth.hasChanged(hashCode()) || kDAzimuth.hasChanged(hashCode())) {
             turningPIDController.setP(kPAzimuth.get());
             turningPIDController.setI(kIAzimuth.get());
+            turningPIDController.setD(kDAzimuth.get());
         }
         
         double turnOutput;
        
         turnOutput = turningPIDController.calculate(inputs.turnAbsolutePositionDegrees, desiredState.angle.getDegrees());
-
-        
-        // reduce output if the error is high
-        
-        
         
         //Logger.recordOutput("Drive/Module" + Integer.toString(this.id) + "", id);
         io.setTurn(MathUtil.clamp(turnOutput, -0.4, 0.4));
-        Logger.recordOutput("Drive/Module" + Integer.toString(this.id) + "/error",turningPIDController.getPositionError());
-        Logger.recordOutput("Drive/Module" + Integer.toString(this.id) + "/deltanonoise",this.deltaSimNoNoise);
+        Logger.recordOutput("Drivetrain/Module" + Integer.toString(this.id) + "/error",turningPIDController.getPositionError());
+        Logger.recordOutput("Drivetrain/Module" + Integer.toString(this.id) + "/deltanonoise",this.deltaSimNoNoise);
         //Logger.recordOutput("Drive/Module" + Integer.toString(this.id) + "/setpoint",turningPIDController.getSetpoint().position);
         double angleErrorPenalty = Math.abs(Math.cos(desiredState.angle.minus(Rotation2d.fromDegrees(inputs.turnAbsolutePositionDegrees)).getRadians()));
         io.setDrive(desiredState.speedMetersPerSecond * angleErrorPenalty);
         // if(velAcc.hasChanged(hashCode()) || velMax.hasChanged(hashCode())){
         //     turningPIDController.setConstraints(new Constraints(velMax.get(),velAcc.get()));
         // }
-    }
-
-    public void setupShuffleboard() {
-        Shuffleboard.getTab(this.idString)
-            .add(idString+"/podAzimuth_setpoint_angle",DrivetrainHardwareMap.AZIMUTH_ABS_ENCODER_OFFSET_POSITION[id])
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", -3.16, "max", 3.16))
-            .withSize(2,1)
-            .withPosition(2,1)
-            .getEntry();
-        Shuffleboard.getTab(this.idString)
-            .add(idString+"/kP_Azimuth", this.kPAzimuth.get())
-            .withSize(1,1)
-            .withPosition(4,1)
-            .getEntry();
-        Shuffleboard.getTab(this.idString)
-            .add(idString+"/kI_Azimuth", this.kIAzimuth)
-            .withSize(1,1)
-            .withPosition(5,1)
-            .getEntry();
-        Shuffleboard.getTab(this.idString)
-            .add(idString+"/kD_Azimuth", this.kDAzimuth)
-            .withSize(1,1)
-            .withPosition(6,1)
-            .getEntry();
     }
 }
 

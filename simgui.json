@@ -32,6 +32,18 @@
   "NetworkTables": {
     "transitory": {
       "AdvantageKit": {
+        "Drivetrain": {
+          "Module0": {
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "TunableNumbers": {
+          "open": true
+        },
         "open": true
       }
     }
