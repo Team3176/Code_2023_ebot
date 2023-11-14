@@ -71,7 +71,12 @@ public class Robot extends LoggedRobot{
       case REAL:
         String folder = Constants.logFolders.get(Constants.getRobot());
         if (folder != null) {
-          Logger.addDataReceiver(new WPILOGWriter(folder));
+          try{
+            Logger.addDataReceiver(new WPILOGWriter(folder));
+          }
+          catch(Error e) {
+            System.out.println("[Error] failed to start local log file");
+          }
         }
         Logger.addDataReceiver(new NT4Publisher());
         if (Constants.getRobot() == RobotType.ROBOT_2023C) {
