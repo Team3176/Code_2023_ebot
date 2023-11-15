@@ -29,8 +29,8 @@ import team3176.robot.Constants.Mode;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
 
 public class PhotonVisionSystem extends SubsystemBase{
-    static double camPitch = Units.degreesToRadians(10); // radians
-    static double camHeightOffGround = 0.8; // meters
+    static double camPitch = Units.degreesToRadians(0); // radians
+    static double camHeightOffGround = 0.25; // meters
     public static final Transform3d camera2Robot = new Transform3d(
         new Translation3d(0.0, 0, camHeightOffGround), new Rotation3d(0, camPitch, 0));
     private PhotonCamera realCam;
@@ -54,7 +54,7 @@ public class PhotonVisionSystem extends SubsystemBase{
         }
         
         if(Constants.getMode() == Mode.SIM) {
-            simInstance = new SimPhotonVision(List.of(realCam),List.of(camera2Robot),field);
+            //simInstance = new SimPhotonVision(List.of(realCam),List.of(camera2Robot),field);
         }
         estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_RIO, realCam, camera2Robot);
     }
@@ -71,7 +71,7 @@ public class PhotonVisionSystem extends SubsystemBase{
             field.setOrigin(OriginPosition.kRedAllianceWallRightSide);
         }
         if(Constants.getMode() == Mode.SIM) {
-            simInstance.switchAllaince(field);
+            //simInstance.switchAllaince(field);
         }
         estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_RIO, realCam, camera2Robot);
     }

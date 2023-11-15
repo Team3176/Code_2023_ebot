@@ -3,7 +3,13 @@ package team3176.robot.subsystems.superstructure;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -27,16 +33,18 @@ public class Arm extends SubsystemBase {
     public enum States {OPEN_LOOP,CLOSED_LOOP}
     private States currentState = States.OPEN_LOOP;
     private double armSetpointAngleRaw = SuperStructureConstants.ARM_ZERO_POS;
-    private Mechanism2d mech = new Mechanism2d(10,10);
-    private MechanismRoot2d root = mech.getRoot("armRoot", 5, 5);
-    private MechanismLigament2d armSholder = root.append(new MechanismLigament2d("armLigament",2,90));
-    private MechanismLigament2d simSholder = root.append(new MechanismLigament2d("simLigament",3,90,10,new Color8Bit(Color.kAqua)));
-    private MechanismLigament2d armElbow = armSholder.append(new MechanismLigament2d("armELigament",2,90));
+    private Mechanism2d mech = new Mechanism2d(3,3);
+    private MechanismRoot2d root = mech.getRoot("armRoot", 0.0, 0.42);
+    private MechanismLigament2d armSholder = root.append(new MechanismLigament2d("armLigament",.4,90));
+    //private MechanismLigament2d simSholder = root.append(new MechanismLigament2d("simLigament",3,90,10,new Color8Bit(Color.kAqua)));
+    private MechanismLigament2d armElbow = armSholder.append(new MechanismLigament2d("armELigament",0.5,90));
     private Arm(ArmIO io) {
         this.io = io;
         this.turningPIDController = new PIDController(SuperStructureConstants.ARM_kP, SuperStructureConstants.ARM_kI, SuperStructureConstants.ARM_kD);
         SmartDashboard.putNumber("Arm_kp", SuperStructureConstants.ARM_kP);
         SmartDashboard.putNumber("Arm_Kg", SuperStructureConstants.ARM_kg);
+        SmartDashboard.putNumber("arm_angle", 0.0);
+        SmartDashboard.putNumber("arm_height", 1.18);
         setArmPidPosMode();
     }
 
@@ -166,11 +174,23 @@ public class Arm extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.getInstance().processInputs("Arm", inputs);
+        Logger.processInputs("Arm", inputs);
         armSholder.setAngle(Rotation2d.fromDegrees(inputs.Position-SuperStructureConstants.ARM_ZERO_POS-190));
         armElbow.setAngle(Rotation2d.fromDegrees(20 + 100 * (SuperStructureConstants.ARM_HIGH_POS - inputs.Position)/(SuperStructureConstants.ARM_HIGH_POS-SuperStructureConstants.ARM_ZERO_POS)));
-        simSholder.setAngle(Rotation2d.fromDegrees(inputs.Position -90 - SuperStructureConstants.ARM_SIM_OFFSET));
+        //simSholder.setAngle(Rotation2d.fromDegrees(inputs.Position -90 - SuperStructureConstants.ARM_SIM_OFFSET));
         Logger.recordOutput("Arm/mech2d", mech);
+        double angle = SmartDashboard.getNumber("arm_angle", 0.0);
+        double height = SmartDashboard.getNumber("arm_height", 1.18);
+        double angle_for_vis = (-inputs.Position) + 240 + 130;
+        Pose3d shoulder = new Pose3d(0.199155, 0.0, 1.18, new Rotation3d(0.0, Units.degreesToRadians(angle_for_vis-130), 0.0));
+        Pose3d shoulder_offset = new Pose3d(0.199155, 0.0, 1.18, new Rotation3d(0.0, Units.degreesToRadians(angle_for_vis), 0.0));
+        Pose3d elbow = shoulder_offset.transformBy(
+            new Transform3d(
+                new Translation3d(0.5, 0.0, 0.0),
+                new Rotation3d(0.0, Units.degreesToRadians(-((50 + 120 * (SuperStructureConstants.ARM_HIGH_POS - (inputs.Position))/(SuperStructureConstants.ARM_HIGH_POS-SuperStructureConstants.ARM_ZERO_POS))) + 130 + 240 ), 0.0)));
+        //Pose3d elbow = new Pose3d(-0.106, 0.0, 0.779603, new Rotation3d(0.0, Units.degreesToRadians(angle), 0.0));
+        Pose3d[] arm_joints = {shoulder,elbow}; 
+        Logger.recordOutput("Arm/visual",arm_joints);
         //SmartDashboard.putNumber("Arm_Position", armEncoder.getAbsolutePosition());
         //SmartDashboard.putNumber("Arm_Position_Relative", armEncoder.getAbsolutePosition() - SuperStructureConstants.ARM_ZERO_POS);
         if(this.currentState == States.CLOSED_LOOP) {
