@@ -31,6 +31,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import team3176.robot.Constants;
@@ -98,11 +99,6 @@ public class Drivetrain extends SubsystemBase {
   private SwervePod podBR;
 
 
-  NetworkTable vision;
-  NetworkTableEntry visionPose;
-  Pose2d lastPose = new Pose2d();
-  double lastVisionTimeStamp = 0.0;
-  double lastVisionX = 0.0;
   Rotation2d wheelOnlyHeading = new Rotation2d();
   private final GyroIO io;
   private GyroIOInputs inputs;
@@ -172,8 +168,6 @@ public class Drivetrain extends SubsystemBase {
     poseEstimator = new SwerveDrivePoseEstimator(kinematics, getSensorYaw(),
         getSwerveModulePositions(), odom.getPoseMeters());
 
-
-    vision = NetworkTableInstance.getDefault().getTable("limelight");
     
     AutoBuilder.configureHolonomic(
         this::getPose,
@@ -257,6 +251,7 @@ public class Drivetrain extends SubsystemBase {
       double distance2 = Math.pow(distance * 0.5, 2);
       cov = VecBuilder.fill(distance2,distance2,distance2);
     }
+    visionPose3d = p.estimatedPose;
     poseEstimator.addVisionMeasurement(p.estimatedPose.toPose2d(), p.timestampSeconds,cov);
   }
 
@@ -268,9 +263,6 @@ public class Drivetrain extends SubsystemBase {
       simNoNoiseOdom.resetSimPose(pose);
     }
     
-  }
-  public void resetPoseToVision() {
-    this.resetPose(visionPose3d.toPose2d());
   }
   
   /** Returns the module states (turn angles and drive velocitoes) for all of the modules. */
@@ -379,12 +371,29 @@ public class Drivetrain extends SubsystemBase {
       this.driveVelocityFieldCentric(speeds);
     });
   }
+
+  private void resetPoseToVision() {
+    // call resetPose() and pass in visionPose3d
+    // use the .toPose2d() method to convert a 3d pose into a 2d pose
+
+  }
+  //TODO: @Liam 11/27 
+  public Command resetPoseToVisionCommand() {
+    //we want to use a instant command
+    
+    // InstantCommand takes in a function reference either () -> { your code here}
+    // or a reference to an existing function this::function_name
+    // here we want to use the resetPoseToVision function you created earlier
+    // use the this::function_name pattern and construct a new InstantCommand to be returned
+    
+    //Replace with your command
+    return new WaitCommand(1.0);
+  }
   
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Drivetrain/gyro", inputs);
-    lastPose = poseEstimator.getEstimatedPosition();
     SwerveModulePosition[] deltas = new SwerveModulePosition[4];
     
     for(int i=0;i<  pods.size(); i++) {
