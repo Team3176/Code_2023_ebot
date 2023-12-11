@@ -10,17 +10,22 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonUtils;
+import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,8 +34,8 @@ import team3176.robot.Constants.Mode;
 import team3176.robot.subsystems.drivetrain.Drivetrain;
 
 public class PhotonVisionSystem extends SubsystemBase{
-    static double camPitch = Units.degreesToRadians(0); // radians
-    static double camHeightOffGround = 0.25; // meters
+    static double camPitch = Units.degreesToRadians(-20); // radians
+    static double camHeightOffGround = Units.inchesToMeters(8); // meters
     public static final Transform3d camera2Robot = new Transform3d(
         new Translation3d(0.0, 0, camHeightOffGround), new Rotation3d(0, camPitch, 0));
     private PhotonCamera realCam;
@@ -54,7 +59,7 @@ public class PhotonVisionSystem extends SubsystemBase{
         }
         
         if(Constants.getMode() == Mode.SIM) {
-            //simInstance = new SimPhotonVision(List.of(realCam),List.of(camera2Robot),field);
+            simInstance = new SimPhotonVision(List.of(realCam),List.of(camera2Robot),field);
         }
         estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_RIO, realCam, camera2Robot);
     }
@@ -71,7 +76,7 @@ public class PhotonVisionSystem extends SubsystemBase{
             field.setOrigin(OriginPosition.kRedAllianceWallRightSide);
         }
         if(Constants.getMode() == Mode.SIM) {
-            //simInstance.switchAllaince(field);
+            simInstance.switchAllaince(field);
         }
         estimator = new PhotonPoseEstimator(field, PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_RIO, realCam, camera2Robot);
     }
@@ -104,4 +109,33 @@ public class PhotonVisionSystem extends SubsystemBase{
             Logger.recordOutput("photonvision/poseEstimates", new Pose3d[] {});
         }
     }
+    public static SimCameraProperties arducam_720() {
+        var prop = new SimCameraProperties();
+        prop.setCalibration(
+                1280,
+                720,
+                Matrix.mat(Nat.N3(), Nat.N3())
+                        .fill( // intrinsic
+                        879.0720598169321,
+                        0,
+                        604.9212300278572,
+                        0,
+                        879.1507505285007,
+                        389.16742755726875,
+                                0.0,
+                                0.0,
+                                1.0),
+                VecBuilder.fill( // distort
+                -0.05910651726620547,
+                0.04721812350044875,
+                0.0023418721710541947,
+                0.00018013724744152414,
+                0.1608556267669461));
+        prop.setCalibError(0.37, 0.06);
+        prop.setFPS(30);
+        prop.setAvgLatencyMs(40);
+        prop.setLatencyStdDevMs(20);
+        return prop;
+    }
+
 }
