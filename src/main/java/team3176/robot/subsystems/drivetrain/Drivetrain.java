@@ -245,10 +245,10 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput("Drivetrain/distance2target", distance);
     if (p.targetsUsed.size() > 1) {
       //multi tag
-      double distance2 = Math.max(Math.pow(distance * 0.2,2),0.7);
+      double distance2 = Math.max(Math.pow(distance * 0.4,2),0.7);
       cov = VecBuilder.fill(distance2,distance2,0.9);
     } else {
-      double distance2 = Math.pow(distance * 0.5, 2);
+      double distance2 = Math.pow(distance, 2);
       cov = VecBuilder.fill(distance2,distance2,distance2);
     }
     visionPose3d = p.estimatedPose;
