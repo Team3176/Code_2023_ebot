@@ -76,8 +76,8 @@ public class SwervePodIOFalconSpark implements SwervePodIO{
 
     /** Run the turn motor at the specified voltage. */
     @Override
-    public void setTurn(double volts) {
-        turnSparkMax.set(volts);
+    public void setTurn(double percent) {
+        turnSparkMax.set(percent);
     }
 
     /** Enable or disable brake mode on the drive motor. */

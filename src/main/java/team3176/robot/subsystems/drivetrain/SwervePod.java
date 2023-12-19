@@ -42,6 +42,8 @@ public class SwervePod implements Subsystem{
     private LoggedTunableNumber kPAzimuth = new LoggedTunableNumber("kP_azimuth",.007);
     private LoggedTunableNumber kIAzimuth = new LoggedTunableNumber("kI_azimuth",0.0);
     private LoggedTunableNumber kDAzimuth = new LoggedTunableNumber("kD_azimuth",0.0);
+    private LoggedTunableNumber turnMaxpercent = new LoggedTunableNumber("turn_max",0.4);
+    private double turnMaxpercentLocal = 0.4;
     private double lastDistance =0.0;
     private double lastDistanceSimNoNoise =0.0;
     private double delta = 0.0;
@@ -163,13 +165,16 @@ public class SwervePod implements Subsystem{
             turningPIDController.setI(kIAzimuth.get());
             turningPIDController.setD(kDAzimuth.get());
         }
+        if(turnMaxpercent.hasChanged(hashCode())){
+            turnMaxpercentLocal = turnMaxpercent.get();
+        }
         
         double turnOutput;
        
         turnOutput = turningPIDController.calculate(inputs.turnAbsolutePositionDegrees, desiredState.angle.getDegrees());
         
         //Logger.recordOutput("Drive/Module" + Integer.toString(this.id) + "", id);
-        io.setTurn(MathUtil.clamp(turnOutput, -0.4, 0.4));
+        io.setTurn(MathUtil.clamp(turnOutput, -turnMaxpercentLocal, turnMaxpercentLocal));
         Logger.recordOutput("Drivetrain/Module" + Integer.toString(this.id) + "/error",turningPIDController.getPositionError());
         Logger.recordOutput("Drivetrain/Module" + Integer.toString(this.id) + "/deltanonoise",this.deltaSimNoNoise);
         //Logger.recordOutput("Drive/Module" + Integer.toString(this.id) + "/setpoint",turningPIDController.getSetpoint().position);
