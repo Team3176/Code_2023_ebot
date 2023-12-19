@@ -40,8 +40,8 @@ public class SwervePodIOFalconSpark implements SwervePodIO{
         thrustFalcon.config_kD(0, 0.0);
         thrustFalcon.config_kF(0, 0.045);
         
-        turnSparkMax.setOpenLoopRampRate(0.5);
-        turnSparkMax.setSmartCurrentLimit(20);
+        //turnSparkMax.setOpenLoopRampRate(0.0);
+        turnSparkMax.setSmartCurrentLimit(25);
         turnSparkMax.setInverted(true);
 
         azimuthEncoder = new CANCoder(id.CANCODER_CID);
