@@ -119,7 +119,7 @@ public class RobotContainer {
                                     .onFalse(superstructure.prepareCarry());
     controller.transStick.button(4).whileTrue(superstructure.prepareScoreHigh())
                                           .onFalse((superstructure.prepareCarry()));
-    //controller.transStick.button(5).onTrue(new InstantCommand(drivetrain::resetPoseToVision,drivetrain));
+    controller.transStick.button(5).onTrue(drivetrain.resetPoseToVisionCommand());
     controller.transStick.button(10).whileTrue(new InstantCommand(drivetrain::setBrakeMode).andThen(drivetrain.swerveDefenseCommand()).withName("swerveDefense"));
     //m_Controller.getTransStick_Button10()
     //    .onFalse(new InstantCommand(() -> m_Drivetrain.setDriveMode(driveMode.DRIVE), m_Drivetrain));

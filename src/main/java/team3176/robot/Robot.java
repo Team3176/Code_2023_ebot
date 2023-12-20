@@ -71,7 +71,7 @@ public class Robot extends LoggedRobot{
         String folder = Constants.logFolders.get(Constants.getRobot());
         if (folder != null) {
           try{
-            //Logger.addDataReceiver(new WPILOGWriter(folder));
+            Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs/"));
           }
           catch(Error e) {
             System.out.println("[Error] failed to start local log file");

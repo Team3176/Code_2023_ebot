@@ -39,10 +39,10 @@ public class SwervePod implements Subsystem{
     //private double kAzimuthEncoderUnitsPerRevolution;
 
     //private double kP_Azimuth;
-    private LoggedTunableNumber kPAzimuth = new LoggedTunableNumber("kP_azimuth",.007);
+    private LoggedTunableNumber kPAzimuth = new LoggedTunableNumber("kP_azimuth",.012);
     private LoggedTunableNumber kIAzimuth = new LoggedTunableNumber("kI_azimuth",0.0);
-    private LoggedTunableNumber kDAzimuth = new LoggedTunableNumber("kD_azimuth",0.0);
-    private LoggedTunableNumber turnMaxpercent = new LoggedTunableNumber("turn_max",0.4);
+    private LoggedTunableNumber kDAzimuth = new LoggedTunableNumber("kD_azimuth",0.0003);
+    private LoggedTunableNumber turnMaxpercent = new LoggedTunableNumber("turn_max",0.75);
     private double turnMaxpercentLocal = 0.4;
     private double lastDistance =0.0;
     private double lastDistanceSimNoNoise =0.0;
@@ -69,7 +69,7 @@ public class SwervePod implements Subsystem{
         velAcc.initDefault(900);
 
         turningPIDController = new PIDController(kPAzimuth.get(), kIAzimuth.get(), kDAzimuth.get());//,new Constraints(velMax.get(), velAcc.get()));
-        turningPIDController.setTolerance(4);
+        turningPIDController.setTolerance(3);
         turningPIDController.enableContinuousInput(-180, 180);
         turningPIDController.setIntegratorRange(-0.1,0.1);
         turningPIDController.setP(this.kPAzimuth.get());

@@ -36,9 +36,9 @@ import team3176.robot.subsystems.drivetrain.Drivetrain;
 
 public class PhotonVisionSystem extends SubsystemBase{
     static double camPitch = Units.degreesToRadians(-20); // radians
-    static double camHeightOffGround = Units.inchesToMeters(8); // meters
+    static double camHeightOffGround = Units.inchesToMeters(7); // meters
     public static final Transform3d camera2Robot = new Transform3d(
-        new Translation3d(0.0, 0, camHeightOffGround), new Rotation3d(0, camPitch, 0));
+        new Translation3d(Units.inchesToMeters(19), 0, camHeightOffGround), new Rotation3d(0, camPitch, 0));
     private PhotonCamera realCam;
     AprilTagFieldLayout field;
     PhotonPoseEstimator estimator;

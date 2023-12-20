@@ -290,6 +290,7 @@ public class Drivetrain extends SubsystemBase {
    * 
    * @return Rotation2d of the yaw
    */
+  @AutoLogOutput
   protected Rotation2d getSensorYaw() {
     if(Constants.getMode() == Mode.SIM) {
       if(this.odom == null || this.poseEstimator == null) {
@@ -326,9 +327,9 @@ public class Drivetrain extends SubsystemBase {
     // coordsys!
     //this.FieldAngleOffset = m_NavX.getRotation2d();
     Rotation2d redOrBlueZero = new Rotation2d();
-    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-      redOrBlueZero.plus(Rotation2d.fromDegrees(180));
-    }
+    // if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+    //   redOrBlueZero.plus(Rotation2d.fromDegrees(180));
+    // }
     resetPose(new Pose2d(getPose().getTranslation(),redOrBlueZero));
   }
 
@@ -374,6 +375,7 @@ public class Drivetrain extends SubsystemBase {
 
   private void resetPoseToVision() {
     // call resetPose() and pass in visionPose3d
+    resetPose(visionPose3d.toPose2d());
     // use the .toPose2d() method to convert a 3d pose into a 2d pose
 
   }
@@ -387,7 +389,7 @@ public class Drivetrain extends SubsystemBase {
     // use the this::function_name pattern and construct a new InstantCommand to be returned
     
     //Replace with your command
-    return new WaitCommand(1.0);
+    return new InstantCommand(this::resetPoseToVision);
   }
   
   @Override
